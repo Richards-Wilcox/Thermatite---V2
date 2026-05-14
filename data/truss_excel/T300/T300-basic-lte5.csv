@@ -1,0 +1,330 @@
+batch,model,widthLoIn,widthHiIn,styleCount,styles
+range1,T300,,,0,
+range1,T300,0,122,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range1,T300,0,127,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range1,T300,127,131,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range1,T300,131,138,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range1,T300,138,140,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range1,T300,140,145,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range1,T300,145,148,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range1,T300,148,149,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range1,T300,149,151,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range1,T300,151,152,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range1,T300,152,156,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range1,T300,156,157,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range1,T300,157,161,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range1,T300,161,162,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range1,T300,162,164,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range1,T300,164,166,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range1,T300,166,168,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range1,T300,168,169,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range1,T300,169,173,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range1,T300,173,174,0,
+range1,T300,,,0,
+range1,T300,0,122,0,
+range1,T300,0,127,0,
+range1,T300,127,131,0,
+range1,T300,131,138,0,
+range1,T300,138,140,0,
+range1,T300,140,145,0,
+range1,T300,145,148,0,
+range1,T300,148,149,0,
+range1,T300,149,151,0,
+range1,T300,151,152,0,
+range1,T300,152,156,0,
+range1,T300,156,157,0,
+range1,T300,157,161,0,
+range1,T300,161,162,0,
+range1,T300,162,164,0,
+range1,T300,164,166,0,
+range1,T300,166,168,0,
+range1,T300,168,169,0,
+range1,T300,169,173,0,
+range1,T300,173,174,0,
+range2,T300,174,176,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range2,T300,176,181,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range2,T300,181,182,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range2,T300,182,184,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range2,T300,184,185,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range2,T300,185,186,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range2,T300,186,187,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range2,T300,187,188,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range2,T300,188,190,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range2,T300,190,191,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range2,T300,191,193,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range2,T300,193,194,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range2,T300,194,197,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range2,T300,197,198,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range2,T300,198,200,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range2,T300,200,202,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range2,T300,202,204,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range2,T300,204,205,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range2,T300,205,209,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range2,T300,209,210,0,
+range2,T300,174,176,0,
+range2,T300,176,181,0,
+range2,T300,181,182,0,
+range2,T300,182,184,0,
+range2,T300,184,185,0,
+range2,T300,185,186,0,
+range2,T300,186,187,0,
+range2,T300,187,188,0,
+range2,T300,188,190,0,
+range2,T300,190,191,0,
+range2,T300,191,193,0,
+range2,T300,193,194,0,
+range2,T300,194,197,0,
+range2,T300,197,198,0,
+range2,T300,198,200,0,
+range2,T300,200,202,0,
+range2,T300,202,204,0,
+range2,T300,204,205,0,
+range2,T300,205,209,0,
+range2,T300,209,210,0,
+range3,T300,210,211,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range3,T300,211,212,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range3,T300,212,213,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range3,T300,213,214,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range3,T300,214,216,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range3,T300,216,217,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range3,T300,217,218,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range3,T300,218,220,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range3,T300,220,221,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range3,T300,221,222,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range3,T300,222,223,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range3,T300,223,224,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range3,T300,224,227,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range3,T300,227,228,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range3,T300,228,229,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range3,T300,229,230,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range3,T300,230,232,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range3,T300,232,233,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range3,T300,233,234,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range3,T300,234,235,0,
+range3,T300,210,211,0,
+range3,T300,211,212,0,
+range3,T300,212,213,0,
+range3,T300,213,214,0,
+range3,T300,214,216,0,
+range3,T300,216,217,0,
+range3,T300,217,218,0,
+range3,T300,218,220,0,
+range3,T300,220,221,0,
+range3,T300,221,222,0,
+range3,T300,222,223,0,
+range3,T300,223,224,0,
+range3,T300,224,227,0,
+range3,T300,227,228,0,
+range3,T300,228,229,0,
+range3,T300,229,230,0,
+range3,T300,230,232,0,
+range3,T300,232,233,0,
+range3,T300,233,234,0,
+range3,T300,234,235,0,
+range4,T300,,,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range4,T300,235,236,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range4,T300,236,237,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range4,T300,237,238,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range4,T300,238,239,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range4,T300,239,240,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range4,T300,240,241,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range4,T300,241,244,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range4,T300,244,245,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range4,T300,245,246,9,T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range4,T300,246,248,9,T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range4,T300,248,250,9,T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range4,T300,250,252,9,T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range4,T300,252,253,9,T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range4,T300,253,254,9,T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range4,T300,254,255,9,T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range4,T300,255,256,9,T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range4,T300,256,257,9,T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range4,T300,257,258,9,T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range4,T300,258,259,9,T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range4,T300,259,261,0,
+range4,T300,235,236,0,
+range4,T300,236,237,0,
+range4,T300,237,238,0,
+range4,T300,238,239,0,
+range4,T300,239,240,0,
+range4,T300,240,241,0,
+range4,T300,241,244,0,
+range4,T300,244,245,0,
+range4,T300,245,246,0,
+range4,T300,246,248,0,
+range4,T300,248,250,0,
+range4,T300,250,252,0,
+range4,T300,252,253,0,
+range4,T300,253,254,0,
+range4,T300,254,255,0,
+range4,T300,255,256,0,
+range4,T300,256,257,0,
+range4,T300,257,258,0,
+range4,T300,258,259,0,
+range4,T300,259,261,0,
+range5,T300,261,262,9,T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range5,T300,262,263,8,T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range5,T300,263,264,8,T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range5,T300,264,265,8,T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range5,T300,265,266,8,T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range5,T300,266,268,8,T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range5,T300,268,269,8,T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range5,T300,269,270,7,T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range5,T300,270,271,7,T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range5,T300,271,272,6,T2.5x18EverySection | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range5,T300,272,275,6,T2.5x18EverySection | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range5,T300,275,276,6,T2.5x18EverySection | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range5,T300,276,277,6,T2.5x18EverySection | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range5,T300,277,278,6,T2.5x18EverySection | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range5,T300,278,280,6,T2.5x18EverySection | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range5,T300,280,281,6,T2.5x18EverySection | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range5,T300,281,282,5,T2.5x18EverySection | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range5,T300,282,283,4,T2.5x18EverySection | T3.625x18EverySection | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range5,T300,283,286,3,T3.625x18EverySection | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range5,T300,286,287,0,
+range5,T300,261,262,0,
+range5,T300,262,263,0,
+range5,T300,263,264,0,
+range5,T300,264,265,0,
+range5,T300,265,266,0,
+range5,T300,266,268,0,
+range5,T300,268,269,0,
+range5,T300,269,270,0,
+range5,T300,270,271,0,
+range5,T300,271,272,0,
+range5,T300,272,275,0,
+range5,T300,275,276,0,
+range5,T300,276,277,0,
+range5,T300,277,278,0,
+range5,T300,278,280,0,
+range5,T300,280,281,0,
+range5,T300,281,282,0,
+range5,T300,282,283,0,
+range5,T300,283,286,0,
+range5,T300,286,287,0,
+range6,T300,288,289,3,T3.625x18EverySection | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range6,T300,287,288,3,T3.625x18EverySection | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range6,T300,289,290,3,T3.625x18EverySection | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range6,T300,290,294,3,T3.625x18EverySection | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range6,T300,294,295,3,T3.625x18EverySection | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range6,T300,295,296,3,T3.625x18EverySection | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range6,T300,296,299,3,T3.625x18EverySection | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range6,T300,299,300,2,T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range6,T300,300,301,2,T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection
+range6,T300,301,302,1,T4.0x16EverySection
+range6,T300,302,304,1,T4.0x16EverySection
+range6,T300,304,305,1,T4.0x16EverySection
+range6,T300,305,306,1,HatTruss
+range6,T300,306,307,1,HatTruss
+range6,T300,307,308,1,HatTruss
+range6,T300,308,310,1,HatTruss
+range6,T300,310,312,1,HatTruss
+range6,T300,312,313,1,HatTruss
+range6,T300,313,314,1,HatTruss
+range6,T300,314,316,0,
+range6,T300,288,289,0,
+range6,T300,287,288,0,
+range6,T300,289,290,0,
+range6,T300,290,294,0,
+range6,T300,294,295,0,
+range6,T300,295,296,0,
+range6,T300,296,299,0,
+range6,T300,299,300,0,
+range6,T300,300,301,0,
+range6,T300,301,302,0,
+range6,T300,302,304,0,
+range6,T300,304,305,0,
+range6,T300,305,306,0,
+range6,T300,306,307,0,
+range6,T300,307,308,0,
+range6,T300,308,310,0,
+range6,T300,310,312,0,
+range6,T300,312,313,0,
+range6,T300,313,314,0,
+range6,T300,314,316,0,
+range7,T300,316,322,1,HatTruss
+range7,T300,322,323,1,HatTruss
+range7,T300,323,324,1,HatTruss
+range7,T300,324,325,1,HatTruss
+range7,T300,325,329,1,HatTruss
+range7,T300,329,330,1,HatTruss
+range7,T300,330,331,1,HatTruss
+range7,T300,331,332,1,HatTruss
+range7,T300,332,333,1,HatTruss
+range7,T300,333,334,1,HatTruss
+range7,T300,334,335,1,HatTruss
+range7,T300,335,338,1,HatTruss
+range7,T300,338,340,1,HatTruss
+range7,T300,340,341,1,HatTruss
+range7,T300,341,342,1,HatTruss
+range7,T300,342,346,1,HatTruss
+range7,T300,346,347,1,HatTruss
+range7,T300,347,348,1,HatTruss
+range7,T300,348,349,1,HatTruss
+range7,T300,349,350,0,
+range7,T300,316,322,0,
+range7,T300,322,323,0,
+range7,T300,323,324,0,
+range7,T300,324,325,0,
+range7,T300,325,329,0,
+range7,T300,329,330,0,
+range7,T300,330,331,0,
+range7,T300,331,332,0,
+range7,T300,332,333,0,
+range7,T300,333,334,0,
+range7,T300,334,335,0,
+range7,T300,335,338,0,
+range7,T300,338,340,0,
+range7,T300,340,341,0,
+range7,T300,341,342,0,
+range7,T300,342,346,0,
+range7,T300,346,347,0,
+range7,T300,347,348,0,
+range7,T300,348,349,0,
+range7,T300,349,350,0,
+range8,T300,350,351,1,HatTruss
+range8,T300,351,352,1,HatTruss
+range8,T300,352,355,1,HatTruss
+range8,T300,355,360,1,HatTruss
+range8,T300,360,361,1,HatTruss
+range8,T300,361,362,1,HatTruss_UbarTruss
+range8,T300,362,363,1,HatTruss_UbarTruss
+range8,T300,363,364,1,HatTruss_UbarTruss
+range8,T300,364,368,1,HatTruss_UbarTruss
+range8,T300,368,369,1,HatTruss_UbarTruss
+range8,T300,369,370,1,HatTruss_UbarTruss
+range8,T300,370,374,1,HatTruss_UbarTruss
+range8,T300,374,376,1,HatTruss_UbarTruss
+range8,T300,376,386,1,HatTruss_UbarTruss
+range8,T300,386,390,1,HatTruss_UbarTruss
+range8,T300,390,400,1,HatTruss_UbarTruss
+range8,T300,400,403,1,HatTruss_UbarTruss
+range8,T300,403,405,1,EXCEEDS_CAPACITY
+range8,T300,405,408,1,EXCEEDS_CAPACITY
+range8,T300,408,409,0,
+range8,T300,350,351,0,
+range8,T300,351,352,0,
+range8,T300,352,355,0,
+range8,T300,355,360,0,
+range8,T300,360,361,0,
+range8,T300,361,362,0,
+range8,T300,362,363,0,
+range8,T300,363,364,0,
+range8,T300,364,368,0,
+range8,T300,368,369,0,
+range8,T300,369,370,0,
+range8,T300,370,374,0,
+range8,T300,374,376,0,
+range8,T300,376,386,0,
+range8,T300,386,390,0,
+range8,T300,390,400,0,
+range8,T300,400,403,0,
+range8,T300,403,405,0,
+range8,T300,405,408,0,
+range8,T300,408,409,0,
+range9,T300,409,410,1,EXCEEDS_CAPACITY
+range9,T300,410,422,1,EXCEEDS_CAPACITY
+range9,T300,422,432,1,EXCEEDS_CAPACITY
+range9,T300,432,462,1,EXCEEDS_CAPACITY
+range9,T300,462,479,1,EXCEEDS_CAPACITY
+range9,T300,479,482,11,None | T2.5x18Top | T2.5x18TopBtmLTE5SEC | T2.5x18TopBtmEvery2ndGT5SEC | T2.5x18EverySection | T3.625x18TopBtmLTE5SEC | T3.625x18TopBtmEvery2ndGT5SEC | T3.625x18EverySection | T4.0x16TopBtmLTE5SEC | T4.0x16TopBtmEvery2ndGT5EC | T4.0x16EverySection

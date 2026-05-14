@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(awk -F',' 'NR>1 && $5 !~ /Driver/ && $5 != \"NONE\" && $5 != \"\" && $2 == \"\" && $6 != \"0\" {key=$6\"|\"$7; if \\(key != prev\\) {print $3\" \"$4\" count=\"$6\" styles=\"substr\\($7,1,80\\); prev=key}}' \"c:/Users/samir/load_html/truss_excel/T300-basic-lte5.csv\")"
+    ]
+  }
+}
