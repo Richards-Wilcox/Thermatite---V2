@@ -379,7 +379,7 @@ function loadForm() {
      SECTION: SECTION_OPTIONS — placeholder, to be filled with section-level controls.
      Tab is rendered automatically by the framework from the title attribute.
      ============================================================ -->
-<section face="true" hardware="true" enabled="true" id="SECTION_OPTIONS" title="Options & Accessories"
+<section face="true" hardware="true" enabled="true" id="SECTION_OPTIONS" title="Advanced"
   class="rw-configurator__page">
 
   <!-- [SO-BOTTOM-SEAL] -->
