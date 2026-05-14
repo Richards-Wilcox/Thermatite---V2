@@ -881,11 +881,17 @@ div.radio-layout{
 		  cursor: not-allowed;
 		  pointer-events: none;
 		}
-		.rw-sliding-button.disabled label {
+		.rw-sliding-button.disabled:not(.selected) label {
 		  opacity: 0.35;
 		}
 
 	}
+}
+
+/* Faded look for selects showing a non-applicable placeholder (e.g. Bottom Seal "None"). */
+select.is-placeholder {
+  color: #999;
+  opacity: 0.7;
 }
 
 
@@ -1896,7 +1902,7 @@ option--disabled {
    wraps each tab in a div.radio-layout with id="tab_N" matching the section's index.
    #section_select uses justify-content: space-evenly, which would leave wide gaps when
    a tab is removed — collapse the missing tab visually rather than hiding it via display:none. */
-.face-only #tab_3 {
+.face-only #tab_1 {
     visibility: hidden !important;
     width: 0 !important;
     min-width: 0 !important;

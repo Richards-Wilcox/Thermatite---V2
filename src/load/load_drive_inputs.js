@@ -558,13 +558,31 @@ function loadDrivenInputEvents() {
   $(document).on("change", "input[name='OnePointLatch']", applyBarLatchOnePointConstraint);
   applyBarLatchOnePointConstraint();
 
-  // [BOTTOM-SEAL-LOGIC] Show Bottom Seal only when retainer includes a seal.
+  // [BOTTOM-SEAL-LOGIC] Bottom Seal row stays visible so the user sees it exists.
+  // When the retainer has no seal slot, swap the options for a single "None" entry.
   const RETAINER_HAS_SEAL = ["steel", "pvc"];
+  const BOTTOM_SEAL_OPTIONS = [
+    { value: "pvc_4_35c",        label: '4" PVC Bottom Seal (-35C)' },
+    { value: "santoprene_3_60c", label: '3" Santoprene Bottom Seal (-60C)' },
+  ];
+  const DEFAULT_BOTTOM_SEAL = BOTTOM_SEAL_OPTIONS[0].value;
   function applyBottomSealConstraint() {
-    const hasSeal = RETAINER_HAS_SEAL.includes($("#BOTTOM_RETAINER").val());
-    $("#BOTTOM_SEAL_ROW").toggle(hasSeal);
-    if (!hasSeal) $("#BOTTOM_SEAL").val("pvc_4_35c");
+    const $sel = $("#BOTTOM_SEAL");
+    if (!$sel.length) return;
+    const nextState = RETAINER_HAS_SEAL.includes($("#BOTTOM_RETAINER").val()) ? "seal" : "none";
+    if ($sel.attr("data-seal-state") === nextState) return;
+    $sel.attr("data-seal-state", nextState);
+    if (nextState === "seal") {
+      $sel[0].innerHTML = BOTTOM_SEAL_OPTIONS.map(o => `<option value="${o.value}">${o.label}</option>`).join("");
+      $sel.val(DEFAULT_BOTTOM_SEAL).prop("disabled", false).removeClass("is-placeholder");
+    } else {
+      $sel[0].innerHTML = `<option value="none">None</option>`;
+      $sel.val("none").prop("disabled", true).addClass("is-placeholder");
+    }
   }
   $(document).on("change", "#BOTTOM_RETAINER", applyBottomSealConstraint);
   applyBottomSealConstraint();
+  // Re-run after host framework finishes hydrating selects.
+  setTimeout(applyBottomSealConstraint, 0);
+  setTimeout(applyBottomSealConstraint, 250);
 }

@@ -228,30 +228,30 @@ function loadForm() {
     </div>
 
 <!-- [DIMENSIONS-PRESET] preset door sizes -->
-<div style="text-align:left" class="config-option-title-style">Dimensions</div>
+<div style="text-align:left" class="config-option-title-style">Finished Door Sizes</div>
 <div class="dimension-layout">
 	<div class="rw-button" tabindex="0">
-	<label for="DIMENSIONS_0">10'2x10</label>
+	<label for="DIMENSIONS_0">10'2x10'0</label>
 	<input type="radio" style="display:none;"  id="DIMENSIONS_0"  name="SIZE" value="0" width="10" widthInches="2" height="10" checked>
 	</div>
 	<div class="rw-button" tabindex="0">
-	<label for="DIMENSIONS_1">14'2x14</label>
+	<label for="DIMENSIONS_1">14'2x14'0</label>
 	<input type="radio" style="display:none;"  id="DIMENSIONS_1" name="SIZE" value="1" width="14" widthInches="2" height="14" >
 	</div>
 	<div class="rw-button" tabindex="0">
-	<label for="DIMENSIONS_2">12'2x12</label>
+	<label for="DIMENSIONS_2">12'2x12'0</label>
 	<input type="radio" style="display:none;"   id="DIMENSIONS_2" name="SIZE" value="2" width="12" widthInches="2" height="12" >
 	</div>
 	<div class="rw-button" tabindex="0">
-	<label for="DIMENSIONS_3">12'2x14</label>
+	<label for="DIMENSIONS_3">12'2x14'0</label>
 	<input type="radio" style="display:none;"   id="DIMENSIONS_3"  name="SIZE" value="3" width="12" widthInches="2" height="14" >
 	</div>
   <div class="rw-button" tabindex="0">
-	<label for="DIMENSIONS_4">8'2x10</label>
+	<label for="DIMENSIONS_4">8'2x10'0</label>
 	<input type="radio" style="display:none;"   id="DIMENSIONS_4"  name="SIZE" value="4" width="8" widthInches="2" height="10" >
 	</div>
   <div class="rw-button" tabindex="0">
-	<label for="DIMENSIONS_5">12x12</label>
+	<label for="DIMENSIONS_5">12'0x12'0</label>
 	<input type="radio" style="display:none;"   id="DIMENSIONS_5"  name="SIZE" value="5" width="12" widthInches="0" height="12" >
 	</div>
 	</div>
@@ -357,7 +357,7 @@ function loadForm() {
 	</div>
 
   <!-- [DM-TOP-WEATHER-SEAL] -->
-  <div style="text-align:left" class="config-option-title-style">Top Weather Seal</div>
+  <div style="text-align:left" class="config-option-title-style">Jamb Seal</div>
   <select id="TOP_WEATHER_SEAL" name="TopWeatherSeal" style="width:fit-content; padding:5px 8px; border:1px solid black; border-radius:6px;">
     <option value="none" selected>None</option>
     <option value="1pc_dual_durometer_1.5_1.75">1 PC top (dual durometer) 1.5"/1.75"</option>
@@ -375,6 +375,376 @@ function loadForm() {
   </select>
      </section>
 
+    <!-- ============================================================
+         SECTION: HARDWARE — track / lift / jamb / shaft hardware
+         ============================================================ -->
+    <section face="false" hardware="true" enabled="true" id="HARDWARE" title="Hardware"
+      class="rw-configurator__page hardware-container-box">
+	<div class="hardware-container-inputs">
+      <!-- [HARDWARE-SIZES] 2 or 3. Hidden when Door Options = Door Face Only. -->
+      <div id="hardware_size_section">
+        <div style="text-align:left" class="config-option-title-style">Hardware Sizes</div>
+        <div class="combined-button-container">
+          <div class="combined-button-container-inner">
+            <div class="rw-sliding-button selected" tabindex="0" id="HARDWARE_SIZE_0_BTN">
+              <label for="HARDWARE_SIZE_0">2</label>
+              <input type="radio" style="display:none;" id="HARDWARE_SIZE_0" name="HARDWARE_SIZE" value="2" checked>
+            </div>
+            <div class="rw-sliding-button" tabindex="0" id="HARDWARE_SIZE_1_BTN">
+              <label for="HARDWARE_SIZE_1">3</label>
+              <input type="radio" style="display:none;" id="HARDWARE_SIZE_1" name="HARDWARE_SIZE" value="3">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- [LIFT-TYPE] standard lift, low headroom, high lift, etc. -->
+      <div class="horizontal-inputs inputs-container-padding-highlift">
+        <div class="hardware-container-lift-type-inner">
+          <div style="text-align:left" class="config-option-title-style">Lift Type</div>
+          <select id="LIFT_TYPE" name="LIFT_TYPE" style="width:fit-content; padding:5px 8px; border:1px solid black; border-radius:6px;">
+            <option value="Std_Lift_12R" selected display="Standard 12R" classification="S" ic_code="H" sb_desc="12\"
+              SL" numVal="1.0" radius="12" trackCode="12R" hwdesc="12R">
+              Standard Lift - Radius(12 inch/305 mm)
+            </option>
+            <option value="Std_Lift_15R" display="Standard 15R" classification="S" ic_code="H" sb_desc="15\" SL"
+              numVal="1.0" radius="15" trackCode="15R" hwdesc="15R">
+              Standard Lift - Radius(15 inch/381 mm)
+            </option>
+            <option id="LIFT_TYPE_32R" maxheight="96" edges="HEIGHT" value="Std_Lift_32R" classification="S"
+              display="Standard 32R" ic_code="H" sb_desc="32\" SL" numVal="1.0" radius="32" trackCode="32R"
+              hwdesc="32R">
+              Standard Lift - Radius(32 inch/813 mm)
+            </option>
+            <option value="LHR_Fr_Mnt" classification="F" display="Low Head Room Front" ic_code="T" sb_desc="LHF"
+              numVal="1.0" trackCode="LHF" radius="7" hwdesc="LHF">
+              Front Mount (Low Head Room)
+            </option>
+            <option value="LHR_Rr_Mnt" classification="R" display="Low Head Room Rear" ic_code="X" sb_desc="LHR"
+              numVal="1.0" trackCode="LHR" radius="7" hwdesc="LHR">
+              Rear Mount (Low Head Room)
+            </option>
+            <option id="LIFT_TYPE_HL" maxheight="120" edges="HEIGHT" value="High_Lift" classification="H"
+              display="High Lift" ic_code="?" sb_desc="HL" numVal="2.0" trackCode="" radius="0" hwdesc="HL">High Lift
+            </option>
+          </select>
+        </div>
+	   <!-- [HIGHLIFT] inches (shown only when LIFT_TYPE === HL, see load_drive_inputs.js) -->
+	   <label id="HIGHLIFT_LABEL" for="HIGHLIFT" style="display:none">Highlift (in)</label>
+      <select id="HIGHLIFT" name="HIGHLIFT" style="display:none; width:fit-content; padding:5px 8px; border:1px solid black; border-radius:6px;">
+        <option value=15 selected>15</option>
+        <option value=16 selected>16</option>
+        <option value=17 selected>17</option>
+        <option value=18>18</option>
+        <option value=19>19</option>
+        <option value=20>20</option>
+        <option value=21>21</option>
+        <option value=22>22</option>
+        <option value=23>23</option>
+        <option value=24>24</option>
+        <option value=25>25</option>
+        <option value=26>26</option>
+        <option value=27>27</option>
+        <option value=28>28</option>
+        <option value=29>29</option>
+        <option value=30>30</option>
+        <option value=31>31</option>
+        <option value=32>32</option>
+        <option value=33>33</option>
+        <option value=34>34</option>
+        <option value=35>35</option>
+        <option value=36>36</option>
+        <option value=37>37</option>
+        <option value=38>38</option>
+        <option value=39>39</option>
+        <option value=40>40</option>
+        <option value=41>41</option>
+        <option value=42>42</option>
+        <option value=43>43</option>
+        <option value=44>44</option>
+        <option value=45>45</option>
+        <option value=46>46</option>
+        <option value=47>47</option>
+        <option value=48>48</option>
+        <option value=49>49</option>
+        <option value=50>50</option>
+        <option value=51>51</option>
+        <option value=52>52</option>
+        <option value=53>53</option>
+        <option value=54>54</option>
+
+      </select>
+
+      </div>
+
+
+      <!-- [TRACK-MOUNT] hidden by default -->
+      <div class="horizontal-inputs" style="display:none">
+        <div>
+          <label for="TRK_MOUNT_TYP">Track Mount</label>
+
+
+          <select id="TRK_MOUNT_TYP" name="TRK_MOUNT_TYP" style="width:fit-content; padding:5px 8px; border:1px solid black; border-radius:6px;">
+
+            <option value="B" hwset="BM">Bracket Mount</option>
+          </select>
+        </div>
+
+      </div>
+
+
+      <!-- [JAMB] hidden — wood jamb fixed value -->
+      <select id="JAMB" name="JAMB" style="display:none;">
+        <!--<option value="steel" hwset="SJ">Steel</option>-->
+        <option value="wood" hwset="WJ">Wood</option>
+        <!--<option value="masonry" hwset="MJ">Masonry</option>-->
+      </select>
+
+      <!-- [JAMB-SEAL] seal type + colour + screw packages -->
+      <div class="horizontal-inputs jamb-seal-inputs">
+        <div>
+          <div style="text-align:left" class="config-option-title-style">Jamb Seal</div>
+          <select id="JAMB_SEAL" name="JAMB_SEAL" style="width:fit-content; padding:5px 8px; border:1px solid black; border-radius:6px;">
+            <option value="DUALA">Aluminium - Dual Fin</option>
+            <option value="NONE">None</option>
+            <option value="SINGLE">PVC - Single Fin</option>
+            <option value="DUAL">PVC - Dual Fin</option>
+            <option value="DUALS"> Steel - Dual Fin</option>
+          </select>
+        </div>
+	   <div class="jamb-seal-design">
+		<div>
+		  <div style="text-align:left" class="config-option-title-style">Colour</div>
+		  <select id="JAMB_SEAL_COLOR" name="JAMB_SEAL_COLOR" style="width:fit-content; padding:5px 8px; border:1px solid black; border-radius:6px;">
+		    <option value="W" jambscrews="215-302W-050">White</option>
+		    <option value="T" jambscrews="215-302T-050">SandStone</option>
+		    <option value="A" jambscrews="215-302A-050">Almond</option>
+		    <option value="C" jambscrews="215-302C-050">Slate Grey</option>
+		    <option value="Z" jambscrews="215-302Z-050">Bronze</option>
+		    <option value="K" jambscrews="215-302K-050" selected="selected">Black</option>
+		    <option value="B" jambscrews="215-302B-050">Brown</option>
+		    <option value="F" jambscrews="215-302F-050">Cafe</option>
+		    <option value="E" jambscrews="215-302E-050">Desert Tan</option>
+		    <option value="V" jambscrews="215-302C-050">Iron Ore</option>
+		    <option value="NONE">None</option>
+		  </select>
+		</div>
+		<div>
+		  <div style="text-align:left" class="config-option-title-style">Screw Packages</div>
+		  <select id="JAMB_SEAL_SCREW_PACKAGES" name="JAMB_SEAL_SCREW_PACKAGES" style="width:fit-content; padding:5px 8px; border:1px solid black; border-radius:6px;">
+		    <option value="0">0</option>
+		    <option value="1">1</option>
+		    <option value="2">2</option>
+		    <option value="3">3</option>
+		    <option value="4">4</option>
+
+		  </select>
+		</div>
+	   </div>
+
+      </div>
+	<!--
+      <label for="EXTRA_TRUSS">Extra Truss?</label>
+      <select id="EXTRA_TRUSS" maxwidth="180" name="EXTRA_TRUSS" class="rw-configurator__select">
+        <option value="no">No</option>
+        <option value="yes">Yes</option>
+
+      </select>
+	-->
+      <!-- [HANGER-ANGLE] hanger angle option + qty -->
+      <div class="horizontal-inputs inputs-container-padding">
+        <div>
+          <div style="text-align:left" class="config-option-title-style">Hanger Angle</div>
+          <select id="HANGER_ANGLE" name="HANGER_ANGLE" style="width:fit-content; padding:5px 8px; border:1px solid black; border-radius:6px;">
+            <option value="None">None</option>
+            <option value="950-254">10' - 16 ga. 1.25" X 1.25" Hole/Hole</option>
+            <option value="950-253">10' - 14 ga. 1.25" X 1.25" Hole/Hole</option>
+            <option value="950-252">10' - 12 ga. 1.25" X 1.25" Hole/Hole</option>
+            <option value="950-255">10' - 11 ga. 1.5" X 1.5" Hole/Slot</option>
+            <option value="950-256">10' - 12 ga. 2" X 2" Hole/Hole</option>
+          </select>
+        </div>
+        <div>
+          <div style="text-align:left" class="config-option-title-style">Qty</div>
+          <select id="HANGER_ANGLE_QTY" name="HANGER_ANGLE_QTY" style="width:fit-content; padding:5px 8px; border:1px solid black; border-radius:6px;">
+            <option value=0>0</option>
+            <option value=1>1</option>
+            <option value=2>2</option>
+            <option value=3>3</option>
+            <option value=4>4</option>
+            <option value=5>5</option>
+            <option value=6>6</option>
+            <option value=7>7</option>
+            <option value=8>8</option>
+            <option value=9>9</option>
+            <option value=10>10</option>
+          </select>
+        </div>
+      </div>
+	<!-- [EXTRA-TRUSS] yes/no -->
+	<div class="inputs-container-padding">
+	<div style="text-align:left" class="config-option-title-style">Extra Truss</div>
+      <select id="EXTRA_TRUSS" name="EXTRA_TRUSS" style="width:fit-content; padding:5px 8px; border:1px solid black; border-radius:6px;">
+        <option value="yes"  >Yes</option>
+        <option value="no" selected>No</option>
+      </select>
+	</div>
+	<!-- [SHAFT-TYPE] tube vs keyed tube -->
+	<div class="inputs-container-padding">
+      <div style="text-align:left" class="config-option-title-style">Shaft Type</div>
+      <select id="SHAFT_TYPE" name="SHAFT_TYPE" style="width:fit-content; padding:5px 8px; border:1px solid black; border-radius:6px;">
+        <option id="SHAFT_TUBE" value="T" maxweight="400" display="Tube Shaft" selected>Tube Shaft</option>
+        <option value="K" maxweight="750" display="Keyed Tube Shaft">Keyed Tube Shaft</option>
+      </select>
+	</div>
+
+	<!-- [OPERATION] how the door is operated -->
+	<div id="operation_section">
+	  <div style="text-align:left" class="config-option-title-style">Operation</div>
+	    <div class="dimension-layout">
+		 <div class="rw-button" tabindex="0">
+		 <label for="OPERATION_0">Manual</label>
+		 <input type="radio" style="display:none;"  id="OPERATION_0"  name="Operation" value="0" checked>
+		 </div>
+		 <div class="rw-button" tabindex="0">
+		 <label for="OPERATION_1">Prepare for Drawbar</label>
+		 <input type="radio" style="display:none;"  id="OPERATION_1" name="Operation" value="1">
+		 </div>
+		 <div class="rw-button" tabindex="0">
+		 <label for="OPERATION_2">Prepare for Jack Shaft</label>
+		 <input type="radio" style="display:none;"   id="OPERATION_2" name="Operation" value="2">
+		 </div>
+		 <div class="rw-button" tabindex="0">
+		 <label for="OPERATION_3">DC Pulse</label>
+		 <input type="radio" style="display:none;"  id="OPERATION_3" name="Operation" value="3">
+		 </div>
+		 <div class="rw-button" tabindex="0">
+		 <label for="OPERATION_4">Chain Hoist</label>
+		 <input type="radio" style="display:none;"   id="OPERATION_4" name="Operation" value="4">
+		 </div>
+	    </div>
+	</div>
+
+     <!-- [MANUAL-TYPE] pull cord / chain options. Hidden by default; syncManualTypeVisibility() shows it only when Operation === "0" (Manual). -->
+     <div id="manual_type_section" style="display:none;">
+	  <div style="text-align:left" class="config-option-title-style">Manual Type</div>
+	    <div class="dimension-layout">
+		 <div class="rw-button" tabindex="0">
+		 <label for="MANUALTYPE_0">None</label>
+		 <input type="radio" style="display:none;"  id="MANUALTYPE_0"  name="ManualType" value="0" checked>
+		 </div>
+		 <div class="rw-button" tabindex="0">
+		 <label for="MANUALTYPE_1">Pull Cord Package</label>
+		 <input type="radio" style="display:none;"  id="MANUALTYPE_1" name="ManualType" value="1">
+		 </div>
+		 <div class="rw-button" tabindex="0">
+		 <label for="MANUALTYPE_2">Pull Chain Package Without Spring</label>
+		 <input type="radio" style="display:none;"   id="MANUALTYPE_2" name="ManualType" value="2">
+		 </div>
+		 <div class="rw-button" tabindex="0">
+		 <label for="MANUALTYPE_3">Pull Chain Package with Spring</label>
+		 <input type="radio" style="display:none;"  id="MANUALTYPE_3" name="ManualType" value="3">
+		 </div>
+	  </div>
+	</div>
+
+	<!-- [CHAIN-HOIST-TYPE] shown only when Operation === "4" (Chain Hoist). Hidden by default; syncChainHoistTypeVisibility() reveals it. -->
+	<div id="chain_hoist_type_section" style="display:none;">
+	  <div style="text-align:left" class="config-option-title-style">Chain Hoist Type</div>
+	  <div class="dimension-layout">
+		 <div class="rw-button" tabindex="0">
+		 <label for="CHAINHOISTTYPE_0">2000</label>
+		 <input type="radio" style="display:none;" id="CHAINHOISTTYPE_0" name="ChainHoistType" value="2000" checked>
+		 </div>
+		 <div class="rw-button" tabindex="0">
+		 <label for="CHAINHOISTTYPE_1">By Others</label>
+		 <input type="radio" style="display:none;" id="CHAINHOISTTYPE_1" name="ChainHoistType" value="by_others">
+		 </div>
+		 <div class="rw-button" tabindex="0">
+		 <label for="CHAINHOISTTYPE_2">JR</label>
+		 <input type="radio" style="display:none;" id="CHAINHOISTTYPE_2" name="ChainHoistType" value="JR">
+		 </div>
+		 <div class="rw-button" tabindex="0">
+		 <label for="CHAINHOISTTYPE_3">JRG</label>
+		 <input type="radio" style="display:none;" id="CHAINHOISTTYPE_3" name="ChainHoistType" value="JRG">
+		 </div>
+	  </div>
+	</div>
+
+	<!-- [OVERLAP-REQUIRED] yes/no selector. -->
+	<div id="overlap_required_section">
+	<div style="text-align:left" class="config-option-title-style">Is Overlap Required</div>
+	<div class="combined-button-container">
+	  <div class="combined-button-container-inner">
+	    <div class="rw-sliding-button" tabindex="0">
+	      <label for="OVERLAP_REQUIRED_0">Yes</label>
+	      <input type="radio" style="display:none;" id="OVERLAP_REQUIRED_0" name="OverlapRequired" value="yes">
+	    </div>
+	    <div class="rw-sliding-button selected" tabindex="0">
+	      <label for="OVERLAP_REQUIRED_1">No</label>
+	      <input type="radio" style="display:none;" id="OVERLAP_REQUIRED_1" name="OverlapRequired" value="no" checked>
+	    </div>
+	  </div>
+	</div>
+	<div id="OVERLAP_NOTE" style="display:none; font-size:12px; color:#555; margin-top:4px; font-style:italic;">If Yes is selected, the door will be 2&quot; wider than normal width.</div>
+	</div>
+	</div>
+    </section>
+
+<!-- ============================================================
+     SECTION: GLAZING — windows + glass options
+     (note: this section reuses id="DIMENSIONS", which is a quirk in the source)
+     ============================================================ -->
+<section id="DIMENSIONS" title="Glazing" class="rw-configurator__page" enabled="true" face="true" hardware="true">
+	<!-- [GLAZING-WINDOWS] None / Slim 40" -->
+	<div style="text-align: left;" class="config-option-title-style">Glazing</div>
+	<div>
+		<div class="combined-button-container">
+		  <div class="combined-button-container-inner">
+			<div class="rw-sliding-button" tabindex="0">
+			  <label for="WINDOWS_0">None</label>
+			  <input type="radio" style="display:none;" id="WINDOWS_0"  name="WINDOWS" value="none" desc="None" checked>
+			</div>
+			<div class="rw-sliding-button"  tabindex="0">
+			  <label for="WINDOWS_1">Slim 40"</label>
+			  <input type="radio" style="display:none;" id="WINDOWS_1" name="WINDOWS" desc="Slim 40" value="slim_40" >
+			  </div>
+			</div>
+		  </div>
+		</div>
+	<!-- [GLAZING-COLOUR] glass tint -->
+	<div id="GLAZING_OPTIONS" style="margin-top:8px;display:flex;flex-direction:column;row-gap:5px;width:100%;">
+	<div style="text-align: left;" class="config-option-title-style">Glazing Colour</div>
+	<div style="display:flex;justify-content:flex-start; flex-wrap: wrap; row-gap: 3px;">
+<div class="rw-button" tabindex="0">
+	<label for="GLAZING_TYPE_0">Clear</label>
+	<input type="radio" style="display:none;" id="GLAZING_TYPE_0"  name="GLAZING_TYPE" desc="Clear" value="clear" checked>
+	</div>
+<div class="rw-button" tabindex="0">
+	<label for="GLAZING_TYPE_1">Satin</label>
+	<input type="radio" style="display:none;" id="GLAZING_TYPE_1" name="GLAZING_TYPE" desc="Satin" value="black_satin" >
+	</div>
+<div class="rw-button" tabindex="0">
+	<label for="GLAZING_TYPE_2">Dark Tint</label>
+	<input type="radio" style="display:none;" id="GLAZING_TYPE_2"  name="GLAZING_TYPE" desc="Dark Tint" value="tinted_grey" >
+	</div>
+	</div>
+	<!-- [GLAZING-TEMPERED] untempered / tempered glass -->
+	<div style="text-align: left;" class="config-option-title-style">Glazing Type</div>
+	<div class="combined-button-container">
+		<div class="combined-button-container-inner">
+		 <div class="rw-sliding-button" tabindex="0">
+		   <label for="TEMPERED_0">Untempered</label>
+		   <input type="radio" style="display:none;" id="TEMPERED_0"  name="TEMPERED" desc="Untempered" value="untempered" checked>
+		 </div>
+		 <div class="rw-sliding-button" tabindex="0">
+		   <label for="TEMPERED_1">Tempered</label>
+		   <input type="radio" style="display:none;" id="TEMPERED_1" name="TEMPERED" desc="Tempered" value="tempered" >
+		 </div>
+		</div>
+	</div>
+	</div>
+     </section>
 <!-- ============================================================
      SECTION: SECTION_OPTIONS — placeholder, to be filled with section-level controls.
      Tab is rendered automatically by the framework from the title attribute.
@@ -385,9 +755,8 @@ function loadForm() {
   <!-- [SO-BOTTOM-SEAL] -->
   <div id="BOTTOM_SEAL_ROW">
     <div style="text-align:left" class="config-option-title-style">Bottom Seal</div>
-    <select id="BOTTOM_SEAL" name="BottomSeal" style="width:fit-content; padding:5px 8px; border:1px solid black; border-radius:6px;">
-      <option value="pvc_4_35c" selected>4" PVC Bottom Seal (-35C)</option>
-      <option value="santoprene_3_60c">3" Santoprene Bottom Seal (-60C)</option>
+    <select id="BOTTOM_SEAL" name="BottomSeal" style="width:fit-content; min-width:180px; padding:5px 8px; border:1px solid black; border-radius:6px;">
+      <option value="none" disabled selected>None</option>
     </select>
   </div>
 
@@ -600,378 +969,6 @@ function loadForm() {
   </div>
 </section>
 
-<!-- ============================================================
-     SECTION: GLAZING — windows + glass options
-     (note: this section reuses id="DIMENSIONS", which is a quirk in the source)
-     ============================================================ -->
-<section id="DIMENSIONS" title="Glazing" class="rw-configurator__page" enabled="true" face="true" hardware="true">
-	<!-- [GLAZING-WINDOWS] None / Slim 40" -->
-	<div style="text-align: left;" class="config-option-title-style">Glazing</div>
-	<div>
-		<div class="combined-button-container">
-		  <div class="combined-button-container-inner">
-			<div class="rw-sliding-button" tabindex="0">
-			  <label for="WINDOWS_0">None</label>
-			  <input type="radio" style="display:none;" id="WINDOWS_0"  name="WINDOWS" value="none" desc="None" checked>
-			</div>
-			<div class="rw-sliding-button"  tabindex="0">
-			  <label for="WINDOWS_1">Slim 40"</label>
-			  <input type="radio" style="display:none;" id="WINDOWS_1" name="WINDOWS" desc="Slim 40" value="slim_40" >
-			  </div>
-			</div>
-		  </div>
-		</div>
-	<!-- [GLAZING-COLOUR] glass tint -->
-	<div id="GLAZING_OPTIONS" style="margin-top:8px;display:flex;flex-direction:column;row-gap:5px;width:100%;">
-	<div style="text-align: left;" class="config-option-title-style">Glazing Colour</div>
-	<div style="display:flex;justify-content:flex-start; flex-wrap: wrap; row-gap: 3px;">
-<div class="rw-button" tabindex="0">
-	<label for="GLAZING_TYPE_0">Clear</label>
-	<input type="radio" style="display:none;" id="GLAZING_TYPE_0"  name="GLAZING_TYPE" desc="Clear" value="clear" checked>
-	</div>
-<div class="rw-button" tabindex="0">
-	<label for="GLAZING_TYPE_1">Satin</label>
-	<input type="radio" style="display:none;" id="GLAZING_TYPE_1" name="GLAZING_TYPE" desc="Satin" value="black_satin" >
-	</div>
-<div class="rw-button" tabindex="0">
-	<label for="GLAZING_TYPE_2">Dark Tint</label>
-	<input type="radio" style="display:none;" id="GLAZING_TYPE_2"  name="GLAZING_TYPE" desc="Dark Tint" value="tinted_grey" >
-	</div>
-	</div>
-	<!-- [GLAZING-TEMPERED] untempered / tempered glass -->
-	<div style="text-align: left;" class="config-option-title-style">Glazing Type</div>
-	<div class="combined-button-container">
-		<div class="combined-button-container-inner">
-		 <div class="rw-sliding-button" tabindex="0">
-		   <label for="TEMPERED_0">Untempered</label>
-		   <input type="radio" style="display:none;" id="TEMPERED_0"  name="TEMPERED" desc="Untempered" value="untempered" checked>
-		 </div>
-		 <div class="rw-sliding-button" tabindex="0">
-		   <label for="TEMPERED_1">Tempered</label>
-		   <input type="radio" style="display:none;" id="TEMPERED_1" name="TEMPERED" desc="Tempered" value="tempered" >
-		 </div>
-		</div>
-	</div>
-	</div>
-     </section>
-
-
-    <!-- ============================================================
-         SECTION: HARDWARE — track / lift / jamb / shaft hardware
-         ============================================================ -->
-    <section face="false" hardware="true" enabled="true" id="HARDWARE" title="Hardware"
-      class="rw-configurator__page hardware-container-box">
-	<div class="config-title-style hardware-title-style">Hardware</div>
-	<div class="hardware-container-inputs">
-      <!-- [HARDWARE-SIZES] 2 or 3. Hidden when Door Options = Door Face Only. -->
-      <div id="hardware_size_section">
-        <div style="text-align:left" class="config-option-label-style config-option-label-padding">Hardware Sizes</div>
-        <div class="combined-button-container">
-          <div class="combined-button-container-inner">
-            <div class="rw-sliding-button selected" tabindex="0" id="HARDWARE_SIZE_0_BTN">
-              <label for="HARDWARE_SIZE_0">2</label>
-              <input type="radio" style="display:none;" id="HARDWARE_SIZE_0" name="HARDWARE_SIZE" value="2" checked>
-            </div>
-            <div class="rw-sliding-button" tabindex="0" id="HARDWARE_SIZE_1_BTN">
-              <label for="HARDWARE_SIZE_1">3</label>
-              <input type="radio" style="display:none;" id="HARDWARE_SIZE_1" name="HARDWARE_SIZE" value="3">
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- [LIFT-TYPE] standard lift, low headroom, high lift, etc. -->
-      <div class="horizontal-inputs inputs-container-padding-highlift">
-        <div class="hardware-container-lift-type-inner">
-          <h3 for="LIFT_TYPE" class="config-option-label-style config-option-label-padding">Lift Type</h3>
-          <select id="LIFT_TYPE" name="LIFT_TYPE">
-            <option value="Std_Lift_12R" selected display="Standard 12R" classification="S" ic_code="H" sb_desc="12\"
-              SL" numVal="1.0" radius="12" trackCode="12R" hwdesc="12R">
-              Standard Lift - Radius(12 inch/305 mm)
-            </option>
-            <option value="Std_Lift_15R" display="Standard 15R" classification="S" ic_code="H" sb_desc="15\" SL"
-              numVal="1.0" radius="15" trackCode="15R" hwdesc="15R">
-              Standard Lift - Radius(15 inch/381 mm)
-            </option>
-            <option id="LIFT_TYPE_32R" maxheight="96" edges="HEIGHT" value="Std_Lift_32R" classification="S"
-              display="Standard 32R" ic_code="H" sb_desc="32\" SL" numVal="1.0" radius="32" trackCode="32R"
-              hwdesc="32R">
-              Standard Lift - Radius(32 inch/813 mm)
-            </option>
-            <option value="LHR_Fr_Mnt" classification="F" display="Low Head Room Front" ic_code="T" sb_desc="LHF"
-              numVal="1.0" trackCode="LHF" radius="7" hwdesc="LHF">
-              Front Mount (Low Head Room)
-            </option>
-            <option value="LHR_Rr_Mnt" classification="R" display="Low Head Room Rear" ic_code="X" sb_desc="LHR"
-              numVal="1.0" trackCode="LHR" radius="7" hwdesc="LHR">
-              Rear Mount (Low Head Room)
-            </option>
-            <option id="LIFT_TYPE_HL" maxheight="120" edges="HEIGHT" value="High_Lift" classification="H"
-              display="High Lift" ic_code="?" sb_desc="HL" numVal="2.0" trackCode="" radius="0" hwdesc="HL">High Lift
-            </option>
-          </select>
-        </div>
-	   <!-- [HIGHLIFT] inches (shown only when LIFT_TYPE === HL, see load_drive_inputs.js) -->
-	   <label id="HIGHLIFT_LABEL" for="HIGHLIFT" style="display:none">Highlift (in)</label>
-      <select id="HIGHLIFT" name="HIGHLIFT" style="display:none">
-        <option value=15 selected>15</option>
-        <option value=16 selected>16</option>
-        <option value=17 selected>17</option>
-        <option value=18>18</option>
-        <option value=19>19</option>
-        <option value=20>20</option>
-        <option value=21>21</option>
-        <option value=22>22</option>
-        <option value=23>23</option>
-        <option value=24>24</option>
-        <option value=25>25</option>
-        <option value=26>26</option>
-        <option value=27>27</option>
-        <option value=28>28</option>
-        <option value=29>29</option>
-        <option value=30>30</option>
-        <option value=31>31</option>
-        <option value=32>32</option>
-        <option value=33>33</option>
-        <option value=34>34</option>
-        <option value=35>35</option>
-        <option value=36>36</option>
-        <option value=37>37</option>
-        <option value=38>38</option>
-        <option value=39>39</option>
-        <option value=40>40</option>
-        <option value=41>41</option>
-        <option value=42>42</option>
-        <option value=43>43</option>
-        <option value=44>44</option>
-        <option value=45>45</option>
-        <option value=46>46</option>
-        <option value=47>47</option>
-        <option value=48>48</option>
-        <option value=49>49</option>
-        <option value=50>50</option>
-        <option value=51>51</option>
-        <option value=52>52</option>
-        <option value=53>53</option>
-        <option value=54>54</option>
-
-      </select>
-
-      </div>
-
-
-      <!-- [TRACK-MOUNT] hidden by default -->
-      <div class="horizontal-inputs" style="display:none">
-        <div>
-          <label for="TRK_MOUNT_TYP">Track Mount</label>
-
-
-          <select id="TRK_MOUNT_TYP" name="TRK_MOUNT_TYP">
-
-            <option value="B" hwset="BM">Bracket Mount</option>
-          </select>
-        </div>
-
-      </div>
-
-
-      <!-- [JAMB] hidden — wood jamb fixed value -->
-      <select id="JAMB" name="JAMB" style="display:none;">
-        <!--<option value="steel" hwset="SJ">Steel</option>-->
-        <option value="wood" hwset="WJ">Wood</option>
-        <!--<option value="masonry" hwset="MJ">Masonry</option>-->
-      </select>
-
-      <!-- [JAMB-SEAL] seal type + colour + screw packages -->
-      <div class="horizontal-inputs jamb-seal-inputs">
-        <div>
-          <h3 for="JAMB_SEAL" class="config-option-label-style config-option-label-padding">Jamb Seal </h3>
-          <select id="JAMB_SEAL" name="JAMB_SEAL">
-            <option value="DUALA">Aluminium - Dual Fin</option>
-            <option value="NONE">None</option>
-            <option value="SINGLE">PVC - Single Fin</option>
-            <option value="DUAL">PVC - Dual Fin</option>
-            <option value="DUALS"> Steel - Dual Fin</option>
-          </select>
-        </div>
-	   <div class="jamb-seal-design">
-		<div>
-		  <h3 for="JAMB_SEAL_COLOR" class="config-option-label-style config-option-label-padding">Colour</h3>
-		  <select id="JAMB_SEAL_COLOR" name="JAMB_SEAL_COLOR">
-		    <option value="W" jambscrews="215-302W-050">White</option>
-		    <option value="T" jambscrews="215-302T-050">SandStone</option>
-		    <option value="A" jambscrews="215-302A-050">Almond</option>
-		    <option value="C" jambscrews="215-302C-050">Slate Grey</option>
-		    <option value="Z" jambscrews="215-302Z-050">Bronze</option>
-		    <option value="K" jambscrews="215-302K-050" selected="selected">Black</option>
-		    <option value="B" jambscrews="215-302B-050">Brown</option>
-		    <option value="F" jambscrews="215-302F-050">Cafe</option>
-		    <option value="E" jambscrews="215-302E-050">Desert Tan</option>
-		    <option value="V" jambscrews="215-302C-050">Iron Ore</option>
-		    <option value="NONE">None</option>
-		  </select>
-		</div>
-		<div>
-		  <h3 for="JAMB_SEAL_SCREW_PACKAGES" class="config-option-label-style config-option-label-padding">Screw Packages</h3>
-		  <select id="JAMB_SEAL_SCREW_PACKAGES" name="JAMB_SEAL_SCREW_PACKAGES">
-		    <option value="0">0</option>
-		    <option value="1">1</option>
-		    <option value="2">2</option>
-		    <option value="3">3</option>
-		    <option value="4">4</option>
-
-		  </select>
-		</div>
-	   </div>
-
-      </div>
-	<!--
-      <label for="EXTRA_TRUSS">Extra Truss?</label>
-      <select id="EXTRA_TRUSS" maxwidth="180" name="EXTRA_TRUSS" class="rw-configurator__select">
-        <option value="no">No</option>
-        <option value="yes">Yes</option>
-
-      </select>
-	-->
-      <!-- [HANGER-ANGLE] hanger angle option + qty -->
-      <div class="horizontal-inputs inputs-container-padding">
-        <div>
-          <h3 for="HANGER_ANGLE" class="config-option-label-style config-option-label-padding">Hanger Angle</h3>
-          <select id="HANGER_ANGLE" name="HANGER_ANGLE">
-            <option value="None">None</option>
-            <option value="950-254">10' - 16 ga. 1.25" X 1.25" Hole/Hole</option>
-            <option value="950-253">10' - 14 ga. 1.25" X 1.25" Hole/Hole</option>
-            <option value="950-252">10' - 12 ga. 1.25" X 1.25" Hole/Hole</option>
-            <option value="950-255">10' - 11 ga. 1.5" X 1.5" Hole/Slot</option>
-            <option value="950-256">10' - 12 ga. 2" X 2" Hole/Hole</option>
-          </select>
-        </div>
-        <div>
-          <h3 for="HANGER_ANGLE_QTY" class="config-option-label-style config-option-label-padding">Qty</h3>
-          <select id="HANGER_ANGLE_QTY" name="HANGER_ANGLE_QTY">
-            <option value=0>0</option>
-            <option value=1>1</option>
-            <option value=2>2</option>
-            <option value=3>3</option>
-            <option value=4>4</option>
-            <option value=5>5</option>
-            <option value=6>6</option>
-            <option value=7>7</option>
-            <option value=8>8</option>
-            <option value=9>9</option>
-            <option value=10>10</option>
-          </select>
-        </div>
-      </div>
-	<!-- [EXTRA-TRUSS] yes/no -->
-	<div class="inputs-container-padding">
-	<h3 for="EXTRA_TRUSS" class="config-option-label-style config-option-label-padding">Extra Truss</h3>
-      <select id="EXTRA_TRUSS" name="EXTRA_TRUSS">
-        <option value="yes"  >Yes</option>
-        <option value="no" selected>No</option>
-      </select>
-	</div>
-	<!-- [SHAFT-TYPE] tube vs keyed tube -->
-	<div class="inputs-container-padding">
-      <h3 for="SHAFT_TYPE" class="config-option-label-style config-option-label-padding">Shaft Type</h3>
-      <select id="SHAFT_TYPE" name="SHAFT_TYPE">
-        <option id="SHAFT_TUBE" value="T" maxweight="400" display="Tube Shaft" selected>Tube Shaft</option>
-        <option value="K" maxweight="750" display="Keyed Tube Shaft">Keyed Tube Shaft</option>
-      </select>
-	</div>
-
-	<!-- [OPERATION] how the door is operated -->
-	<div id="operation_section">
-	  <div style="text-align:left" class="config-option-title-style">Operation</div>
-	    <div class="dimension-layout">
-		 <div class="rw-button" tabindex="0">
-		 <label for="OPERATION_0">Manual</label>
-		 <input type="radio" style="display:none;"  id="OPERATION_0"  name="Operation" value="0" checked>
-		 </div>
-		 <div class="rw-button" tabindex="0">
-		 <label for="OPERATION_1">Prepare for Drawbar</label>
-		 <input type="radio" style="display:none;"  id="OPERATION_1" name="Operation" value="1">
-		 </div>
-		 <div class="rw-button" tabindex="0">
-		 <label for="OPERATION_2">Prepare for Jack Shaft</label>
-		 <input type="radio" style="display:none;"   id="OPERATION_2" name="Operation" value="2">
-		 </div>
-		 <div class="rw-button" tabindex="0">
-		 <label for="OPERATION_3">DC Pulse</label>
-		 <input type="radio" style="display:none;"  id="OPERATION_3" name="Operation" value="3">
-		 </div>
-		 <div class="rw-button" tabindex="0">
-		 <label for="OPERATION_4">Chain Hoist</label>
-		 <input type="radio" style="display:none;"   id="OPERATION_4" name="Operation" value="4">
-		 </div>
-	    </div>
-	</div>
-
-     <!-- [MANUAL-TYPE] pull cord / chain options. Hidden by default; syncManualTypeVisibility() shows it only when Operation === "0" (Manual). -->
-     <div id="manual_type_section" style="display:none;">
-	  <div style="text-align:left" class="config-option-title-style">Manual Type</div>
-	    <div class="dimension-layout">
-		 <div class="rw-button" tabindex="0">
-		 <label for="MANUALTYPE_0">None</label>
-		 <input type="radio" style="display:none;"  id="MANUALTYPE_0"  name="ManualType" value="0" checked>
-		 </div>
-		 <div class="rw-button" tabindex="0">
-		 <label for="MANUALTYPE_1">Pull Cord Package</label>
-		 <input type="radio" style="display:none;"  id="MANUALTYPE_1" name="ManualType" value="1">
-		 </div>
-		 <div class="rw-button" tabindex="0">
-		 <label for="MANUALTYPE_2">Pull Chain Package Without Spring</label>
-		 <input type="radio" style="display:none;"   id="MANUALTYPE_2" name="ManualType" value="2">
-		 </div>
-		 <div class="rw-button" tabindex="0">
-		 <label for="MANUALTYPE_3">Pull Chain Package with Spring</label>
-		 <input type="radio" style="display:none;"  id="MANUALTYPE_3" name="ManualType" value="3">
-		 </div>
-	  </div>
-	</div>
-
-	<!-- [CHAIN-HOIST-TYPE] shown only when Operation === "4" (Chain Hoist). Hidden by default; syncChainHoistTypeVisibility() reveals it. -->
-	<div id="chain_hoist_type_section" style="display:none;">
-	  <div style="text-align:left" class="config-option-title-style">Chain Hoist Type</div>
-	  <div class="dimension-layout">
-		 <div class="rw-button" tabindex="0">
-		 <label for="CHAINHOISTTYPE_0">2000</label>
-		 <input type="radio" style="display:none;" id="CHAINHOISTTYPE_0" name="ChainHoistType" value="2000" checked>
-		 </div>
-		 <div class="rw-button" tabindex="0">
-		 <label for="CHAINHOISTTYPE_1">By Others</label>
-		 <input type="radio" style="display:none;" id="CHAINHOISTTYPE_1" name="ChainHoistType" value="by_others">
-		 </div>
-		 <div class="rw-button" tabindex="0">
-		 <label for="CHAINHOISTTYPE_2">JR</label>
-		 <input type="radio" style="display:none;" id="CHAINHOISTTYPE_2" name="ChainHoistType" value="JR">
-		 </div>
-		 <div class="rw-button" tabindex="0">
-		 <label for="CHAINHOISTTYPE_3">JRG</label>
-		 <input type="radio" style="display:none;" id="CHAINHOISTTYPE_3" name="ChainHoistType" value="JRG">
-		 </div>
-	  </div>
-	</div>
-
-	<!-- [OVERLAP-REQUIRED] yes/no selector. -->
-	<div id="overlap_required_section">
-	<div style="text-align:left" class="config-option-title-style">Is Overlap Required</div>
-	<div class="combined-button-container">
-	  <div class="combined-button-container-inner">
-	    <div class="rw-sliding-button" tabindex="0">
-	      <label for="OVERLAP_REQUIRED_0">Yes</label>
-	      <input type="radio" style="display:none;" id="OVERLAP_REQUIRED_0" name="OverlapRequired" value="yes">
-	    </div>
-	    <div class="rw-sliding-button selected" tabindex="0">
-	      <label for="OVERLAP_REQUIRED_1">No</label>
-	      <input type="radio" style="display:none;" id="OVERLAP_REQUIRED_1" name="OverlapRequired" value="no" checked>
-	    </div>
-	  </div>
-	</div>
-	<div id="OVERLAP_NOTE" style="display:none; font-size:12px; color:#555; margin-top:4px; font-style:italic;">If Yes is selected, the door will be 2&quot; wider than normal width.</div>
-	</div>
-	</div>
-    </section>
     <!-- ============================================================
          SECTION: OPERATOR_OPTIONS — opener selection + accessories
          ============================================================ -->
@@ -1693,11 +1690,11 @@ function syncHardwareVisibility() {
     // Toggle .face-only class on #configurator so CSS can hide the Hardware tab.
     $("#configurator").toggleClass("face-only", faceOnly);
     // Disable the Hardware tab radio so it can't be selected programmatically/keyboard.
-    $("input[name='section_select'][value='3']").prop("disabled", faceOnly);
+    $("input[name='section_select'][value='1']").prop("disabled", faceOnly);
     if (faceOnly) {
         $("#operation_section, #manual_type_section, #chain_hoist_type_section").hide();
         // If the user is currently on the Hardware tab, jump them to Door Model.
-        if ($("input[name='section_select']:checked").val() === "3") {
+        if ($("input[name='section_select']:checked").val() === "1") {
             $("input[name='section_select'][value='0']").prop("checked", true).trigger("change");
         }
     } else {
@@ -1712,10 +1709,10 @@ syncHardwareVisibility();
 setTimeout(syncHardwareVisibility, 200);
 setTimeout(syncHardwareVisibility, 1000);
 
-// The Hardware tab wrapper (div#tab_3) has an inline onclick="showSection(3)" that bypasses
+// The Hardware tab wrapper (div#tab_1) has an inline onclick="showSection(1)" that bypasses
 // disabled radios and event listeners. Strip/restore the inline handler around face-only.
 function syncHardwareTabInlineClick() {
-    const tab = document.getElementById("tab_3");
+    const tab = document.getElementById("tab_1");
     if (!tab) return;
     const faceOnly = $("#configurator").hasClass("face-only");
     if (faceOnly) {
