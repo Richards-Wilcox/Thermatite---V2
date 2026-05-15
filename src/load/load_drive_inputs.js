@@ -423,45 +423,7 @@ function loadDrivenInputEvents() {
     _widthConstraintRunning = false;
   });
 
-  // [LIFT-TYPE-LOGIC]
-  addLogic("LIFT_TYPE", function () {
-    let selectedHardware = nodeset["HARDWARE_SET"]?.value;
-    let SelectedSpring = nodeset["SPRINGTYPE"]?.value;
-    let SelectedInclinedTrack = nodeset["INCLINEDTRACK"]?.value;
-    if (!selectedHardware) { this.value = $(`input[type="radio"][name="LIFT_TYPE"]:checked`).val(); return; }
-    $(".lift-option").hide();
-
-    const liftMapTorsion = {
-      "A": ["STD12", "STD15", "LHF", "LHROUT", "HL"],
-      "Y": ["STD12", "STD15", "32R", "LHF", "LHROUT", "HL"],
-    };
-
-    const liftMapExtension = {
-      "A": [""],
-      "Y": ["STD12", "STD15", "LHREXT"],
-    };
-
-    let selectedMap =
-      (SelectedSpring === "EXTENSION" || SelectedSpring === "EXT") ?
-        liftMapExtension :
-        liftMapTorsion;
-
-    let showList = [];
-
-    if (selectedHardware === "C") {
-      showList = SelectedInclinedTrack === "N"
-        ? ["STD12", "STD15", "LHF", "LHROUT", "HL", "VL", "LHR_VL"]
-        : ["STD12", "STD15", "HL", "LHR_VL"];
-    } else {
-      showList = selectedMap[selectedHardware] || [];
-    }
-
-    showList.forEach(id => {
-      $("#opt-" + id).show();
-    });
-
-    this.value = $(`input[type="radio"][name="LIFT_TYPE"]:checked`).val()
-  }, ["HARDWARE_SET", "SPRINGTYPE", "INCLINEDTRACK"])
+  // [LIFT-TYPE-LOGIC] LIFT_TYPE is a plain <select>; framework binds value natively. No addLogic needed.
 
   // [12GA-HINGES-LOGIC] Double End Caps forces 12 Gauge Hinges to Yes and disables No button.
   function apply12GaHingesConstraint() {

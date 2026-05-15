@@ -477,12 +477,10 @@ function loadForm() {
         <div class="hardware-container-lift-type-inner">
           <div style="text-align:left" class="config-option-title-style">Lift Type</div>
           <select id="LIFT_TYPE" name="LIFT_TYPE" class="long-select" style="padding:5px 8px; border:1px solid black; border-radius:6px;">
-            <option value="Std_Lift_12R" selected display="Standard 12R" classification="S" ic_code="H" sb_desc="12\"
-              SL" numVal="1.0" radius="12" trackCode="12R" hwdesc="12R">
+            <option value="Std_Lift_12R" selected display="Standard 12R" classification="S" ic_code="H" sb_desc="12&quot; SL" numVal="1.0" radius="12" trackCode="12R" hwdesc="12R">
               Standard Lift - Radius(12 inch/305 mm)
             </option>
-            <option value="Std_Lift_16R" display="Standard 16R" classification="S" ic_code="H" sb_desc="16\" SL"
-              numVal="1.0" radius="16" trackCode="16R" hwdesc="16R">
+            <option value="Std_Lift_16R" display="Standard 16R" classification="S" ic_code="H" sb_desc="16&quot; SL" numVal="1.0" radius="16" trackCode="16R" hwdesc="16R">
               Standard Lift - Radius(16 inch/406 mm)
             </option>
             <option value="LHR_Fr_Mnt" classification="F" display="Low Head Room Front" ic_code="T" sb_desc="LHF"
@@ -553,8 +551,8 @@ function loadForm() {
       </div>
 
 
-      <!-- [TRACK-MOUNT] (Mount + Seal) + [LOWER-SPLICE] + [INCLINED-TRACK] -->
-      <div class="horizontal-inputs" style="display:flex; gap:16px; flex-wrap:wrap;">
+      <!-- [TRACK-MOUNT] + [JAMB] -->
+      <div class="horizontal-inputs" style="display:flex; gap:24px; flex-wrap:wrap; margin-top:8px;">
         <div>
           <div style="text-align:left" class="config-option-title-style">Track Mount</div>
           <select id="TRK_MOUNT_TYP" name="TRK_MOUNT_TYP" style="width:fit-content; padding:5px 8px; border:1px solid black; border-radius:6px;">
@@ -574,30 +572,34 @@ function loadForm() {
             <option value="masonry" hwset="MJ">Masonry</option>
           </select>
         </div>
-        <div>
-          <div style="text-align:left" class="config-option-title-style">Lower Splice</div>
-          <select id="LOWER_SPLICE" name="LowerSplice" style="width:fit-content; padding:5px 8px; border:1px solid black; border-radius:6px;">
-            <option value="NONE" selected>None</option>
-            <option value="UPPER_WALL_ANGLE">With Upper Wall Angle</option>
-            <option value="UPPER_BRACKET_MOUNT">With Upper Bracket Mount</option>
-          </select>
-        </div>
-        <div>
-          <div style="text-align:left" class="config-option-title-style">Inclined Track</div>
-          <div class="combined-button-container">
-            <div class="combined-button-container-inner">
-              <div class="rw-sliding-button selected" tabindex="0" id="INCLINED_TRACK_NONE_BTN">
-                <label for="INCLINED_TRACK_NONE">None</label>
-                <input type="radio" style="display:none;" id="INCLINED_TRACK_NONE" name="InclinedTrack" value="none" checked>
-              </div>
-              <div class="rw-sliding-button" tabindex="0" id="INCLINED_TRACK_SLOPE_BTN">
-                <label for="INCLINED_TRACK_SLOPE">Slope</label>
-                <input type="radio" style="display:none;" id="INCLINED_TRACK_SLOPE" name="InclinedTrack" value="slope">
-              </div>
-              <div class="rw-sliding-button" tabindex="0" id="INCLINED_TRACK_DEG_BTN">
-                <label for="INCLINED_TRACK_DEG">Degrees</label>
-                <input type="radio" style="display:none;" id="INCLINED_TRACK_DEG" name="InclinedTrack" value="degrees">
-              </div>
+      </div>
+
+      <!-- [LOWER-SPLICE] -->
+      <div style="margin-top:8px;">
+        <div style="text-align:left" class="config-option-title-style">Lower Splice</div>
+        <select id="LOWER_SPLICE" name="LowerSplice" style="width:fit-content; padding:5px 8px; border:1px solid black; border-radius:6px;">
+          <option value="NONE" selected>None</option>
+          <option value="UPPER_WALL_ANGLE">With Upper Wall Angle</option>
+          <option value="UPPER_BRACKET_MOUNT">With Upper Bracket Mount</option>
+        </select>
+      </div>
+
+      <!-- [INCLINED-TRACK] -->
+      <div style="margin-top:8px;">
+        <div style="text-align:left" class="config-option-title-style">Inclined Track</div>
+        <div class="combined-button-container">
+          <div class="combined-button-container-inner">
+            <div class="rw-sliding-button selected" tabindex="0" id="INCLINED_TRACK_NONE_BTN">
+              <label for="INCLINED_TRACK_NONE">None</label>
+              <input type="radio" style="display:none;" id="INCLINED_TRACK_NONE" name="InclinedTrack" value="none" checked>
+            </div>
+            <div class="rw-sliding-button" tabindex="0" id="INCLINED_TRACK_SLOPE_BTN">
+              <label for="INCLINED_TRACK_SLOPE">Slope</label>
+              <input type="radio" style="display:none;" id="INCLINED_TRACK_SLOPE" name="InclinedTrack" value="slope">
+            </div>
+            <div class="rw-sliding-button" tabindex="0" id="INCLINED_TRACK_DEG_BTN">
+              <label for="INCLINED_TRACK_DEG">Degrees</label>
+              <input type="radio" style="display:none;" id="INCLINED_TRACK_DEG" name="InclinedTrack" value="degrees">
             </div>
           </div>
         </div>
@@ -783,54 +785,54 @@ function loadForm() {
 	</div>
 	</div>
 
-	<!-- [HW-CSBB] Cable Fail Safety Bottom Brackets + [HW-CSBB-DRHGT] + [HW-NOLAP-STEEL-JAMB] -->
-	<div style="display:flex; gap:16px; flex-wrap:wrap; margin-top:12px;">
-	  <div>
-	    <div style="text-align:left" class="config-option-title-style">Cable Fail Safety Bottom Brackets</div>
-	    <div class="combined-button-container">
-	      <div class="combined-button-container-inner">
-	        <div class="rw-sliding-button" tabindex="0" id="CSBB_YES_BTN">
-	          <label for="CSBB_YES">Yes</label>
-	          <input type="radio" style="display:none;" id="CSBB_YES" name="CSBB" value="yes">
-	        </div>
-	        <div class="rw-sliding-button selected" tabindex="0" id="CSBB_NO_BTN">
-	          <label for="CSBB_NO">No</label>
-	          <input type="radio" style="display:none;" id="CSBB_NO" name="CSBB" value="no" checked>
-	        </div>
+	<!-- [HW-CSBB] Cable Fail Safety Bottom Brackets -->
+	<div style="margin-top:12px;">
+	  <div style="text-align:left" class="config-option-title-style">Cable Fail Safety Bottom Brackets</div>
+	  <div class="combined-button-container">
+	    <div class="combined-button-container-inner">
+	      <div class="rw-sliding-button" tabindex="0" id="CSBB_YES_BTN">
+	        <label for="CSBB_YES">Yes</label>
+	        <input type="radio" style="display:none;" id="CSBB_YES" name="CSBB" value="yes">
+	      </div>
+	      <div class="rw-sliding-button selected" tabindex="0" id="CSBB_NO_BTN">
+	        <label for="CSBB_NO">No</label>
+	        <input type="radio" style="display:none;" id="CSBB_NO" name="CSBB" value="no" checked>
 	      </div>
 	    </div>
 	  </div>
-	  <div>
-	    <div style="text-align:left" class="config-option-title-style">CSBB Door Height</div>
-	    <div class="combined-button-container">
-	      <div class="combined-button-container-inner">
-	        <div class="rw-sliding-button selected" tabindex="0" id="CSBB_DRHGT_NONE_BTN">
-	          <label for="CSBB_DRHGT_NONE">NO CSBB</label>
-	          <input type="radio" style="display:none;" id="CSBB_DRHGT_NONE" name="CSBBDrHgt" value="no_csbb" checked>
-	        </div>
-	        <div class="rw-sliding-button" tabindex="0" id="CSBB_DRHGT_LTE20_BTN">
-	          <label for="CSBB_DRHGT_LTE20">DHLTE20FT</label>
-	          <input type="radio" style="display:none;" id="CSBB_DRHGT_LTE20" name="CSBBDrHgt" value="csbb_dhlte20ft">
-	        </div>
-	        <div class="rw-sliding-button" tabindex="0" id="CSBB_DRHGT_GT20_BTN">
-	          <label for="CSBB_DRHGT_GT20">DHGT20</label>
-	          <input type="radio" style="display:none;" id="CSBB_DRHGT_GT20" name="CSBBDrHgt" value="csbb_dhgt20">
-	        </div>
-	      </div>
+	</div>
+
+	<!-- [HW-CSBB-DRHGT] -->
+	<div id="csbb_drhgt_section">
+	  <div style="text-align:left" class="config-option-title-style">CSBB Door Height</div>
+	  <div class="dimension-layout">
+	    <div class="rw-button" tabindex="0">
+	      <label for="CSBB_DRHGT_NONE">NO CSBB</label>
+	      <input type="radio" style="display:none;" id="CSBB_DRHGT_NONE" name="CSBBDrHgt" value="no_csbb" checked>
+	    </div>
+	    <div class="rw-button" tabindex="0">
+	      <label for="CSBB_DRHGT_LTE20">DHLTE20FT</label>
+	      <input type="radio" style="display:none;" id="CSBB_DRHGT_LTE20" name="CSBBDrHgt" value="csbb_dhlte20ft">
+	    </div>
+	    <div class="rw-button" tabindex="0">
+	      <label for="CSBB_DRHGT_GT20">DHGT20</label>
+	      <input type="radio" style="display:none;" id="CSBB_DRHGT_GT20" name="CSBBDrHgt" value="csbb_dhgt20">
 	    </div>
 	  </div>
-	  <div>
-	    <div style="text-align:left" class="config-option-title-style">No Lap Steel Jamb</div>
-	    <div class="combined-button-container">
-	      <div class="combined-button-container-inner">
-	        <div class="rw-sliding-button" tabindex="0" id="NOLAP_STEEL_JAMB_YES_BTN">
-	          <label for="NOLAP_STEEL_JAMB_YES">Yes</label>
-	          <input type="radio" style="display:none;" id="NOLAP_STEEL_JAMB_YES" name="NoLapSteelJamb" value="yes">
-	        </div>
-	        <div class="rw-sliding-button selected" tabindex="0" id="NOLAP_STEEL_JAMB_NO_BTN">
-	          <label for="NOLAP_STEEL_JAMB_NO">No</label>
-	          <input type="radio" style="display:none;" id="NOLAP_STEEL_JAMB_NO" name="NoLapSteelJamb" value="no" checked>
-	        </div>
+	</div>
+
+	<!-- [HW-NOLAP-STEEL-JAMB] -->
+	<div>
+	  <div style="text-align:left" class="config-option-title-style">No Lap Steel Jamb</div>
+	  <div class="combined-button-container">
+	    <div class="combined-button-container-inner">
+	      <div class="rw-sliding-button" tabindex="0" id="NOLAP_STEEL_JAMB_YES_BTN">
+	        <label for="NOLAP_STEEL_JAMB_YES">Yes</label>
+	        <input type="radio" style="display:none;" id="NOLAP_STEEL_JAMB_YES" name="NoLapSteelJamb" value="yes">
+	      </div>
+	      <div class="rw-sliding-button selected" tabindex="0" id="NOLAP_STEEL_JAMB_NO_BTN">
+	        <label for="NOLAP_STEEL_JAMB_NO">No</label>
+	        <input type="radio" style="display:none;" id="NOLAP_STEEL_JAMB_NO" name="NoLapSteelJamb" value="no" checked>
 	      </div>
 	    </div>
 	  </div>
