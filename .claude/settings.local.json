@@ -1,7 +1,12 @@
 {
   "permissions": {
     "allow": [
-      "Bash(awk -F',' 'NR>1 && $5 !~ /Driver/ && $5 != \"NONE\" && $5 != \"\" && $2 == \"\" && $6 != \"0\" {key=$6\"|\"$7; if \\(key != prev\\) {print $3\" \"$4\" count=\"$6\" styles=\"substr\\($7,1,80\\); prev=key}}' \"c:/Users/samir/load_html/truss_excel/T300-basic-lte5.csv\")"
+      "Bash(awk -F',' 'NR>1 && $5 !~ /Driver/ && $5 != \"NONE\" && $5 != \"\" && $2 == \"\" && $6 != \"0\" {key=$6\"|\"$7; if \\(key != prev\\) {print $3\" \"$4\" count=\"$6\" styles=\"substr\\($7,1,80\\); prev=key}}' \"c:/Users/samir/load_html/truss_excel/T300-basic-lte5.csv\")",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)",
+      "PowerShell($path = 'c:\\\\Users\\\\samir\\\\load_html\\\\src\\\\load\\\\load_html.js'; $lines = [System.IO.File]::ReadAllLines\\($path\\); $head = $lines[0..416]; $hardware = $lines[417..740]; $glazing = $lines[742..795]; $between = $lines[741]; $tail = $lines[796..\\($lines.Length-1\\)]; $new = $head + $glazing + ,$between + $hardware + $tail; [System.IO.File]::WriteAllLines\\($path, $new\\); \"wrote $\\($new.Length\\) lines\")",
+      "Bash(awk '/<section.*id=\"HARDWARE\"/,/<\\\\/section>/' src/load/load_html.js)"
     ]
   }
 }

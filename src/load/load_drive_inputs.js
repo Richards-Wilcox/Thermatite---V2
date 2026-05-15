@@ -585,4 +585,5 @@ function loadDrivenInputEvents() {
   // Re-run after host framework finishes hydrating selects.
   setTimeout(applyBottomSealConstraint, 0);
   setTimeout(applyBottomSealConstraint, 250);
+
 }

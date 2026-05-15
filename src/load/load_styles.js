@@ -894,6 +894,17 @@ select.is-placeholder {
   opacity: 0.7;
 }
 
+/* Cap visible width of selects with long labels. The full label still shows
+   inside the opened dropdown menu (browsers render <option> at intrinsic width),
+   only the closed-state display gets truncated with an ellipsis. */
+select.long-select {
+  max-width: 240px;
+  width: 240px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
 
 
 
@@ -1902,7 +1913,7 @@ option--disabled {
    wraps each tab in a div.radio-layout with id="tab_N" matching the section's index.
    #section_select uses justify-content: space-evenly, which would leave wide gaps when
    a tab is removed — collapse the missing tab visually rather than hiding it via display:none. */
-.face-only #tab_1 {
+.face-only #tab_2 {
     visibility: hidden !important;
     width: 0 !important;
     min-width: 0 !important;
