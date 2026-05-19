@@ -613,8 +613,9 @@ function loadForm() {
           <select id="JAMB_SEAL" name="JAMB_SEAL" class="long-select" style="padding:5px 8px; border:1px solid black; border-radius:6px;">
             <option value="NONE" selected>None</option>
             <option value="EU_ADCA_JWS">EU ADCA Jamb Weather Strip</option>
+            <option value="EU_ADCA">EU ADCA</option>
             <option value="ADCA_MOUNT_JWS">ADCA Mount Jamb Weather Seal</option>
-            <option value="ALUM_BLACK_VINYL">Aluminium Black Vinyl</option>
+            <option value="ALUM_BLACK_VINYL">Alum Black Vinyl</option>
             <option value="ALUM_CAFE_VINYL">Alum Cafe Vinyl</option>
             <option value="ALUM_BROWN_VINYL">Alum Brown Vinyl</option>
             <option value="ALUM_CHARCOAL_VINYL">Alum Charcoal Vinyl</option>

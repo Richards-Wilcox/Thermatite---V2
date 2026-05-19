@@ -425,6 +425,173 @@ function loadDrivenInputEvents() {
 
   // [LIFT-TYPE-LOGIC] LIFT_TYPE is a plain <select>; framework binds value natively. No addLogic needed.
 
+  // [TRACK-MOUNT-LOGIC] Filter Track Mount options by (door thickness, HW size, CSBB Door Height, No Lap Steel Jamb).
+  // Thickness mapping: 150 = T150/T150U, 175 = T175/T175U, 200 = T200/T200U/T200-20, 300 = T300, 200C = T200C/U200C.
+  // Values: 3A=ADCA_3, 2A=ADCA_2, 3C=CLIP_3, 2C=CLIP_2, B=B, NONE=NONE.
+  const TRK_MODEL_THICKNESS = {
+    "T150": "150", "T150U": "150",
+    "T175": "175", "T175U": "175",
+    "T200": "200", "T200U": "200", "T200-20": "200",
+    "T300": "300",
+    "T200C": "200C", "U200C": "200C",
+  };
+  // Key: thickness|hwSize|csbb|nolap → allowed Track Mount values.
+  // hwSize: 2|3, csbb: no_csbb|csbb_dhlte20ft|csbb_dhgt20, nolap: yes|no.
+  const TRK_MOUNT_RULES = {
+    "150|2|no_csbb|no":         ["ADCA_2", "CLIP_2", "B"],
+    "150|3|no_csbb|no":         ["ADCA_3", "ADCA_2", "CLIP_3", "CLIP_2", "B"],
+    "150|2|csbb_dhlte20ft|no":  ["ADCA_2"],
+    "150|3|csbb_dhlte20ft|no":  ["ADCA_3", "ADCA_2"],
+    "150|2|csbb_dhgt20|no":     ["ADCA_2"],
+    "150|3|csbb_dhgt20|no":     ["ADCA_3"],
+    "150|2|no_csbb|yes":        ["B"],
+    "150|3|no_csbb|yes":        ["ADCA_2", "CLIP_2", "B"],
+    "150|2|csbb_dhlte20ft|yes": ["NONE"],
+    "150|3|csbb_dhlte20ft|yes": ["ADCA_2"],
+    "150|2|csbb_dhgt20|yes":    ["ADCA_2", "B"],
+    "150|3|csbb_dhgt20|yes":    ["B"],
+
+    "175|2|no_csbb|no":         ["ADCA_2", "CLIP_2", "B"],
+    "175|3|no_csbb|no":         ["ADCA_3", "ADCA_2", "CLIP_3", "CLIP_2", "B"],
+    "175|2|csbb_dhlte20ft|no":  ["ADCA_2"],
+    "175|3|csbb_dhlte20ft|no":  ["ADCA_3", "ADCA_2", "B"],
+    "175|2|csbb_dhgt20|no":     ["ADCA_2"],
+    "175|3|csbb_dhgt20|no":     ["ADCA_3"],
+    "175|2|no_csbb|yes":        ["B"],
+    "175|3|no_csbb|yes":        ["ADCA_2", "CLIP_2", "B"],
+    "175|2|csbb_dhlte20ft|yes": ["NONE"],
+    "175|3|csbb_dhlte20ft|yes": ["ADCA_2"],
+    "175|2|csbb_dhgt20|yes":    ["NONE"],
+    "175|3|csbb_dhgt20|yes":    ["NONE"],
+
+    "200|2|no_csbb|no":         ["ADCA_2", "CLIP_2", "B"],
+    "200|3|no_csbb|no":         ["ADCA_3", "ADCA_2", "CLIP_3", "CLIP_2", "B"],
+    "200|2|csbb_dhlte20ft|no":  ["ADCA_2"],
+    "200|3|csbb_dhlte20ft|no":  ["ADCA_3", "ADCA_2"],
+    "200|2|csbb_dhgt20|no":     ["ADCA_2"],
+    "200|3|csbb_dhgt20|no":     ["ADCA_3"],
+    "200|2|no_csbb|yes":        ["B"],
+    "200|3|no_csbb|yes":        ["ADCA_2", "CLIP_2", "B"],
+    "200|2|csbb_dhlte20ft|yes": ["NONE"],
+    "200|3|csbb_dhlte20ft|yes": ["ADCA_2"],
+    "200|2|csbb_dhgt20|yes":    ["NONE"],
+    "200|3|csbb_dhgt20|yes":    ["NONE"],
+
+    "300|2|no_csbb|no":         ["ADCA_2"],
+    "300|3|no_csbb|no":         ["ADCA_3"],
+    "300|2|csbb_dhlte20ft|no":  ["ADCA_2"],
+    "300|3|csbb_dhlte20ft|no":  ["ADCA_3"],
+    "300|2|csbb_dhgt20|no":     ["ADCA_2"],
+    "300|3|csbb_dhgt20|no":     ["ADCA_3"],
+    "300|2|no_csbb|yes":        ["ADCA_2"],
+    "300|3|no_csbb|yes":        ["ADCA_2"],
+    "300|2|csbb_dhlte20ft|yes": ["NONE"],
+    "300|3|csbb_dhlte20ft|yes": ["NONE"],
+    "300|2|csbb_dhgt20|yes":    ["NONE"],
+    "300|3|csbb_dhgt20|yes":    ["NONE"],
+
+    "200C|2|no_csbb|no":         ["ADCA_2", "CLIP_2", "B"],
+    "200C|3|no_csbb|no":         ["ADCA_3", "ADCA_2", "CLIP_3", "CLIP_2", "B"],
+    "200C|2|csbb_dhlte20ft|no":  ["ADCA_2"],
+    "200C|3|csbb_dhlte20ft|no":  ["ADCA_3", "ADCA_2"],
+    "200C|2|csbb_dhgt20|no":     ["ADCA_2"],
+    "200C|3|csbb_dhgt20|no":     ["ADCA_3"],
+    "200C|2|no_csbb|yes":        ["B"],
+    "200C|3|no_csbb|yes":        ["ADCA_2", "CLIP_2", "B"],
+    "200C|2|csbb_dhlte20ft|yes": ["NONE"],
+    "200C|3|csbb_dhlte20ft|yes": ["ADCA_3", "ADCA_2"],
+    "200C|2|csbb_dhgt20|yes":    ["NONE"],
+    "200C|3|csbb_dhgt20|yes":    ["NONE"],
+  };
+  const TRK_MOUNT_LABEL = {
+    "ADCA_3": "3 IN ADCA",
+    "ADCA_2": "2 IN ADCA",
+    "CLIP_3": "3 IN Clip Angle",
+    "CLIP_2": "2 IN Clip Angle",
+    "B":      "Bracket Mount",
+    "NONE":   "None",
+  };
+  const TRK_MOUNT_HWSET = {
+    "ADCA_3": "ADCA3",
+    "ADCA_2": "ADCA2",
+    "CLIP_3": "CLIP3",
+    "CLIP_2": "CLIP2",
+    "B":      "BM",
+    "NONE":   "NONE",
+  };
+  function applyTrackMountConstraint() {
+    const $sel = $("#TRK_MOUNT_TYP");
+    if (!$sel.length) return;
+    const model    = $("input[name='DOOR_MODEL']:checked").val();
+    const hwSize   = $("input[name='HARDWARE_SIZE']:checked").val();
+    const csbbDr   = $("input[name='CSBBDrHgt']:checked").val()    || "no_csbb";
+    const noLap    = $("input[name='NoLapSteelJamb']:checked").val() || "no";
+    const thickness = TRK_MODEL_THICKNESS[model];
+    if (!thickness) return;
+    const key = `${thickness}|${hwSize}|${csbbDr}|${noLap}`;
+    const allowed = TRK_MOUNT_RULES[key];
+    if (!allowed) return;
+    const prev = $sel.val();
+    $sel[0].innerHTML = allowed.map(v =>
+      `<option value="${v}" hwset="${TRK_MOUNT_HWSET[v]}">${TRK_MOUNT_LABEL[v]}</option>`
+    ).join("");
+    $sel.val(allowed.includes(prev) ? prev : allowed[0]);
+  }
+  $(document).on("change",
+    "input[name='DOOR_MODEL'], input[name='HARDWARE_SIZE'], input[name='CSBBDrHgt'], input[name='NoLapSteelJamb']",
+    applyTrackMountConstraint);
+  applyTrackMountConstraint();
+  setTimeout(applyTrackMountConstraint, 0);
+  setTimeout(applyTrackMountConstraint, 250);
+
+  // [LOWER-SPLICE-LOGIC] Lower Splice depends on Lift Type. Track Mount = NONE forces None.
+  // Std lifts (12R/16R/LHR_Fr/LHR_Rr) → None only. High Lift / VL / LHR_VL → UWA + UBM.
+  const LOWER_SPLICE_LABEL = {
+    "NONE":                "None",
+    "UPPER_WALL_ANGLE":    "With Upper Wall Angle",
+    "UPPER_BRACKET_MOUNT": "With Upper Bracket Mount",
+  };
+  const LIFT_TYPES_STD = ["Std_Lift_12R", "Std_Lift_16R", "LHR_Fr_Mnt", "LHR_Rr_Mnt"];
+  function applyLowerSpliceConstraint() {
+    const $sel = $("#LOWER_SPLICE");
+    if (!$sel.length) return;
+    const trkMount = $("#TRK_MOUNT_TYP").val();
+    const liftType = $("#LIFT_TYPE").val();
+    const allowed = trkMount === "NONE" || LIFT_TYPES_STD.includes(liftType)
+      ? ["NONE"]
+      : ["UPPER_WALL_ANGLE", "UPPER_BRACKET_MOUNT"];
+    const prev = $sel.val();
+    $sel[0].innerHTML = allowed.map(v => `<option value="${v}">${LOWER_SPLICE_LABEL[v]}</option>`).join("");
+    $sel.val(allowed.includes(prev) ? prev : allowed[0]);
+  }
+  $(document).on("change", "#TRK_MOUNT_TYP, #LIFT_TYPE", applyLowerSpliceConstraint);
+  applyLowerSpliceConstraint();
+  setTimeout(applyLowerSpliceConstraint, 0);
+  setTimeout(applyLowerSpliceConstraint, 250);
+
+  // [INCLINED-TRACK-LOGIC] Inclined Track Degrees option disabled for LHR_Fr/LHR_Rr/VL/LHR_VL.
+  const LIFT_TYPES_NO_DEGREES = ["LHR_Fr_Mnt", "LHR_Rr_Mnt", "Vertical_Lift", "LHR_Vertical_Lift"];
+  function applyInclinedTrackConstraint() {
+    const $degBtn = $("#INCLINED_TRACK_DEG_BTN");
+    if (!$degBtn.length) return;
+    const liftType = $("#LIFT_TYPE").val();
+    const blockDegrees = LIFT_TYPES_NO_DEGREES.includes(liftType);
+    if (blockDegrees) {
+      $degBtn.addClass("disabled");
+      if ($("#INCLINED_TRACK_DEG").is(":checked")) {
+        $("#INCLINED_TRACK_NONE").prop("checked", true).trigger("change");
+        $degBtn.removeClass("selected");
+        $("#INCLINED_TRACK_NONE_BTN").addClass("selected");
+      }
+    } else {
+      $degBtn.removeClass("disabled");
+    }
+  }
+  $(document).on("change", "#LIFT_TYPE", applyInclinedTrackConstraint);
+  applyInclinedTrackConstraint();
+  setTimeout(applyInclinedTrackConstraint, 0);
+  setTimeout(applyInclinedTrackConstraint, 250);
+
   // [12GA-HINGES-LOGIC] Double End Caps forces 12 Gauge Hinges to Yes and disables No button.
   function apply12GaHingesConstraint() {
     const isDouble = $("input[name='EndCaps']:checked").val() === "1";
@@ -519,6 +686,166 @@ function loadDrivenInputEvents() {
   }
   $(document).on("change", "input[name='OnePointLatch']", applyBarLatchOnePointConstraint);
   applyBarLatchOnePointConstraint();
+
+  // [WEATHER-SEAL-LOGIC] JAMB_SEAL options filtered by (color, track mount, model).
+  // Source: data/weather_seal/*.csv — 600 (color × mount × model) rows compressed
+  // into 12 unique seal-code sets. Options not in the allowed list are hidden
+  // (display:none) rather than removed, so they remain available for
+  // colors/mounts/models we don't have data for yet.
+  // CSV seal code → JAMB_SEAL <option> value:
+  const WS_SEAL_TO_VALUE = {
+    "None":                   "NONE",
+    "ADCAMntJamb":            "ADCA_MOUNT_JWS",
+    "EU_ADCA":                "EU_ADCA",
+    "AlumBlkVinyl":           "ALUM_BLACK_VINYL",
+    "AlumCafeVinyl":          "ALUM_CAFE_VINYL",
+    "AlumBrownVinyl":         "ALUM_BROWN_VINYL",
+    "AlumCharcoalVinyl":      "ALUM_CHARCOAL_VINYL",
+    "AlumBronzeVinyl":        "ALUM_BRONZE_VINYL",
+    "AlumCherryVinyl":        "ALUM_CHERRY_VINYL",
+    "AlumGoldenOakVinyl":     "ALUM_GOLDEN_OAK_VINYL",
+    "AlumDarkOakVinyl":       "ALUM_DARK_OAK_VINYL",
+    "AlumWhtVinyl":           "ALUM_WHITE_VINYL",
+    "AlumTpeVinyl":           "ALUM_TAUPE_VINYL",
+    "AlumAlmVinyl":           "ALUM_ALMOND_VINYL",
+    "StlWhtVinyl":            "STEEL_WHITE_VINYL",
+    "StlAlmVinyl":            "STEEL_ALMOND_VINYL",
+    "StlTpeVinyl":            "STEEL_TAUPE_VINYL",
+    "StlBrwnVinyl":           "STEEL_BROWN_VINYL",
+    "StlBlkVinyl":            "STEEL_BLACK_VINYL",
+    "StlCharCoalVinyl":       "STEEL_CHARCOAL_VINYL",
+    "StlBronzeVinyl":         "STEEL_BRONZE_VINYL",
+    "HeavyDutyAlumBlacVinyl": "HD_ALUM_BLACK_DUAL_FIN",
+  };
+  // Pre-map sets at module load to JAMB_SEAL values for O(1) lookup.
+  const WS_SET_CODES = [
+    [],                                                                                                                                                            // 0 EMPTY -> only NONE
+    ["None"],                                                                                                                                                       // 1
+    ["None","ADCAMntJamb","AlumBlkVinyl","AlumCafeVinyl","AlumBrownVinyl","AlumCharcoalVinyl","AlumBronzeVinyl","AlumCherryVinyl","AlumGoldenOakVinyl","AlumDarkOakVinyl","AlumWhtVinyl","AlumTpeVinyl","AlumAlmVinyl","StlWhtVinyl","StlAlmVinyl","StlTpeVinyl","StlBrwnVinyl","StlBlkVinyl"], // 2
+    ["None","AlumBlkVinyl","AlumCafeVinyl","AlumBrownVinyl","AlumCharcoalVinyl","AlumBronzeVinyl","AlumCherryVinyl","AlumGoldenOakVinyl","AlumDarkOakVinyl","AlumWhtVinyl","AlumTpeVinyl","AlumAlmVinyl","StlWhtVinyl","StlAlmVinyl","StlTpeVinyl","StlBrwnVinyl","StlBlkVinyl"],              // 3
+    ["None","ADCAMntJamb","AlumBlkVinyl","AlumCafeVinyl","AlumBrownVinyl","AlumCharcoalVinyl","AlumBronzeVinyl","AlumCherryVinyl","AlumGoldenOakVinyl","AlumDarkOakVinyl","AlumWhtVinyl","AlumTpeVinyl","AlumAlmVinyl","StlWhtVinyl","StlAlmVinyl","StlTpeVinyl","StlBrwnVinyl","StlBlkVinyl","StlCharCoalVinyl","StlBronzeVinyl","HeavyDutyAlumBlacVinyl"], // 4
+    ["None","AlumBlkVinyl","AlumCafeVinyl","AlumBrownVinyl","AlumCharcoalVinyl","AlumBronzeVinyl","AlumCherryVinyl","AlumGoldenOakVinyl","AlumDarkOakVinyl","AlumWhtVinyl","AlumTpeVinyl","AlumAlmVinyl","StlWhtVinyl","StlAlmVinyl","StlTpeVinyl","StlBrwnVinyl","StlBlkVinyl","StlCharCoalVinyl","StlBronzeVinyl"],                                       // 5
+    ["None","ADCAMntJamb","AlumBlkVinyl","AlumCafeVinyl","AlumBrownVinyl","AlumCharcoalVinyl","AlumBronzeVinyl","AlumCherryVinyl","AlumGoldenOakVinyl","AlumDarkOakVinyl","AlumWhtVinyl","AlumTpeVinyl","AlumAlmVinyl","StlWhtVinyl","StlAlmVinyl","StlTpeVinyl","StlBrwnVinyl","StlBlkVinyl","StlCharCoalVinyl","StlBronzeVinyl"],                       // 6
+    ["None","ADCAMntJamb","AlumBlkVinyl","AlumCafeVinyl","AlumBrownVinyl","AlumCharcoalVinyl","AlumBronzeVinyl","AlumCherryVinyl","AlumGoldenOakVinyl","AlumDarkOakVinyl","AlumWhtVinyl","AlumTpeVinyl","AlumAlmVinyl","StlWhtVinyl","StlAlmVinyl","StlTpeVinyl","StlBrwnVinyl","StlBlkVinyl","HeavyDutyAlumBlacVinyl"],                                  // 7
+    ["None","AlumBlkVinyl","AlumCafeVinyl","AlumBrownVinyl","AlumCharcoalVinyl","AlumBronzeVinyl","AlumCherryVinyl","AlumGoldenOakVinyl","AlumDarkOakVinyl","AlumWhtVinyl","AlumTpeVinyl","AlumAlmVinyl","StlWhtVinyl","StlAlmVinyl","StlTpeVinyl","StlBrwnVinyl","StlBlkVinyl","StlCharCoalVinyl","StlBronzeVinyl","HeavyDutyAlumBlacVinyl"],             // 8
+    ["None","AlumBlkVinyl","StlWhtVinyl","StlAlmVinyl","StlTpeVinyl","StlBrwnVinyl","StlBlkVinyl"],                                                                                                                                                                                                                                                       // 9
+    ["None","AlumBlkVinyl","AlumCafeVinyl","AlumBrownVinyl","AlumCharcoalVinyl","AlumBronzeVinyl","AlumCherryVinyl","AlumGoldenOakVinyl","AlumDarkOakVinyl","AlumWhtVinyl","AlumTpeVinyl","AlumAlmVinyl","StlWhtVinyl","StlAlmVinyl","StlTpeVinyl","StlBrwnVinyl","StlBlkVinyl","HeavyDutyAlumBlacVinyl"],                                                // 10
+    ["None","EU_ADCA","AlumBlkVinyl","AlumCafeVinyl","AlumBrownVinyl","AlumCharcoalVinyl","AlumBronzeVinyl","AlumCherryVinyl","AlumGoldenOakVinyl","AlumDarkOakVinyl","AlumWhtVinyl","AlumTpeVinyl","AlumAlmVinyl","StlWhtVinyl","StlAlmVinyl","StlTpeVinyl","StlBrwnVinyl","StlBlkVinyl"],                                                               // 11
+  ];
+  // Set 0 (empty CSV) means no seals — only NONE option visible. Otherwise map codes through.
+  const WS_SET_VALUES = WS_SET_CODES.map(codes =>
+    codes.length === 0 ? ["NONE"] : codes.map(c => WS_SEAL_TO_VALUE[c]).filter(Boolean)
+  );
+  // COLOR swatch key → CSV color prefix
+  const WS_COLOR_KEY = {
+    "white":      "white",
+    "brown":      "brown",
+    "silver":     "silver",
+    "bronze":     "Bronze",
+    "slate_grey": "SlateGrey",
+    "iron_ore":   "IronOre",
+    "black":      "Black",
+    "sandstone":  "Sandstone",
+    "almond":     "Almond",
+    "cafe":       "Cafe",
+  };
+  // TRK_MOUNT_TYP value → CSV mount suffix
+  const WS_MOUNT_KEY = {
+    "ADCA_3": "3A",
+    "ADCA_2": "2A",
+    "CLIP_3": "3C",
+    "CLIP_2": "2C",
+    "B":      "B",
+    "NONE":   "None",
+  };
+  // (colorPrefix-mount|model) → set index. Generated from data/weather_seal/*.csv.
+  const WS_LOOKUP = {
+    "Almond-3A|T150":0,"Almond-3A|T175":0,"Almond-3A|T200":0,"Almond-3A|T300":0,"Almond-3A|T200-20":1,"Almond-3A|T200C":1,"Almond-3A|T150U":1,"Almond-3A|T175U":1,"Almond-3A|T200U":1,"Almond-3A|U200C":1,
+    "Almond-2A|T150":0,"Almond-2A|T175":0,"Almond-2A|T200":0,"Almond-2A|T300":0,"Almond-2A|T200-20":1,"Almond-2A|T200C":1,"Almond-2A|T150U":1,"Almond-2A|T175U":1,"Almond-2A|T200U":1,"Almond-2A|U200C":1,
+    "Almond-3C|T150":2,"Almond-3C|T175":2,"Almond-3C|T200":2,"Almond-3C|T300":2,"Almond-3C|T200-20":1,"Almond-3C|T200C":1,"Almond-3C|T150U":1,"Almond-3C|T175U":1,"Almond-3C|T200U":1,"Almond-3C|U200C":1,
+    "Almond-2C|T150":2,"Almond-2C|T175":2,"Almond-2C|T200":2,"Almond-2C|T300":2,"Almond-2C|T200-20":1,"Almond-2C|T200C":1,"Almond-2C|T150U":1,"Almond-2C|T175U":1,"Almond-2C|T200U":1,"Almond-2C|U200C":1,
+    "Almond-B|T150":2,"Almond-B|T175":2,"Almond-B|T200":2,"Almond-B|T300":2,"Almond-B|T200-20":1,"Almond-B|T200C":1,"Almond-B|T150U":1,"Almond-B|T175U":1,"Almond-B|T200U":1,"Almond-B|U200C":1,
+    "Almond-None|T150":1,"Almond-None|T175":1,"Almond-None|T200":1,"Almond-None|T300":1,"Almond-None|T200-20":1,"Almond-None|T200C":1,"Almond-None|T150U":1,"Almond-None|T175U":1,"Almond-None|T200U":1,"Almond-None|U200C":1,
+    "Black-3A|T150":0,"Black-3A|T175":0,"Black-3A|T200":0,"Black-3A|T300":0,"Black-3A|T200-20":1,"Black-3A|T200C":1,"Black-3A|T150U":1,"Black-3A|T175U":1,"Black-3A|T200U":1,"Black-3A|U200C":1,
+    "Black-2A|T150":0,"Black-2A|T175":0,"Black-2A|T200":0,"Black-2A|T300":0,"Black-2A|T200-20":1,"Black-2A|T200C":1,"Black-2A|T150U":1,"Black-2A|T175U":1,"Black-2A|T200U":1,"Black-2A|U200C":1,
+    "Black-3C|T150":2,"Black-3C|T175":2,"Black-3C|T200":2,"Black-3C|T300":3,"Black-3C|T200-20":1,"Black-3C|T200C":1,"Black-3C|T150U":1,"Black-3C|T175U":1,"Black-3C|T200U":1,"Black-3C|U200C":1,
+    "Black-2C|T150":2,"Black-2C|T175":2,"Black-2C|T200":2,"Black-2C|T300":2,"Black-2C|T200-20":1,"Black-2C|T200C":1,"Black-2C|T150U":1,"Black-2C|T175U":1,"Black-2C|T200U":1,"Black-2C|U200C":1,
+    "Black-B|T150":4,"Black-B|T175":4,"Black-B|T200":2,"Black-B|T300":2,"Black-B|T200-20":1,"Black-B|T200C":1,"Black-B|T150U":1,"Black-B|T175U":1,"Black-B|T200U":1,"Black-B|U200C":1,
+    "Black-None|T150":1,"Black-None|T175":1,"Black-None|T200":1,"Black-None|T300":1,"Black-None|T200-20":1,"Black-None|T200C":1,"Black-None|T150U":1,"Black-None|T175U":1,"Black-None|T200U":1,"Black-None|U200C":1,
+    "Bronze-3A|T150":5,"Bronze-3A|T175":5,"Bronze-3A|T200":5,"Bronze-3A|T300":0,"Bronze-3A|T200-20":1,"Bronze-3A|T200C":1,"Bronze-3A|T150U":1,"Bronze-3A|T175U":1,"Bronze-3A|T200U":1,"Bronze-3A|U200C":1,
+    "Bronze-2A|T150":5,"Bronze-2A|T175":5,"Bronze-2A|T200":5,"Bronze-2A|T300":0,"Bronze-2A|T200-20":1,"Bronze-2A|T200C":1,"Bronze-2A|T150U":1,"Bronze-2A|T175U":1,"Bronze-2A|T200U":1,"Bronze-2A|U200C":1,
+    "Bronze-3C|T150":6,"Bronze-3C|T175":6,"Bronze-3C|T200":6,"Bronze-3C|T300":2,"Bronze-3C|T200-20":1,"Bronze-3C|T200C":1,"Bronze-3C|T150U":1,"Bronze-3C|T175U":1,"Bronze-3C|T200U":1,"Bronze-3C|U200C":1,
+    "Bronze-2C|T150":6,"Bronze-2C|T175":6,"Bronze-2C|T200":6,"Bronze-2C|T300":2,"Bronze-2C|T200-20":1,"Bronze-2C|T200C":1,"Bronze-2C|T150U":1,"Bronze-2C|T175U":1,"Bronze-2C|T200U":1,"Bronze-2C|U200C":1,
+    "Bronze-B|T150":6,"Bronze-B|T175":6,"Bronze-B|T200":6,"Bronze-B|T300":2,"Bronze-B|T200-20":1,"Bronze-B|T200C":1,"Bronze-B|T150U":1,"Bronze-B|T175U":1,"Bronze-B|T200U":1,"Bronze-B|U200C":1,
+    "Bronze-None|T150":1,"Bronze-None|T175":1,"Bronze-None|T200":1,"Bronze-None|T300":1,"Bronze-None|T200-20":1,"Bronze-None|T200C":1,"Bronze-None|T150U":1,"Bronze-None|T175U":1,"Bronze-None|T200U":1,"Bronze-None|U200C":1,
+    "brown-3A|T150":7,"brown-3A|T175":7,"brown-3A|T200":0,"brown-3A|T300":0,"brown-3A|T200-20":1,"brown-3A|T200C":1,"brown-3A|T150U":1,"brown-3A|T175U":1,"brown-3A|T200U":1,"brown-3A|U200C":1,
+    "brown-2A|T150":7,"brown-2A|T175":7,"brown-2A|T200":0,"brown-2A|T300":0,"brown-2A|T200-20":1,"brown-2A|T200C":1,"brown-2A|T150U":1,"brown-2A|T175U":1,"brown-2A|T200U":1,"brown-2A|U200C":1,
+    "brown-3C|T150":7,"brown-3C|T175":7,"brown-3C|T200":7,"brown-3C|T300":7,"brown-3C|T200-20":8,"brown-3C|T200C":1,"brown-3C|T150U":1,"brown-3C|T175U":1,"brown-3C|T200U":1,"brown-3C|U200C":1,
+    "brown-2C|T150":7,"brown-2C|T175":7,"brown-2C|T200":7,"brown-2C|T300":7,"brown-2C|T200-20":8,"brown-2C|T200C":1,"brown-2C|T150U":1,"brown-2C|T175U":1,"brown-2C|T200U":1,"brown-2C|U200C":1,
+    "brown-B|T150":9,"brown-B|T175":9,"brown-B|T200":9,"brown-B|T300":10,"brown-B|T200-20":9,"brown-B|T200C":1,"brown-B|T150U":1,"brown-B|T175U":1,"brown-B|T200U":1,"brown-B|U200C":1,
+    "brown-None|T150":1,"brown-None|T175":1,"brown-None|T200":1,"brown-None|T300":1,"brown-None|T200-20":1,"brown-None|T200C":1,"brown-None|T150U":1,"brown-None|T175U":1,"brown-None|T200U":1,"brown-None|U200C":1,
+    "Cafe-3A|T150":0,"Cafe-3A|T175":0,"Cafe-3A|T200":0,"Cafe-3A|T300":0,"Cafe-3A|T200-20":1,"Cafe-3A|T200C":1,"Cafe-3A|T150U":1,"Cafe-3A|T175U":1,"Cafe-3A|T200U":1,"Cafe-3A|U200C":1,
+    "Cafe-2A|T150":0,"Cafe-2A|T175":0,"Cafe-2A|T200":0,"Cafe-2A|T300":0,"Cafe-2A|T200-20":1,"Cafe-2A|T200C":1,"Cafe-2A|T150U":1,"Cafe-2A|T175U":1,"Cafe-2A|T200U":1,"Cafe-2A|U200C":1,
+    "Cafe-3C|T150":0,"Cafe-3C|T175":0,"Cafe-3C|T200":0,"Cafe-3C|T300":0,"Cafe-3C|T200-20":1,"Cafe-3C|T200C":1,"Cafe-3C|T150U":1,"Cafe-3C|T175U":1,"Cafe-3C|T200U":1,"Cafe-3C|U200C":1,
+    "Cafe-2C|T150":0,"Cafe-2C|T175":0,"Cafe-2C|T200":0,"Cafe-2C|T300":0,"Cafe-2C|T200-20":1,"Cafe-2C|T200C":1,"Cafe-2C|T150U":1,"Cafe-2C|T175U":1,"Cafe-2C|T200U":1,"Cafe-2C|U200C":1,
+    "Cafe-B|T150":2,"Cafe-B|T175":2,"Cafe-B|T200":2,"Cafe-B|T300":2,"Cafe-B|T200-20":1,"Cafe-B|T200C":1,"Cafe-B|T150U":1,"Cafe-B|T175U":1,"Cafe-B|T200U":1,"Cafe-B|U200C":1,
+    "Cafe-None|T150":1,"Cafe-None|T175":1,"Cafe-None|T200":1,"Cafe-None|T300":1,"Cafe-None|T200-20":1,"Cafe-None|T200C":1,"Cafe-None|T150U":1,"Cafe-None|T175U":1,"Cafe-None|T200U":1,"Cafe-None|U200C":1,
+    "IronOre-3A|T150":0,"IronOre-3A|T175":0,"IronOre-3A|T200":0,"IronOre-3A|T300":0,"IronOre-3A|T200-20":1,"IronOre-3A|T200C":1,"IronOre-3A|T150U":1,"IronOre-3A|T175U":1,"IronOre-3A|T200U":1,"IronOre-3A|U200C":1,
+    "IronOre-2A|T150":0,"IronOre-2A|T175":0,"IronOre-2A|T200":0,"IronOre-2A|T300":0,"IronOre-2A|T200-20":1,"IronOre-2A|T200C":1,"IronOre-2A|T150U":1,"IronOre-2A|T175U":1,"IronOre-2A|T200U":1,"IronOre-2A|U200C":1,
+    "IronOre-3C|T150":2,"IronOre-3C|T175":2,"IronOre-3C|T200":2,"IronOre-3C|T300":2,"IronOre-3C|T200-20":1,"IronOre-3C|T200C":1,"IronOre-3C|T150U":1,"IronOre-3C|T175U":1,"IronOre-3C|T200U":1,"IronOre-3C|U200C":1,
+    "IronOre-2C|T150":2,"IronOre-2C|T175":2,"IronOre-2C|T200":2,"IronOre-2C|T300":2,"IronOre-2C|T200-20":1,"IronOre-2C|T200C":1,"IronOre-2C|T150U":1,"IronOre-2C|T175U":1,"IronOre-2C|T200U":1,"IronOre-2C|U200C":1,
+    "IronOre-B|T150":2,"IronOre-B|T175":2,"IronOre-B|T200":2,"IronOre-B|T300":2,"IronOre-B|T200-20":1,"IronOre-B|T200C":1,"IronOre-B|T150U":1,"IronOre-B|T175U":1,"IronOre-B|T200U":1,"IronOre-B|U200C":1,
+    "IronOre-None|T150":1,"IronOre-None|T175":1,"IronOre-None|T200":1,"IronOre-None|T300":1,"IronOre-None|T200-20":1,"IronOre-None|T200C":1,"IronOre-None|T150U":1,"IronOre-None|T175U":1,"IronOre-None|T200U":1,"IronOre-None|U200C":1,
+    "Sandstone-3A|T150":0,"Sandstone-3A|T175":0,"Sandstone-3A|T200":0,"Sandstone-3A|T300":0,"Sandstone-3A|T200-20":1,"Sandstone-3A|T200C":1,"Sandstone-3A|T150U":1,"Sandstone-3A|T175U":1,"Sandstone-3A|T200U":1,"Sandstone-3A|U200C":1,
+    "Sandstone-2A|T150":0,"Sandstone-2A|T175":0,"Sandstone-2A|T200":0,"Sandstone-2A|T300":0,"Sandstone-2A|T200-20":1,"Sandstone-2A|T200C":1,"Sandstone-2A|T150U":1,"Sandstone-2A|T175U":1,"Sandstone-2A|T200U":1,"Sandstone-2A|U200C":1,
+    "Sandstone-3C|T150":2,"Sandstone-3C|T175":2,"Sandstone-3C|T200":2,"Sandstone-3C|T300":2,"Sandstone-3C|T200-20":1,"Sandstone-3C|T200C":1,"Sandstone-3C|T150U":1,"Sandstone-3C|T175U":1,"Sandstone-3C|T200U":1,"Sandstone-3C|U200C":1,
+    "Sandstone-2C|T150":2,"Sandstone-2C|T175":2,"Sandstone-2C|T200":2,"Sandstone-2C|T300":2,"Sandstone-2C|T200-20":1,"Sandstone-2C|T200C":1,"Sandstone-2C|T150U":1,"Sandstone-2C|T175U":1,"Sandstone-2C|T200U":1,"Sandstone-2C|U200C":1,
+    "Sandstone-B|T150":2,"Sandstone-B|T175":2,"Sandstone-B|T200":2,"Sandstone-B|T300":2,"Sandstone-B|T200-20":1,"Sandstone-B|T200C":1,"Sandstone-B|T150U":1,"Sandstone-B|T175U":1,"Sandstone-B|T200U":1,"Sandstone-B|U200C":1,
+    "Sandstone-None|T150":1,"Sandstone-None|T175":1,"Sandstone-None|T200":1,"Sandstone-None|T300":1,"Sandstone-None|T200-20":1,"Sandstone-None|T200C":1,"Sandstone-None|T150U":1,"Sandstone-None|T175U":1,"Sandstone-None|T200U":1,"Sandstone-None|U200C":1,
+    "silver-3A|T150":8,"silver-3A|T175":8,"silver-3A|T200":5,"silver-3A|T300":0,"silver-3A|T200-20":1,"silver-3A|T200C":1,"silver-3A|T150U":1,"silver-3A|T175U":1,"silver-3A|T200U":1,"silver-3A|U200C":1,
+    "silver-2A|T150":8,"silver-2A|T175":8,"silver-2A|T200":5,"silver-2A|T300":0,"silver-2A|T200-20":1,"silver-2A|T200C":1,"silver-2A|T150U":1,"silver-2A|T175U":1,"silver-2A|T200U":1,"silver-2A|U200C":1,
+    "silver-3C|T150":8,"silver-3C|T175":8,"silver-3C|T200":5,"silver-3C|T300":0,"silver-3C|T200-20":1,"silver-3C|T200C":1,"silver-3C|T150U":1,"silver-3C|T175U":1,"silver-3C|T200U":1,"silver-3C|U200C":1,
+    "silver-2C|T150":7,"silver-2C|T175":7,"silver-2C|T200":0,"silver-2C|T300":0,"silver-2C|T200-20":1,"silver-2C|T200C":1,"silver-2C|T150U":1,"silver-2C|T175U":1,"silver-2C|T200U":1,"silver-2C|U200C":1,
+    "silver-B|T150":9,"silver-B|T175":9,"silver-B|T200":6,"silver-B|T300":2,"silver-B|T200-20":1,"silver-B|T200C":1,"silver-B|T150U":1,"silver-B|T175U":1,"silver-B|T200U":1,"silver-B|U200C":1,
+    "silver-None|T150":1,"silver-None|T175":1,"silver-None|T200":1,"silver-None|T300":1,"silver-None|T200-20":1,"silver-None|T200C":1,"silver-None|T150U":1,"silver-None|T175U":1,"silver-None|T200U":1,"silver-None|U200C":1,
+    "SlateGrey-3A|T150":5,"SlateGrey-3A|T175":5,"SlateGrey-3A|T200":5,"SlateGrey-3A|T300":0,"SlateGrey-3A|T200-20":1,"SlateGrey-3A|T200C":1,"SlateGrey-3A|T150U":1,"SlateGrey-3A|T175U":1,"SlateGrey-3A|T200U":1,"SlateGrey-3A|U200C":1,
+    "SlateGrey-2A|T150":5,"SlateGrey-2A|T175":5,"SlateGrey-2A|T200":5,"SlateGrey-2A|T300":0,"SlateGrey-2A|T200-20":1,"SlateGrey-2A|T200C":1,"SlateGrey-2A|T150U":1,"SlateGrey-2A|T175U":1,"SlateGrey-2A|T200U":1,"SlateGrey-2A|U200C":1,
+    "SlateGrey-3C|T150":6,"SlateGrey-3C|T175":6,"SlateGrey-3C|T200":6,"SlateGrey-3C|T300":2,"SlateGrey-3C|T200-20":1,"SlateGrey-3C|T200C":1,"SlateGrey-3C|T150U":1,"SlateGrey-3C|T175U":1,"SlateGrey-3C|T200U":1,"SlateGrey-3C|U200C":1,
+    "SlateGrey-2C|T150":6,"SlateGrey-2C|T175":6,"SlateGrey-2C|T200":6,"SlateGrey-2C|T300":2,"SlateGrey-2C|T200-20":1,"SlateGrey-2C|T200C":1,"SlateGrey-2C|T150U":1,"SlateGrey-2C|T175U":1,"SlateGrey-2C|T200U":1,"SlateGrey-2C|U200C":1,
+    "SlateGrey-B|T150":6,"SlateGrey-B|T175":6,"SlateGrey-B|T200":6,"SlateGrey-B|T300":2,"SlateGrey-B|T200-20":1,"SlateGrey-B|T200C":1,"SlateGrey-B|T150U":1,"SlateGrey-B|T175U":1,"SlateGrey-B|T200U":1,"SlateGrey-B|U200C":1,
+    "SlateGrey-None|T150":1,"SlateGrey-None|T175":1,"SlateGrey-None|T200":1,"SlateGrey-None|T300":1,"SlateGrey-None|T200-20":1,"SlateGrey-None|T200C":1,"SlateGrey-None|T150U":1,"SlateGrey-None|T175U":1,"SlateGrey-None|T200U":1,"SlateGrey-None|U200C":1,
+    "white-3A|T150":8,"white-3A|T175":8,"white-3A|T200":8,"white-3A|T300":8,"white-3A|T200-20":8,"white-3A|T200C":8,"white-3A|T150U":8,"white-3A|T175U":8,"white-3A|T200U":8,"white-3A|U200C":1,
+    "white-2A|T150":8,"white-2A|T175":8,"white-2A|T200":8,"white-2A|T300":11,"white-2A|T200-20":8,"white-2A|T200C":8,"white-2A|T150U":8,"white-2A|T175U":8,"white-2A|T200U":8,"white-2A|U200C":1,
+    "white-3C|T150":8,"white-3C|T175":8,"white-3C|T200":5,"white-3C|T300":0,"white-3C|T200-20":8,"white-3C|T200C":8,"white-3C|T150U":8,"white-3C|T175U":8,"white-3C|T200U":8,"white-3C|U200C":1,
+    "white-2C|T150":8,"white-2C|T175":8,"white-2C|T200":8,"white-2C|T300":7,"white-2C|T200-20":8,"white-2C|T200C":8,"white-2C|T150U":8,"white-2C|T175U":8,"white-2C|T200U":8,"white-2C|U200C":1,
+    "white-B|T150":9,"white-B|T175":9,"white-B|T200":9,"white-B|T300":10,"white-B|T200-20":9,"white-B|T200C":9,"white-B|T150U":9,"white-B|T175U":9,"white-B|T200U":9,"white-B|U200C":1,
+    "white-None|T150":1,"white-None|T175":1,"white-None|T200":1,"white-None|T300":1,"white-None|T200-20":1,"white-None|T200C":1,"white-None|T150U":1,"white-None|T175U":1,"white-None|T200U":1,"white-None|U200C":1,
+  };
+  function applyJambSealConstraint() {
+    const $sel = $("#JAMB_SEAL");
+    if (!$sel.length) return;
+    const colorKey = $("input[name='COLOR']:checked").val();
+    const mountVal = $("#TRK_MOUNT_TYP").val();
+    const model    = $("input[name='DOOR_MODEL']:checked").val();
+    const colorPrefix = WS_COLOR_KEY[colorKey];
+    const mountKey    = WS_MOUNT_KEY[mountVal];
+    if (!colorPrefix || !mountKey || !model) return;
+    const setIdx = WS_LOOKUP[`${colorPrefix}-${mountKey}|${model}`];
+    // Unknown combo (no data) → show all options rather than blank out.
+    const allowed = setIdx === undefined ? null : new Set(WS_SET_VALUES[setIdx]);
+    const $options = $sel.find("option");
+    $options.each(function () {
+      const allow = allowed === null || allowed.has(this.value);
+      $(this).toggle(allow).prop("disabled", !allow);
+    });
+    if (allowed && !allowed.has($sel.val())) $sel.val("NONE");
+  }
+  $(document).on("change",
+    "input[name='COLOR'], #TRK_MOUNT_TYP, input[name='DOOR_MODEL']",
+    applyJambSealConstraint);
+  applyJambSealConstraint();
+  setTimeout(applyJambSealConstraint, 0);
+  setTimeout(applyJambSealConstraint, 250);
 
   // [BOTTOM-SEAL-LOGIC] Bottom Seal row stays visible so the user sees it exists.
   // When the retainer has no seal slot, swap the options for a single "None" entry.
