@@ -947,9 +947,7 @@ const CANVAS_PLUGIN = {
 
     const pattern = $("input[name='Pattern']:checked").val() || "Standard Rib";
     const color = $("input[name='COLOR']:checked").attr("hex") || "#654321";
-    const numSections = $("#custom_dimensions").is(":checked")
-      ? (parseInt($("#NUM_OF_SEC").val()) || 4)
-      : 4;
+    const numSections = parseInt($("#NUM_OF_SEC").val()) || 4;
 
     await CANVAS_PLUGIN.drawThermatiteDoor({
       dimensions: { widthInches, heightInches, numSections, scale: 1 },
@@ -969,6 +967,7 @@ const HEIGHT_FEET_MAX = 22;
 const WIDTH_FEET_MIN = 4;
 const WIDTH_FEET_MAX = 22;
 
+let _canvasRedrawTimer = null;
 $(document).on(
   "input",
   "#CUSTOM_WIDTH_FEET, #CUSTOM_WIDTH_INCHES, #CUSTOM_HEIGHT_FEET, #CUSTOM_HEIGHT_INCHES",
@@ -991,7 +990,11 @@ $(document).on(
         if (val > dynMax) this.value = dynMax;
       }
     }
-    CANVAS_PLUGIN.redrawFromCurrentForm();
+    if (_canvasRedrawTimer) clearTimeout(_canvasRedrawTimer);
+    _canvasRedrawTimer = setTimeout(() => {
+      _canvasRedrawTimer = null;
+      CANVAS_PLUGIN.redrawFromCurrentForm();
+    }, 80);
   }
 );
 

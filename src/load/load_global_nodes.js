@@ -8,67 +8,72 @@ function loadGlobalNodes() {
   addNode({
     id: "SIZE_HEIGHT",
     logic() {
-      const sizeNode = getNode("SIZE");
-      this.value = sizeNode
-        ? Number(sizeNode.getAttribute("height")) || 0
-        : 0;
+      const $checked = $("input[name='SIZE']:checked");
+      this.value = Number($checked.attr("height")) || 0;
     }
   }, ["SIZE"]);
 
   addNode({
     id: "SIZE_WIDTH",
     logic() {
-      const sizeNode = getNode("SIZE");
-      this.value = sizeNode
-        ? Number(sizeNode.getAttribute("width")) || 0
-        : 0;
+      const $checked = $("input[name='SIZE']:checked");
+      this.value = Number($checked.attr("width")) || 0;
     }
   }, ["SIZE"]);
 
   addNode({
     id: "WIDTH",
     logic: function () {
-      const toggle_Switch = nodeset["customSwitch"]?.value;
       const sizeWidth = nodeset["SIZE_WIDTH"]?.value ?? 0;
-      this.value = toggle_Switch === "on"
+      this.value = $("#custom_dimensions").is(":checked")
         ? getGlobalDoorWidthFromFeetInches()
         : sizeWidth * 12;
     }
   },
-    ["SIZE_WIDTH", "DOOR_WIDTH_FEET", "DOOR_WIDTH_INCHES", "customSwitch"])
+    ["SIZE_WIDTH"])
 
   addNode({
     id: "HEIGHT",
     logic: function () {
-      const toggle_Switch = nodeset["customSwitch"]?.value;
       const sizeHeight = nodeset["SIZE_HEIGHT"]?.value ?? 0;
-      this.value = toggle_Switch === "on"
+      this.value = $("#custom_dimensions").is(":checked")
         ? getGlobalDoorHeightFromFeetInches()
         : sizeHeight * 12;
     }
   },
-    ["SIZE_HEIGHT", "DOOR_HEIGHT_FEET", "DOOR_HEIGHT_INCHES", "customSwitch"]);
+    ["SIZE_HEIGHT"]);
 
   addLogic("DOOR_WIDTH_FEET", function () {
-    const toggle_Switch = nodeset["customSwitch"]?.value;
-    if (toggle_Switch === "off") {
+    if ($("#custom_dimensions").is(":checked")) {
+      this.value = parseInt($("#CUSTOM_WIDTH_FEET").val()) || 0;
+    } else {
       this.value = getDoorWidthFeetFromSize();
     }
-  }, ["customSwitch", "SIZE"])
+  }, ["SIZE"])
 
   addLogic("DOOR_HEIGHT_FEET", function () {
-    const toggle_Switch = nodeset["customSwitch"]?.value;
-    if (toggle_Switch === "off") {
+    if ($("#custom_dimensions").is(":checked")) {
+      this.value = parseInt($("#CUSTOM_HEIGHT_FEET").val()) || 0;
+    } else {
       this.value = getDoorHeightFeetFromSize();
     }
-  }, ["customSwitch", "SIZE"])
+  }, ["SIZE"])
 
   addLogic("DOOR_WIDTH_INCHES", function () {
-    const toggle_Switch = nodeset["customSwitch"]?.value;
-    if (toggle_Switch === "off") {
+    if ($("#custom_dimensions").is(":checked")) {
+      this.value = parseInt($("#CUSTOM_WIDTH_INCHES").val()) || 0;
+    } else {
       this.value = 0;
     }
-  }, ["customSwitch", "SIZE"])
+  }, ["SIZE"])
+
+  addLogic("DOOR_HEIGHT_INCHES", function () {
+    if ($("#custom_dimensions").is(":checked")) {
+      this.value = parseInt($("#CUSTOM_HEIGHT_INCHES").val()) || 0;
+    } else {
+      this.value = 0;
+    }
+  }, ["SIZE"])
 
 
   addLogic("LM_DOOR_MODEL", function () {
@@ -81,7 +86,7 @@ function loadGlobalNodes() {
   addNode({
     id: "WEIGHT",
     logic: function () {
-      this.value = getCurrentDoorWeight()
+      // this.value = getCurrentDoorWeight()
     }
   }, ["WIDTH", "HEIGHT", "COLOR", "WINDOWS", "WINDOW_POSITION",
       "DOOR_WIDTH_FEET", "DOOR_HEIGHT_FEET",
@@ -165,27 +170,31 @@ function getGlobalDoorHeight() {
 }
 
 function getGlobalDoorWidthFromFeetInches() {
-  return (parseInt(getState("DOOR_WIDTH_FEET")) * 12 + parseInt(getState("DOOR_WIDTH_INCHES")));
+  const feet = parseInt($("#CUSTOM_WIDTH_FEET").val()) || 0;
+  const inches = parseInt($("#CUSTOM_WIDTH_INCHES").val()) || 0;
+  return feet * 12 + inches;
 }
 
 function getGlobalDoorWidthFromSizeRadio() {
-  return (parseInt(getNode("SIZE").getAttribute("width")) || 0) * 12; // convert feet to inches
+  return (parseInt($("input[name='SIZE']:checked").attr("width")) || 0) * 12;
 };
 
 function getDoorWidthFeetFromSize() {
-  return (parseInt(getNode("SIZE").getAttribute("width")));
+  return parseInt($("input[name='SIZE']:checked").attr("width")) || 0;
 };
 
 function getGlobalDoorHeightFromFeetInches() {
-  return (parseInt(getState("DOOR_HEIGHT_FEET")) * 12 + parseInt(getState("DOOR_HEIGHT_INCHES")));
+  const feet = parseInt($("#CUSTOM_HEIGHT_FEET").val()) || 0;
+  const inches = parseInt($("#CUSTOM_HEIGHT_INCHES").val()) || 0;
+  return feet * 12 + inches;
 }
 
 function getDoorHeightFeetFromSize() {
-  return (parseInt(getNode("SIZE").getAttribute("height")) || 0);
+  return parseInt($("input[name='SIZE']:checked").attr("height")) || 0;
 }
 
 function getGlobalDoorHeightFromSizeRadio() {
-  return (parseInt(getNode("SIZE").getAttribute("height")) || 0) * 12; // convert feet to inches
+  return (parseInt($("input[name='SIZE']:checked").attr("height")) || 0) * 12;
 };
 
 function getEndCapsData() {

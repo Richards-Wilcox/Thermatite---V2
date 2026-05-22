@@ -201,11 +201,18 @@ function applyWidthConstraint(model, hwSize, doorOptions) {
   const curFt = parseInt($w.val());
   const clampedFt = isNaN(curFt) || curFt < limits.min ? limits.min : curFt > limits.max ? limits.max : curFt;
   $w.attr("min", limits.min).attr("max", limits.max);
-  $w.empty();
-  for (let v = limits.min; v <= limits.max; v++) {
-    $w.append(`<option value="${v}"${v === clampedFt ? " selected" : ""}>${v}</option>`);
+  const ftRangeChanged = $w.children().length !== (limits.max - limits.min + 1)
+    || parseInt($w.children().first().val()) !== limits.min
+    || parseInt($w.children().last().val()) !== limits.max;
+  if (ftRangeChanged) {
+    $w.empty();
+    for (let v = limits.min; v <= limits.max; v++) {
+      $w.append(`<option value="${v}"${v === clampedFt ? " selected" : ""}>${v}</option>`);
+    }
   }
-  if (clampedFt !== curFt) $w.trigger("change");
+  if (clampedFt !== curFt) {
+    $w.val(clampedFt).trigger("change");
+  }
 
   const inchThreshold = limits.maxInchesThreshold ?? limits.max;
   const maxIn = limits.inchExceptions?.[clampedFt] !== undefined
@@ -213,11 +220,16 @@ function applyWidthConstraint(model, hwSize, doorOptions) {
     : (clampedFt >= inchThreshold ? (limits.maxInches ?? 11) : 11);
   const curIn = parseInt($wi.val());
   const clampedIn = !isNaN(curIn) && curIn <= maxIn ? curIn : maxIn;
-  $wi.empty();
-  for (let v = 0; v <= maxIn; v++) {
-    $wi.append(`<option value="${v}"${v === clampedIn ? " selected" : ""}>${v}</option>`);
+  const inRangeChanged = $wi.children().length !== (maxIn + 1);
+  if (inRangeChanged) {
+    $wi.empty();
+    for (let v = 0; v <= maxIn; v++) {
+      $wi.append(`<option value="${v}"${v === clampedIn ? " selected" : ""}>${v}</option>`);
+    }
   }
-  if (clampedIn !== curIn) $wi.trigger("change");
+  if (clampedIn !== curIn) {
+    $wi.val(clampedIn).trigger("change");
+  }
 }
 
 // [HEIGHT-CONSTRAINT]
@@ -237,11 +249,18 @@ function applyHeightConstraint(model, hwSize, doorOptions) {
   const cur = parseInt($h.val());
   const clamped = isNaN(cur) || cur < limits.min ? limits.min : cur > limits.max ? limits.max : cur;
   $h.attr("min", limits.min).attr("max", limits.max);
-  $h.empty();
-  for (let v = limits.min; v <= limits.max; v++) {
-    $h.append(`<option value="${v}"${v === clamped ? " selected" : ""}>${v}</option>`);
+  const ftRangeChanged = $h.children().length !== (limits.max - limits.min + 1)
+    || parseInt($h.children().first().val()) !== limits.min
+    || parseInt($h.children().last().val()) !== limits.max;
+  if (ftRangeChanged) {
+    $h.empty();
+    for (let v = limits.min; v <= limits.max; v++) {
+      $h.append(`<option value="${v}"${v === clamped ? " selected" : ""}>${v}</option>`);
+    }
   }
-  if (clamped !== cur) $h.trigger("change");
+  if (clamped !== cur) {
+    $h.val(clamped).trigger("change");
+  }
 
   const inchThreshold = limits.maxInchesThreshold ?? limits.max;
   const maxIn = limits.inchExceptions?.[clamped] !== undefined
@@ -249,11 +268,16 @@ function applyHeightConstraint(model, hwSize, doorOptions) {
     : (clamped >= inchThreshold ? (limits.maxInches ?? 11) : 11);
   const curIn = parseInt($hi.val());
   const clampedIn = !isNaN(curIn) && curIn <= maxIn ? curIn : maxIn;
-  $hi.empty();
-  for (let v = 0; v <= maxIn; v++) {
-    $hi.append(`<option value="${v}"${v === clampedIn ? " selected" : ""}>${v}</option>`);
+  const inRangeChanged = $hi.children().length !== (maxIn + 1);
+  if (inRangeChanged) {
+    $hi.empty();
+    for (let v = 0; v <= maxIn; v++) {
+      $hi.append(`<option value="${v}"${v === clampedIn ? " selected" : ""}>${v}</option>`);
+    }
   }
-  if (clampedIn !== curIn) $hi.trigger("change");
+  if (clampedIn !== curIn) {
+    $hi.val(clampedIn).trigger("change");
+  }
 }
 
 // [APPLY-ALL]
@@ -268,12 +292,35 @@ function loadDrivenInputEvents() {
     createNode(
       "HIGHLIFT_LAYOUT",
       function () {
-        this.setVisibility(getState("LIFT_TYPE") === 'HL')
+        this.setVisibility(getState("LIFT_TYPE") === 'High_Lift')
       },
       "",
       $("#HIGHLIFT_LAYOUT")[0],
       ["LIFT_TYPE"])
   }
+
+  // [HIGHLIFT-CLEARANCE-VIS] Show HIGHLIFT (in) and CLEARANCE only when LIFT_TYPE === High_Lift.
+  // Clearance options: High_Lift → [HighLift, HeadRoom]; everything else → [None].
+  // Also shows Custom LHR Setup toggle when LIFT_TYPE === LHR_Vertical_Lift.
+  function applyHighLiftControlsVisibility() {
+    const liftType = $("#LIFT_TYPE").val();
+    const isHL = liftType === "High_Lift";
+    const isLHRVL = liftType === "LHR_Vertical_Lift";
+    $("#HIGHLIFT_ROW").css("display", isHL ? "flex" : "none");
+    $("#CUSTOM_LHR_ROW").css("display", isLHRVL ? "flex" : "none");
+    const $cl = $("#CLEARANCE");
+    if (!$cl.length) return;
+    const allowed = isHL ? ["HighLift", "HeadRoom"] : ["None"];
+    $cl.find("option").each(function () {
+      const ok = allowed.includes(this.value);
+      $(this).toggle(ok).prop("disabled", !ok);
+    });
+    if (!allowed.includes($cl.val())) $cl.val(allowed[0]);
+  }
+  $(document).on("change", "#LIFT_TYPE", applyHighLiftControlsVisibility);
+  applyHighLiftControlsVisibility();
+  setTimeout(applyHighLiftControlsVisibility, 0);
+  setTimeout(applyHighLiftControlsVisibility, 250);
 
   // [HIGHLIFT-VALUE]
   addLogic("HIGHLIFT_VALUE", function () {
@@ -406,21 +453,31 @@ function loadDrivenInputEvents() {
   });
 
   let _heightConstraintRunning = false;
+  let _heightConstraintTimer = null;
   $(document).on("change", "#CUSTOM_HEIGHT_FEET", function () {
-    if (_heightConstraintRunning) return;
-    _heightConstraintRunning = true;
-    const { model, hwSize, doorOpts } = getSelections();
-    applyHeightConstraint(model, hwSize, doorOpts);
-    _heightConstraintRunning = false;
+    if (_heightConstraintTimer) clearTimeout(_heightConstraintTimer);
+    _heightConstraintTimer = setTimeout(() => {
+      _heightConstraintTimer = null;
+      if (_heightConstraintRunning) return;
+      _heightConstraintRunning = true;
+      const { model, hwSize, doorOpts } = getSelections();
+      applyHeightConstraint(model, hwSize, doorOpts);
+      _heightConstraintRunning = false;
+    }, 80);
   });
 
   let _widthConstraintRunning = false;
+  let _widthConstraintTimer = null;
   $(document).on("change", "#CUSTOM_WIDTH_FEET", function () {
-    if (_widthConstraintRunning) return;
-    _widthConstraintRunning = true;
-    const { model, hwSize, doorOpts } = getSelections();
-    applyWidthConstraint(model, hwSize, doorOpts);
-    _widthConstraintRunning = false;
+    if (_widthConstraintTimer) clearTimeout(_widthConstraintTimer);
+    _widthConstraintTimer = setTimeout(() => {
+      _widthConstraintTimer = null;
+      if (_widthConstraintRunning) return;
+      _widthConstraintRunning = true;
+      const { model, hwSize, doorOpts } = getSelections();
+      applyWidthConstraint(model, hwSize, doorOpts);
+      _widthConstraintRunning = false;
+    }, 80);
   });
 
   // [LIFT-TYPE-LOGIC] LIFT_TYPE is a plain <select>; framework binds value natively. No addLogic needed.
@@ -535,7 +592,9 @@ function loadDrivenInputEvents() {
     $sel[0].innerHTML = allowed.map(v =>
       `<option value="${v}" hwset="${TRK_MOUNT_HWSET[v]}">${TRK_MOUNT_LABEL[v]}</option>`
     ).join("");
-    $sel.val(allowed.includes(prev) ? prev : allowed[0]);
+    const next = allowed.includes(prev) ? prev : allowed[0];
+    $sel.val(next);
+    if ($sel.val() !== next) $sel[0].selectedIndex = 0;
   }
   $(document).on("change",
     "input[name='DOOR_MODEL'], input[name='HARDWARE_SIZE'], input[name='CSBBDrHgt'], input[name='NoLapSteelJamb']",
@@ -543,6 +602,7 @@ function loadDrivenInputEvents() {
   applyTrackMountConstraint();
   setTimeout(applyTrackMountConstraint, 0);
   setTimeout(applyTrackMountConstraint, 250);
+  setTimeout(applyTrackMountConstraint, 1000);
 
   // [LOWER-SPLICE-LOGIC] Lower Splice depends on Lift Type. Track Mount = NONE forces None.
   // Std lifts (12R/16R/LHR_Fr/LHR_Rr) → None only. High Lift / VL / LHR_VL → UWA + UBM.
@@ -562,32 +622,37 @@ function loadDrivenInputEvents() {
       : ["UPPER_WALL_ANGLE", "UPPER_BRACKET_MOUNT"];
     const prev = $sel.val();
     $sel[0].innerHTML = allowed.map(v => `<option value="${v}">${LOWER_SPLICE_LABEL[v]}</option>`).join("");
-    $sel.val(allowed.includes(prev) ? prev : allowed[0]);
+    const next = allowed.includes(prev) ? prev : allowed[0];
+    $sel.val(next);
+    if ($sel.val() !== next) $sel[0].selectedIndex = 0;
   }
   $(document).on("change", "#TRK_MOUNT_TYP, #LIFT_TYPE", applyLowerSpliceConstraint);
   applyLowerSpliceConstraint();
   setTimeout(applyLowerSpliceConstraint, 0);
   setTimeout(applyLowerSpliceConstraint, 250);
+  setTimeout(applyLowerSpliceConstraint, 1000);
 
-  // [INCLINED-TRACK-LOGIC] Inclined Track Degrees option disabled for LHR_Fr/LHR_Rr/VL/LHR_VL.
+  // [INCLINED-TRACK-LOGIC] Yes/No toggle reveals the Degree-or-No-Slope picker.
+  // For LHR_Fr/LHR_Rr/VL/LHR_VL lift types, degree values are disabled — only No Slope remains.
   const LIFT_TYPES_NO_DEGREES = ["LHR_Fr_Mnt", "LHR_Rr_Mnt", "Vertical_Lift", "LHR_Vertical_Lift"];
   function applyInclinedTrackConstraint() {
-    const $degBtn = $("#INCLINED_TRACK_DEG_BTN");
-    if (!$degBtn.length) return;
-    const liftType = $("#LIFT_TYPE").val();
-    const blockDegrees = LIFT_TYPES_NO_DEGREES.includes(liftType);
-    if (blockDegrees) {
-      $degBtn.addClass("disabled");
-      if ($("#INCLINED_TRACK_DEG").is(":checked")) {
-        $("#INCLINED_TRACK_NONE").prop("checked", true).trigger("change");
-        $degBtn.removeClass("selected");
-        $("#INCLINED_TRACK_NONE_BTN").addClass("selected");
-      }
-    } else {
-      $degBtn.removeClass("disabled");
-    }
+    const $details = $("#INCLINED_TRACK_DETAILS");
+    if (!$details.length) return;
+    const isYes = $("#INCLINED_TRACK_YES").is(":checked");
+    $details.css("display", isYes ? "flex" : "none");
+    const $sel = $("#INCLINED_TRACK_VALUE");
+    const blockDegrees = LIFT_TYPES_NO_DEGREES.includes($("#LIFT_TYPE").val());
+    $sel.find("option").each(function () {
+      if (this.value === "no_slope") return;
+      $(this).prop("disabled", blockDegrees).toggle(!blockDegrees);
+    });
+    if (blockDegrees && $sel.val() !== "no_slope") $sel.val("no_slope");
+    // Mirror state to the legacy InclinedTrack hidden input for host config.
+    const v = $sel.val();
+    const hidden = !isYes || v === "no_slope" ? "none" : "degrees";
+    $("#INCLINED_TRACK_HIDDEN").val(hidden);
   }
-  $(document).on("change", "#LIFT_TYPE", applyInclinedTrackConstraint);
+  $(document).on("change", "#LIFT_TYPE, input[name='InclinedTrackOn'], #INCLINED_TRACK_VALUE", applyInclinedTrackConstraint);
   applyInclinedTrackConstraint();
   setTimeout(applyInclinedTrackConstraint, 0);
   setTimeout(applyInclinedTrackConstraint, 250);
@@ -621,15 +686,22 @@ function loadDrivenInputEvents() {
 
   function applyRollerStyleConstraint() {
     const hwSize = $("input[name='HARDWARE_SIZE']:checked").val();
-    const $select = $("#ROLLER_STYLE");
     const allowed = hwSize === "3" ? ROLLER_HW3 : ROLLER_HW2;
 
-    $("#ROLLER_STYLE option").each(function () {
-      const allowed_ = allowed.includes(this.value);
-      $(this).prop("disabled", !allowed_).toggle(allowed_);
+    $("input[name='RollerStyle']").each(function () {
+      const $btn = $(this).closest(".rw-button");
+      const ok = allowed.includes(this.value);
+      $btn.toggle(ok);
+      $(this).prop("disabled", !ok);
     });
 
-    if (!allowed.includes($select.val())) $select.val("Steel");
+    const $checked = $("input[name='RollerStyle']:checked");
+    if (!$checked.length || !allowed.includes($checked.val())) {
+      $("input[name='RollerStyle']").prop("checked", false);
+      $("input[name='RollerStyle'][value='Steel']").prop("checked", true);
+      $("input[name='RollerStyle']").closest(".rw-button").removeClass("btn-checked");
+      $("input[name='RollerStyle'][value='Steel']").closest(".rw-button").addClass("btn-checked");
+    }
   }
 
   $(document).on("change", "input[name='HARDWARE_SIZE']", applyRollerStyleConstraint);
@@ -821,55 +893,164 @@ function loadDrivenInputEvents() {
     "white-B|T150":9,"white-B|T175":9,"white-B|T200":9,"white-B|T300":10,"white-B|T200-20":9,"white-B|T200C":9,"white-B|T150U":9,"white-B|T175U":9,"white-B|T200U":9,"white-B|U200C":1,
     "white-None|T150":1,"white-None|T175":1,"white-None|T200":1,"white-None|T300":1,"white-None|T200-20":1,"white-None|T200C":1,"white-None|T150U":1,"white-None|T175U":1,"white-None|T200U":1,"white-None|U200C":1,
   };
+  // Coverage matrix (data/weather_seal/Coverage.csv): which seals are valid for
+  // each Weather Seal Coverage mode. NONE is always selectable; selecting NONE
+  // disables the coverage control (no coverage applies).
+  const WS_COVERAGE_BLOCKS = {
+    complete:      new Set(["EU_ADCA", "ADCA_MOUNT_JWS"]),
+    vertical_only: new Set([]),
+  };
   function applyJambSealConstraint() {
     const $sel = $("#JAMB_SEAL");
     if (!$sel.length) return;
     const colorKey = $("input[name='COLOR']:checked").val();
     const mountVal = $("#TRK_MOUNT_TYP").val();
     const model    = $("input[name='DOOR_MODEL']:checked").val();
+    const coverage = $("input[name='WeatherSealCoverage']:checked").val() || "complete";
     const colorPrefix = WS_COLOR_KEY[colorKey];
     const mountKey    = WS_MOUNT_KEY[mountVal];
-    if (!colorPrefix || !mountKey || !model) return;
+    if (!colorPrefix || !mountKey || !model) {
+      if (!$sel.val()) $sel[0].selectedIndex = 0;
+      return;
+    }
     const setIdx = WS_LOOKUP[`${colorPrefix}-${mountKey}|${model}`];
     // Unknown combo (no data) → show all options rather than blank out.
-    const allowed = setIdx === undefined ? null : new Set(WS_SET_VALUES[setIdx]);
+    const dataAllowed = setIdx === undefined ? null : new Set(WS_SET_VALUES[setIdx]);
+    const coverageBlocks = WS_COVERAGE_BLOCKS[coverage] || new Set();
     const $options = $sel.find("option");
     $options.each(function () {
-      const allow = allowed === null || allowed.has(this.value);
+      const v = this.value;
+      const dataOk = dataAllowed === null || dataAllowed.has(v);
+      const coverageOk = v === "NONE" || !coverageBlocks.has(v);
+      const allow = dataOk && coverageOk;
       $(this).toggle(allow).prop("disabled", !allow);
     });
-    if (allowed && !allowed.has($sel.val())) $sel.val("NONE");
-  }
-  $(document).on("change",
-    "input[name='COLOR'], #TRK_MOUNT_TYP, input[name='DOOR_MODEL']",
-    applyJambSealConstraint);
-  applyJambSealConstraint();
-  setTimeout(applyJambSealConstraint, 0);
-  setTimeout(applyJambSealConstraint, 250);
-
-  // [BOTTOM-SEAL-LOGIC] Bottom Seal row stays visible so the user sees it exists.
-  // When the retainer has no seal slot, swap the options for a single "None" entry.
-  const RETAINER_HAS_SEAL = ["steel", "pvc"];
-  const BOTTOM_SEAL_OPTIONS = [
-    { value: "pvc_4_35c",        label: '4" PVC Bottom Seal (-35C)' },
-    { value: "santoprene_3_60c", label: '3" Santoprene Bottom Seal (-60C)' },
-  ];
-  const DEFAULT_BOTTOM_SEAL = BOTTOM_SEAL_OPTIONS[0].value;
-  function applyBottomSealConstraint() {
-    const $sel = $("#BOTTOM_SEAL");
-    if (!$sel.length) return;
-    const nextState = RETAINER_HAS_SEAL.includes($("#BOTTOM_RETAINER").val()) ? "seal" : "none";
-    if ($sel.attr("data-seal-state") === nextState) return;
-    $sel.attr("data-seal-state", nextState);
-    if (nextState === "seal") {
-      $sel[0].innerHTML = BOTTOM_SEAL_OPTIONS.map(o => `<option value="${o.value}">${o.label}</option>`).join("");
-      $sel.val(DEFAULT_BOTTOM_SEAL).prop("disabled", false).removeClass("is-placeholder");
-    } else {
-      $sel[0].innerHTML = `<option value="none">None</option>`;
-      $sel.val("none").prop("disabled", true).addClass("is-placeholder");
+    const current = $sel.val();
+    const stillValid = current &&
+      (dataAllowed === null || dataAllowed.has(current)) &&
+      (current === "NONE" || !coverageBlocks.has(current));
+    if (!stillValid) {
+      // Default is always NONE — it's never blocked by data or coverage.
+      $sel.find("option[value='NONE']").prop("selected", true);
+      $sel.val("NONE");
+    }
+    if (!$sel.val()) {
+      $sel.find("option[value='NONE']").prop("selected", true);
+      $sel.val("NONE");
     }
   }
-  $(document).on("change", "#BOTTOM_RETAINER", applyBottomSealConstraint);
+  // Coverage toggle is disabled when JAMB_SEAL = NONE (no coverage applies).
+  function applyCoverageEnablement() {
+    const val = $("#JAMB_SEAL").val();
+    if (!val) return;
+    const isNone = val === "NONE";
+    const $btns = $("#WS_COVERAGE_COMPLETE_BTN, #WS_COVERAGE_VERTICAL_BTN");
+    $btns.toggleClass("disabled", isNone);
+    $("input[name='WeatherSealCoverage']").prop("disabled", isNone);
+  }
+  $(document).on("change",
+    "input[name='COLOR'], #TRK_MOUNT_TYP, input[name='DOOR_MODEL'], input[name='WeatherSealCoverage']",
+    applyJambSealConstraint);
+  $(document).on("change", "#JAMB_SEAL", applyCoverageEnablement);
+  applyJambSealConstraint();
+  applyCoverageEnablement();
+  setTimeout(() => { applyJambSealConstraint(); applyCoverageEnablement(); }, 0);
+  setTimeout(() => { applyJambSealConstraint(); applyCoverageEnablement(); }, 250);
+  setTimeout(() => { applyJambSealConstraint(); applyCoverageEnablement(); }, 1000);
+
+  // [NOLAP-STEEL-JAMB-LOGIC] Forced by (Jamb, OverlapRequired):
+  //   Steel  + Overlap Yes → NoLap = No   (Yes disabled)
+  //   Steel  + Overlap No  → NoLap = Yes  (No disabled)
+  //   Wood   / Masonry     → NoLap = No   (Yes disabled, both overlap states)
+  function applyNoLapSteelJambConstraint() {
+    const $yes = $("#NOLAP_STEEL_JAMB_YES");
+    const $no  = $("#NOLAP_STEEL_JAMB_NO");
+    if (!$yes.length) return;
+    const $yesBtn = $("#NOLAP_STEEL_JAMB_YES_BTN");
+    const $noBtn  = $("#NOLAP_STEEL_JAMB_NO_BTN");
+    const jamb    = $("#JAMB").val();
+    const overlap = $("input[name='OverlapRequired']:checked").val();
+    let forced;
+    if (jamb === "steel") forced = overlap === "yes" ? "no" : "yes";
+    else forced = "no";
+    $yes.prop("checked", forced === "yes").prop("disabled", forced !== "yes");
+    $no.prop("checked",  forced === "no").prop("disabled",  forced !== "no");
+    $yesBtn.toggleClass("disabled", forced !== "yes").toggleClass("selected", forced === "yes");
+    $noBtn.toggleClass("disabled",  forced !== "no").toggleClass("selected",  forced === "no");
+    if (typeof window.syncSlidingButtonGroup === "function") window.syncSlidingButtonGroup("NoLapSteelJamb");
+    if (typeof applyTrackMountConstraint === "function") applyTrackMountConstraint();
+  }
+  $(document).on("change", "#JAMB, input[name='OverlapRequired']", applyNoLapSteelJambConstraint);
+  applyNoLapSteelJambConstraint();
+  setTimeout(applyNoLapSteelJambConstraint, 0);
+  setTimeout(applyNoLapSteelJambConstraint, 250);
+
+  // [CSBB-DRHGT-LOGIC] CSBB Door Height is forced by (CSBB, CUSTOM_HEIGHT_FEET):
+  //   CSBB = No                        → NO CSBB
+  //   CSBB = Yes + height ≤ 20 ft      → DHLTE20FT
+  //   CSBB = Yes + height > 20 ft      → DHGT20
+  // Buttons stay visible but are disabled.
+  function applyCsbbDrHgtConstraint() {
+    const $none = $("#CSBB_DRHGT_NONE");
+    if (!$none.length) return;
+    const csbb = $("input[name='CSBB']:checked").val();
+    const heightFt = parseInt($("#CUSTOM_HEIGHT_FEET").val(), 10);
+    let forced;
+    if (csbb !== "yes") forced = "no_csbb";
+    else if (!isNaN(heightFt) && heightFt > 20) forced = "csbb_dhgt20";
+    else forced = "csbb_dhlte20ft";
+    $("input[name='CSBBDrHgt']").each(function () {
+      const isForced = this.value === forced;
+      $(this).prop("checked", isForced).prop("disabled", true);
+      const $btn = $(this).closest(".rw-sliding-button");
+      $btn.toggleClass("btn-checked selected", isForced).addClass("disabled");
+    });
+    if (typeof window.syncSlidingButtonGroup === "function") window.syncSlidingButtonGroup("CSBBDrHgt");
+    if (typeof applyTrackMountConstraint === "function") applyTrackMountConstraint();
+  }
+  let _csbbDrHgtTimer = null;
+  $(document).on("change", "input[name='CSBB'], #CUSTOM_HEIGHT_FEET", function () {
+    if (_csbbDrHgtTimer) clearTimeout(_csbbDrHgtTimer);
+    _csbbDrHgtTimer = setTimeout(() => {
+      _csbbDrHgtTimer = null;
+      applyCsbbDrHgtConstraint();
+    }, 80);
+  });
+  applyCsbbDrHgtConstraint();
+  setTimeout(applyCsbbDrHgtConstraint, 0);
+  setTimeout(applyCsbbDrHgtConstraint, 250);
+
+  // [BOTTOM-SEAL-LOGIC] Bottom Seal row stays visible so the user sees it exists.
+  // When the retainer has no seal slot, only "None" is selectable.
+  const RETAINER_HAS_SEAL = ["steel", "pvc"];
+  const DEFAULT_BOTTOM_SEAL = "pvc_4_35c";
+  function applyBottomSealConstraint() {
+    const $row = $("#BOTTOM_SEAL_ROW");
+    if (!$row.length) return;
+    const nextState = RETAINER_HAS_SEAL.includes($("input[name='BottomRetainer']:checked").val()) ? "seal" : "none";
+    if ($row.attr("data-seal-state") === nextState) return;
+    $row.attr("data-seal-state", nextState);
+
+    const $sealBtns = $("input[name='BottomSeal'][value='pvc_4_35c'], input[name='BottomSeal'][value='santoprene_3_60c']");
+    const $noneBtn = $("input[name='BottomSeal'][value='none']");
+
+    if (nextState === "seal") {
+      $sealBtns.each(function () { $(this).closest(".rw-button").show(); $(this).prop("disabled", false); });
+      $noneBtn.closest(".rw-button").hide();
+      $noneBtn.prop("disabled", true);
+      $("input[name='BottomSeal']").prop("checked", false);
+      $("input[name='BottomSeal']").closest(".rw-button").removeClass("btn-checked");
+      $("input[name='BottomSeal'][value='" + DEFAULT_BOTTOM_SEAL + "']").prop("checked", true).closest(".rw-button").addClass("btn-checked");
+    } else {
+      $sealBtns.each(function () { $(this).closest(".rw-button").hide(); $(this).prop("disabled", true); });
+      $noneBtn.closest(".rw-button").show();
+      $noneBtn.prop("disabled", false);
+      $("input[name='BottomSeal']").prop("checked", false);
+      $("input[name='BottomSeal']").closest(".rw-button").removeClass("btn-checked");
+      $noneBtn.prop("checked", true).closest(".rw-button").addClass("btn-checked");
+    }
+  }
+  $(document).on("change", "input[name='BottomRetainer']", applyBottomSealConstraint);
   applyBottomSealConstraint();
   // Re-run after host framework finishes hydrating selects.
   setTimeout(applyBottomSealConstraint, 0);

@@ -718,6 +718,7 @@ div.radio-layout{
   overflow-x: hidden;
 }
 
+
 .cobalt.autodesk360 .drawing_area, #rt2d_Landmark_door_img{
   background-color: transparent !important;
 }
@@ -1188,11 +1189,11 @@ height:100%;
 	font-weight:bold;
 }
 
-#LIFT_TYPE_DISPLAY_LABEL {
+#DOOR_SUMMARY_LABEL {
 	font-size: 1.1rem;
 }
 
-#LIFT_TYPE_DISPLAY {
+#DOOR_SUMMARY_VALUE {
 	font-size: 14px;
      font-family: 'Karla', Arial, sans-serif;
 	line-height: 1.5rem;
@@ -1923,7 +1924,6 @@ option--disabled {
     overflow: hidden !important;
     pointer-events: none !important;
 }
-
 
 `
   const stylesheet = document.createElement('style')

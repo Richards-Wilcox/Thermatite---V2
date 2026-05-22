@@ -1216,13 +1216,10 @@ function runTrussStyleLogic() {
   const widthIn  = getTrussStyleWidthInches();
   const sections = getTrussStyleSectionCount();
   const result   = lookupTrussStyle({ model, wind, widthIn, sections });
-  console.log("[TRUSS_STYLE] inputs:", { model, wind, widthIn, sections }, "result:", result);
   applyTrussStyleResult(result);
 }
 
 function loadTrussStyleLogic() {
-  console.log("[TRUSS_STYLE] loadTrussStyleLogic() called");
-
   // Listen directly for DOM changes on every axis that affects the rule.
   // Avoids relying on the framework's addLogic/nodeset which silently fails
   // when the logic id has no matching DOM element.
@@ -1236,14 +1233,17 @@ function loadTrussStyleLogic() {
     "#custom_dimensions",
   ].join(", ");
 
+  let _trussStyleTimer = null;
   $(document).on("change", triggers, function () {
-    console.log("[TRUSS_STYLE] change on", this.name || this.id);
-    runTrussStyleLogic();
+    if (_trussStyleTimer) clearTimeout(_trussStyleTimer);
+    _trussStyleTimer = setTimeout(() => {
+      _trussStyleTimer = null;
+      runTrussStyleLogic();
+    }, 80);
   });
 
   // Initial fire so the dropdown filters on page load (not just on changes).
   setTimeout(() => {
-    console.log("[TRUSS_STYLE] initial fire");
     runTrussStyleLogic();
   }, 0);
 }

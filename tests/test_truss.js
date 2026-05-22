@@ -68,20 +68,18 @@
         console.log("%c=== Running truss + driven-input tests ===", "color: #06f; font-weight: bold");
 
         // ---- T150 basic + 15psf / lte5 ----
+        // T150 max width is 24'2" (290") per MODEL_WIDTH_LIMITS in load_drive_inputs.js.
+        // Widths past that are unreachable from the UI and are not tested.
         trussCase("T150 basic lte5 @ width=100", { model: "T150", wind: "basic", widthIn: 100, sections: 4 }, "ALLOWED");
         trussCase("T150 basic lte5 @ width=181 (boundary 15'1\")", { model: "T150", wind: "basic", widthIn: 181, sections: 4 }, "ALLOWED");
         trussCase("T150 basic lte5 @ width=182", { model: "T150", wind: "basic", widthIn: 182, sections: 4 }, "ALLOWED");
-        trussCase("T150 basic lte5 @ width=360 (NO_OPTIONS)", { model: "T150", wind: "basic", widthIn: 360, sections: 4 }, "NO_OPTIONS");
-        trussCase("T150 basic lte5 @ width=400 (EXCEEDS_CAPACITY)", { model: "T150", wind: "basic", widthIn: 400, sections: 4 }, "EXCEEDS_CAPACITY");
 
         // ---- T150 basic + 15psf / gt5 ----
         trussCase("T150 basic gt5 @ width=120", { model: "T150", wind: "basic", widthIn: 120, sections: 8 }, "ALLOWED");
-        trussCase("T150 basic gt5 @ width=350", { model: "T150", wind: "basic", widthIn: 350, sections: 8 }, "ALLOWED");
-        trussCase("T150 basic gt5 @ width=400 (EXCEEDS_CAPACITY)", { model: "T150", wind: "basic", widthIn: 400, sections: 8 }, "EXCEEDS_CAPACITY");
 
         // ---- T150 — confirm 15psf shares basic slice ----
         trussCase("T150 15psf lte5 @ width=200", { model: "T150", wind: "15psf", widthIn: 200, sections: 4 }, "ALLOWED");
-        trussCase("T150 15psf gt5 @ width=300", { model: "T150", wind: "15psf", widthIn: 300, sections: 8 }, "ALLOWED");
+        // T150 15psf gt5 @ width=300 removed — T150 24' cap (299") makes 300 unreachable.
 
         // ---- T150 20psf / lte5 ----
         trussCase("T150 20psf lte5 @ width=100", { model: "T150", wind: "20psf", widthIn: 100, sections: 4 }, "ALLOWED");
@@ -275,22 +273,18 @@
             // For each width, assert the lookup's `kind`. Boundary pairs (hi, hi+1)
             // catch off-by-one errors in interval bounds.
             const intervals = [
+                // T150 cases are bounded by the 24'2" (290") UI cap from MODEL_WIDTH_LIMITS.
                 { label: "T150 basic lte5", model: "T150", wind: "basic", sections: 4,
                   cases: [[100,"ALLOWED"],[181,"ALLOWED"],[182,"ALLOWED"],[210,"ALLOWED"],[211,"ALLOWED"],
                           [227,"ALLOWED"],[228,"ALLOWED"],[241,"ALLOWED"],[242,"ALLOWED"],[246,"ALLOWED"],
                           [247,"ALLOWED"],[263,"ALLOWED"],[264,"ALLOWED"],[266,"ALLOWED"],[267,"ALLOWED"],
-                          [280,"ALLOWED"],[281,"ALLOWED"],[295,"ALLOWED"],[296,"ALLOWED"],[310,"ALLOWED"],
-                          [311,"ALLOWED"],[352,"ALLOWED"],[353,"NO_OPTIONS"],[360,"NO_OPTIONS"],
-                          [361,"EXCEEDS_CAPACITY"],[400,"EXCEEDS_CAPACITY"],[458,"EXCEEDS_CAPACITY"]] },
+                          [280,"ALLOWED"],[281,"ALLOWED"]] },
                 { label: "T150 basic gt5", model: "T150", wind: "basic", sections: 8,
                   cases: [[100,"ALLOWED"],[181,"ALLOWED"],[182,"ALLOWED"],[227,"ALLOWED"],[228,"ALLOWED"],
                           [241,"ALLOWED"],[242,"ALLOWED"],[263,"ALLOWED"],[264,"ALLOWED"],[280,"ALLOWED"],
-                          [281,"ALLOWED"],[295,"ALLOWED"],[296,"ALLOWED"],[310,"ALLOWED"],[311,"ALLOWED"],
-                          [351,"ALLOWED"],[352,"EXCEEDS_CAPACITY"],[400,"EXCEEDS_CAPACITY"]] },
+                          [281,"ALLOWED"]] },
                 { label: "T150 15psf lte5", model: "T150", wind: "15psf", sections: 4,
-                  cases: [[210,"ALLOWED"],[353,"NO_OPTIONS"],[400,"EXCEEDS_CAPACITY"]] },
-                { label: "T150 15psf gt5",  model: "T150", wind: "15psf", sections: 8,
-                  cases: [[295,"ALLOWED"],[352,"EXCEEDS_CAPACITY"]] },
+                  cases: [[210,"ALLOWED"]] },
                 { label: "T150 20psf lte5", model: "T150", wind: "20psf", sections: 4,
                   cases: [[100,"ALLOWED"],[127,"ALLOWED"],[128,"ALLOWED"],[156,"ALLOWED"],[157,"ALLOWED"],
                           [168,"ALLOWED"],[169,"ALLOWED"],[173,"ALLOWED"],[174,"ALLOWED"],[181,"ALLOWED"],

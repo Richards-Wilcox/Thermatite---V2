@@ -126,8 +126,8 @@ function loadForm() {
     <div id="DOOR_PROPERTIES" style="display:flex;flex-direction:row;justify-content:space-between; padding: 20px 0 0 0">
 
         <div style="display:flex;flex-direction:column">
-          <span id="LIFT_TYPE_DISPLAY_LABEL" class="rw-text">Lift Type:</span>
-          <span id="LIFT_TYPE_DISPLAY" class="rw-text">Standard Lift 12R</span>
+          <span id="DOOR_SUMMARY_LABEL" class="rw-text">Door Summary:</span>
+          <span id="DOOR_SUMMARY_VALUE" class="rw-text"></span>
         </div>
         <div id="SPRING_WARNING" class="rw-text rw-warning">The current configuration has no Residential springs
           available.
@@ -473,7 +473,7 @@ function loadForm() {
       </div>
 
       <!-- [LIFT-TYPE] standard lift, low headroom, high lift, etc. -->
-      <div class="horizontal-inputs inputs-container-padding-highlift">
+      <div class="horizontal-inputs inputs-container-padding-highlift" style="flex-direction:column; align-items:flex-start; gap:8px;">
         <div class="hardware-container-lift-type-inner">
           <div style="text-align:left" class="config-option-title-style">Lift Type</div>
           <select id="LIFT_TYPE" name="LIFT_TYPE" class="long-select" style="padding:5px 8px; border:1px solid black; border-radius:6px;">
@@ -504,9 +504,11 @@ function loadForm() {
             </option>
           </select>
         </div>
-	   <!-- [HIGHLIFT] inches (shown only when LIFT_TYPE === HL, see load_drive_inputs.js) -->
-	   <label id="HIGHLIFT_LABEL" for="HIGHLIFT" style="display:none">Highlift (in)</label>
-      <select id="HIGHLIFT" name="HIGHLIFT" style="display:none; width:fit-content; padding:5px 8px; border:1px solid black; border-radius:6px;">
+	   <!-- [HIGHLIFT] inches + [CLEARANCE] — shown only when LIFT_TYPE === High_Lift -->
+	   <div id="HIGHLIFT_ROW" style="display:none; gap:16px; align-items:center; flex-wrap:wrap;">
+	   <div>
+	   <div id="HIGHLIFT_LABEL" style="text-align:left" class="config-option-title-style">Highlift (in)</div>
+      <select id="HIGHLIFT" name="HIGHLIFT" style="width:fit-content; padding:5px 8px; border:1px solid black; border-radius:6px;">
         <option value=15 selected>15</option>
         <option value=16>16</option>
         <option value=17>17</option>
@@ -548,6 +550,33 @@ function loadForm() {
         <option value=53>53</option>
         <option value=54>54</option>
       </select>
+	   </div>
+	   <!-- [CLEARANCE] -->
+	   <div>
+	   <div id="CLEARANCE_LABEL" style="text-align:left" class="config-option-title-style">Clearance</div>
+      <select id="CLEARANCE" name="CLEARANCE" style="width:fit-content; padding:5px 8px; border:1px solid black; border-radius:6px;">
+        <option value="None" selected>None</option>
+        <option value="HighLift">High Lift</option>
+        <option value="HeadRoom">Head Room</option>
+      </select>
+	   </div>
+	   </div>
+	   <!-- [CUSTOM-LHR-SETUP] shown only when LIFT_TYPE === LHR_Vertical_Lift -->
+	   <div id="CUSTOM_LHR_ROW" style="display:none; flex-direction:column; align-items:flex-start;">
+	     <div style="text-align:left" class="config-option-title-style">Include Custom Low Headroom Setup</div>
+	     <div class="combined-button-container">
+	       <div class="combined-button-container-inner">
+	         <div class="rw-sliding-button" tabindex="0" id="CUSTOM_LHR_YES_BTN">
+	           <label for="CUSTOM_LHR_YES">Yes</label>
+	           <input type="radio" style="display:none;" id="CUSTOM_LHR_YES" name="CustomLHRSetup" value="yes">
+	         </div>
+	         <div class="rw-sliding-button selected" tabindex="0" id="CUSTOM_LHR_NO_BTN">
+	           <label for="CUSTOM_LHR_NO">No</label>
+	           <input type="radio" style="display:none;" id="CUSTOM_LHR_NO" name="CustomLHRSetup" value="no" checked>
+	         </div>
+	       </div>
+	     </div>
+	   </div>
       </div>
 
 
@@ -584,22 +613,67 @@ function loadForm() {
         </select>
       </div>
 
-      <!-- [INCLINED-TRACK] -->
+      <!-- [INCLINED-TRACK] Yes/No + Slope/Degrees + value when Yes -->
       <div style="margin-top:8px;">
-        <div style="text-align:left" class="config-option-title-style">Inclined Track</div>
-        <div class="combined-button-container">
-          <div class="combined-button-container-inner">
-            <div class="rw-sliding-button selected" tabindex="0" id="INCLINED_TRACK_NONE_BTN">
-              <label for="INCLINED_TRACK_NONE">None</label>
-              <input type="radio" style="display:none;" id="INCLINED_TRACK_NONE" name="InclinedTrack" value="none" checked>
+        <div class="horizontal-inputs" style="display:flex; gap:16px; align-items:flex-end; flex-wrap:wrap;">
+          <div>
+            <div style="text-align:left" class="config-option-title-style">Inclined Track</div>
+            <div class="combined-button-container">
+              <div class="combined-button-container-inner">
+                <div class="rw-sliding-button" tabindex="0" id="INCLINED_TRACK_YES_BTN">
+                  <label for="INCLINED_TRACK_YES">Yes</label>
+                  <input type="radio" style="display:none;" id="INCLINED_TRACK_YES" name="InclinedTrackOn" value="yes">
+                </div>
+                <div class="rw-sliding-button selected" tabindex="0" id="INCLINED_TRACK_NO_BTN">
+                  <label for="INCLINED_TRACK_NO">No</label>
+                  <input type="radio" style="display:none;" id="INCLINED_TRACK_NO" name="InclinedTrackOn" value="no" checked>
+                </div>
+                <!-- Legacy InclinedTrack name kept for host config compatibility; value mirrored by JS. -->
+                <input type="hidden" id="INCLINED_TRACK_HIDDEN" name="InclinedTrack" value="none">
+              </div>
             </div>
-            <div class="rw-sliding-button" tabindex="0" id="INCLINED_TRACK_SLOPE_BTN">
-              <label for="INCLINED_TRACK_SLOPE">Slope</label>
-              <input type="radio" style="display:none;" id="INCLINED_TRACK_SLOPE" name="InclinedTrack" value="slope">
-            </div>
-            <div class="rw-sliding-button" tabindex="0" id="INCLINED_TRACK_DEG_BTN">
-              <label for="INCLINED_TRACK_DEG">Degrees</label>
-              <input type="radio" style="display:none;" id="INCLINED_TRACK_DEG" name="InclinedTrack" value="degrees">
+          </div>
+          <div id="INCLINED_TRACK_DETAILS" style="display:none; gap:12px; align-items:flex-start; flex-wrap:wrap;">
+            <div>
+              <div style="text-align:left" class="config-option-title-style">Degree or No Slope</div>
+              <select id="INCLINED_TRACK_VALUE" name="InclinedTrackValue" class="long-select" style="padding:5px 8px; border:1px solid black; border-radius:6px;">
+                <option value="no_slope" selected>No Slope</option>
+                <option value="2.39">2.39 degrees - 0.5/12 pitch</option>
+                <option value="3">3 degrees</option>
+                <option value="4">4 degrees</option>
+                <option value="4.76">4.76 degrees - 1/12 pitch</option>
+                <option value="5">5 degrees</option>
+                <option value="6">6 degrees</option>
+                <option value="7.13">7.13 degrees - 1.5/12 pitch</option>
+                <option value="8">8 degrees</option>
+                <option value="9">9 degrees</option>
+                <option value="9.46">9.46 degrees - 2/12 pitch</option>
+                <option value="10">10 degrees</option>
+                <option value="10.5">10.5 degrees</option>
+                <option value="11.7">11.7 degrees - 2.5/12 pitch</option>
+                <option value="12">12 degrees</option>
+                <option value="13">13 degrees</option>
+                <option value="14.04">14.04 degrees - 3/12 pitch</option>
+                <option value="15">15 degrees</option>
+                <option value="16.26">16.26 degrees - 3.5/12 pitch</option>
+                <option value="18">18 degrees</option>
+                <option value="18.3">18.3 degrees - 4/12 pitch</option>
+                <option value="20">20 degrees</option>
+                <option value="21">21 degrees</option>
+                <option value="22">22 degrees</option>
+                <option value="22.62">22.62 degrees - 5/12 pitch</option>
+                <option value="25">25 degrees</option>
+                <option value="26.57">26.57 degrees - 6/12 pitch</option>
+                <option value="30">30 degrees</option>
+                <option value="30.26">30.26 degrees - 7/12 pitch</option>
+                <option value="33.69">33.69 degrees - 8/12 pitch</option>
+                <option value="35">35 degrees</option>
+                <option value="36.87">36.87 degrees - 9/12 pitch</option>
+                <option value="39.81">39.81 degrees - 10/12 pitch</option>
+                <option value="40">40 degrees</option>
+                <option value="42.51">42.51 degrees - 11/12 pitch</option>
+                <option value="45">45 degrees - 12/12 pitch</option>
+              </select>
             </div>
           </div>
         </div>
@@ -663,37 +737,6 @@ function loadForm() {
 
       </select>
 	-->
-      <!-- [HANGER-ANGLE] hanger angle option + qty -->
-      <div class="horizontal-inputs inputs-container-padding">
-        <div>
-          <div style="text-align:left" class="config-option-title-style">Hanger Angle</div>
-          <select id="HANGER_ANGLE" name="HANGER_ANGLE" class="long-select" style="padding:5px 8px; border:1px solid black; border-radius:6px;">
-            <option value="None" selected>None</option>
-            <option value="950-254">10' - 16 ga. 1.25" X 1.25" Hole/Hole</option>
-            <option value="950-253">10' - 14 ga. 1.25" X 1.25" Hole/Hole</option>
-            <option value="950-252">10' - 12 ga. 1.25" X 1.25" Hole/Hole</option>
-            <option value="950-255">10' - 11 ga. 1.5" X 1.5" Hole/Slot</option>
-            <option value="950-256">10' - 12 ga. 2" X 2" Hole/Hole</option>
-          </select>
-        </div>
-        <div>
-          <div style="text-align:left" class="config-option-title-style">Qty</div>
-          <select id="HANGER_ANGLE_QTY" name="HANGER_ANGLE_QTY" style="width:fit-content; padding:5px 8px; border:1px solid black; border-radius:6px;">
-            <option value=0 selected>0</option>
-            <option value=1>1</option>
-            <option value=2>2</option>
-            <option value=3>3</option>
-            <option value=4>4</option>
-            <option value=5>5</option>
-            <option value=6>6</option>
-            <option value=7>7</option>
-            <option value=8>8</option>
-            <option value=9>9</option>
-            <option value=10>10</option>
-          </select>
-        </div>
-      </div>
-
 	<!-- [OPERATION] how the door is operated -->
 	<div id="operation_section">
 	  <div style="text-align:left" class="config-option-title-style">Operation</div>
@@ -767,59 +810,6 @@ function loadForm() {
 	  </div>
 	</div>
 
-	<!-- [OVERLAP-REQUIRED] yes/no selector. -->
-	<div id="overlap_required_section">
-	<div style="text-align:left" class="config-option-title-style">Is Overlap Required</div>
-	<div class="combined-button-container">
-	  <div class="combined-button-container-inner">
-	    <div class="rw-sliding-button" tabindex="0">
-	      <label for="OVERLAP_REQUIRED_0">Yes</label>
-	      <input type="radio" style="display:none;" id="OVERLAP_REQUIRED_0" name="OverlapRequired" value="yes">
-	    </div>
-	    <div class="rw-sliding-button selected" tabindex="0">
-	      <label for="OVERLAP_REQUIRED_1">No</label>
-	      <input type="radio" style="display:none;" id="OVERLAP_REQUIRED_1" name="OverlapRequired" value="no" checked>
-	    </div>
-	  </div>
-	</div>
-	<div id="OVERLAP_NOTE" style="display:none; font-size:12px; color:#555; margin-top:4px; font-style:italic;">If Yes is selected, the door will be 2&quot; wider than normal width.</div>
-	</div>
-	</div>
-
-	<!-- [HW-CSBB] Cable Fail Safety Bottom Brackets -->
-	<div style="margin-top:12px;">
-	  <div style="text-align:left" class="config-option-title-style">Cable Fail Safety Bottom Brackets</div>
-	  <div class="combined-button-container">
-	    <div class="combined-button-container-inner">
-	      <div class="rw-sliding-button" tabindex="0" id="CSBB_YES_BTN">
-	        <label for="CSBB_YES">Yes</label>
-	        <input type="radio" style="display:none;" id="CSBB_YES" name="CSBB" value="yes">
-	      </div>
-	      <div class="rw-sliding-button selected" tabindex="0" id="CSBB_NO_BTN">
-	        <label for="CSBB_NO">No</label>
-	        <input type="radio" style="display:none;" id="CSBB_NO" name="CSBB" value="no" checked>
-	      </div>
-	    </div>
-	  </div>
-	</div>
-
-	<!-- [HW-CSBB-DRHGT] -->
-	<div id="csbb_drhgt_section">
-	  <div style="text-align:left" class="config-option-title-style">CSBB Door Height</div>
-	  <div class="dimension-layout">
-	    <div class="rw-button" tabindex="0">
-	      <label for="CSBB_DRHGT_NONE">NO CSBB</label>
-	      <input type="radio" style="display:none;" id="CSBB_DRHGT_NONE" name="CSBBDrHgt" value="no_csbb" checked>
-	    </div>
-	    <div class="rw-button" tabindex="0">
-	      <label for="CSBB_DRHGT_LTE20">DHLTE20FT</label>
-	      <input type="radio" style="display:none;" id="CSBB_DRHGT_LTE20" name="CSBBDrHgt" value="csbb_dhlte20ft">
-	    </div>
-	    <div class="rw-button" tabindex="0">
-	      <label for="CSBB_DRHGT_GT20">DHGT20</label>
-	      <input type="radio" style="display:none;" id="CSBB_DRHGT_GT20" name="CSBBDrHgt" value="csbb_dhgt20">
-	    </div>
-	  </div>
 	</div>
 
 	<!-- [HW-NOLAP-STEEL-JAMB] -->
@@ -837,6 +827,7 @@ function loadForm() {
 	      </div>
 	    </div>
 	  </div>
+	  <div style="font-size:12px; color:#555; margin-top:4px; font-style:italic;">As viewed from the outside.</div>
 	</div>
     </section>
 <!-- ============================================================
@@ -847,11 +838,24 @@ function loadForm() {
   class="rw-configurator__page">
 
   <!-- [SO-BOTTOM-SEAL] -->
-  <div id="BOTTOM_SEAL_ROW">
+  <div id="BOTTOM_SEAL_ROW" style="margin-top:12px;">
     <div style="text-align:left" class="config-option-title-style">Bottom Seal</div>
-    <select id="BOTTOM_SEAL" name="BottomSeal" style="width:fit-content; min-width:180px; padding:5px 8px; border:1px solid black; border-radius:6px;">
-      <option value="none" disabled selected>None</option>
-    </select>
+    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:6px;">
+      <div class="dimension-layout">
+        <div class="rw-button btn-checked" tabindex="0">
+          <label for="BOTTOM_SEAL_NONE">None</label>
+          <input type="radio" style="display:none;" id="BOTTOM_SEAL_NONE" name="BottomSeal" value="none" checked>
+        </div>
+        <div class="rw-button" tabindex="0">
+          <label for="BOTTOM_SEAL_PVC">4" PVC Bottom Seal (-35C)</label>
+          <input type="radio" style="display:none;" id="BOTTOM_SEAL_PVC" name="BottomSeal" value="pvc_4_35c">
+        </div>
+        <div class="rw-button" tabindex="0">
+          <label for="BOTTOM_SEAL_SANTOPRENE" >3" Santoprene Bottom Seal (-60C)</label>
+          <input type="radio" style="display:none;" id="BOTTOM_SEAL_SANTOPRENE" name="BottomSeal" value="santoprene_3_60c">
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- [SO-TOP-WEATHER-SEAL] -->
@@ -862,25 +866,66 @@ function loadForm() {
   </select>
 
   <!-- [SO-BOTTOM-RETAINER] -->
-  <div style="text-align:left" class="config-option-title-style">Bottom Retainer</div>
-  <select id="BOTTOM_RETAINER" name="BottomRetainer" class="long-select" style="padding:5px 8px; border:1px solid black; border-radius:6px;">
-    <option value="aluminum" selected>Aluminum retainer only</option>
-    <option value="steel">Bottom seal with PVC Retainer</option>
-    <option value="pvc">Bottom seal with aluminum retainer</option>
-    <option value="ChannelCap">Channel Cap</option>
-    <option value="GalvanizedBottomAngle">Galvanized bottom angle</option>
-    <option value="none">None</option>
-  </select>
+  <div style="margin-top:12px;">
+    <div style="text-align:left" class="config-option-title-style">Bottom Retainer</div>
+    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:6px;">
+      <div class="dimension-layout">
+        <div class="rw-button btn-checked" tabindex="0">
+          <label for="BOTTOM_RETAINER_ALUMINUM">Aluminum retainer only</label>
+          <input type="radio" style="display:none;" id="BOTTOM_RETAINER_ALUMINUM" name="BottomRetainer" value="aluminum" checked>
+        </div>
+        <div class="rw-button" tabindex="0">
+          <label for="BOTTOM_RETAINER_STEEL">Bottom seal with PVC Retainer</label>
+          <input type="radio" style="display:none;" id="BOTTOM_RETAINER_STEEL" name="BottomRetainer" value="steel">
+        </div>
+        <div class="rw-button" tabindex="0">
+          <label for="BOTTOM_RETAINER_PVC">Bottom seal with aluminum retainer</label>
+          <input type="radio" style="display:none;" id="BOTTOM_RETAINER_PVC" name="BottomRetainer" value="pvc">
+        </div>
+        <div class="rw-button" tabindex="0">
+          <label for="BOTTOM_RETAINER_CHANNELCAP">Channel Cap</label>
+          <input type="radio" style="display:none;" id="BOTTOM_RETAINER_CHANNELCAP" name="BottomRetainer" value="ChannelCap">
+        </div>
+        <div class="rw-button" tabindex="0">
+          <label for="BOTTOM_RETAINER_GALVANIZED">Galvanized bottom angle</label>
+          <input type="radio" style="display:none;" id="BOTTOM_RETAINER_GALVANIZED" name="BottomRetainer" value="GalvanizedBottomAngle">
+        </div>
+        <div class="rw-button" tabindex="0">
+          <label for="BOTTOM_RETAINER_NONE">None</label>
+          <input type="radio" style="display:none;" id="BOTTOM_RETAINER_NONE" name="BottomRetainer" value="none">
+        </div>
+      </div>
+    </div>
+  </div>
 
-  <!-- [SO-ROLLER-STYLE] dropdown — long labels make button row clunky. -->
-  <div style="text-align:left" class="config-option-title-style">Roller Style</div>
-  <select id="ROLLER_STYLE" name="RollerStyle" class="long-select" style="padding:5px 8px; border:1px solid black; border-radius:6px;">
-    <option value="Steel" selected>Steel</option>
-    <option value="Nylon">Nylon</option>
-    <option value="Nylon w/ sealed bearing">Nylon w/ sealed bearing</option>
-    <option value="UHMW W/Sealed bearing">UHMW W/Sealed bearing</option>
-    <option value="Nylon w/ stainless stem and sealed bearing">Nylon w/ stainless stem and sealed bearing</option>
-  </select>
+  <!-- [SO-ROLLER-STYLE] -->
+  <div style="margin-top:12px;">
+    <div style="text-align:left" class="config-option-title-style">Roller Style</div>
+    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:6px;">
+      <div class="dimension-layout">
+        <div class="rw-button btn-checked" tabindex="0">
+          <label for="ROLLER_STYLE_STEEL">Steel</label>
+          <input type="radio" style="display:none;" id="ROLLER_STYLE_STEEL" name="RollerStyle" value="Steel" checked>
+        </div>
+        <div class="rw-button" tabindex="0">
+          <label for="ROLLER_STYLE_NYLON">Nylon</label>
+          <input type="radio" style="display:none;" id="ROLLER_STYLE_NYLON" name="RollerStyle" value="Nylon">
+        </div>
+        <div class="rw-button" tabindex="0">
+          <label for="ROLLER_STYLE_NYLON_SB">Nylon w/ sealed bearing</label>
+          <input type="radio" style="display:none;" id="ROLLER_STYLE_NYLON_SB" name="RollerStyle" value="Nylon w/ sealed bearing">
+        </div>
+        <div class="rw-button" tabindex="0">
+          <label for="ROLLER_STYLE_UHMW_SB">UHMW W/Sealed bearing</label>
+          <input type="radio" style="display:none;" id="ROLLER_STYLE_UHMW_SB" name="RollerStyle" value="UHMW W/Sealed bearing">
+        </div>
+        <div class="rw-button" tabindex="0">
+          <label for="ROLLER_STYLE_NYLON_SS">Nylon w/ stainless stem and sealed bearing</label>
+          <input type="radio" style="display:none;" id="ROLLER_STYLE_NYLON_SS" name="RollerStyle" value="Nylon w/ stainless stem and sealed bearing">
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- [SO-12-GAUGE-HINGES] -->
   <div style="text-align:left" class="config-option-title-style">12 Gauge Hinges</div>
@@ -898,14 +943,33 @@ function loadForm() {
   </div>
 
   <!-- [SO-STEP-PLATE] -->
-  <div style="text-align:left" class="config-option-title-style">Step Plate</div>
-  <select id="STEP_PLATE" name="StepPlate" style="width:fit-content; padding:5px 8px; border:1px solid black; border-radius:6px;">
-    <option value="none" selected>None</option>
-    <option value="left">1 Left side</option>
-    <option value="right">1 Right side</option>
-    <option value="centre">1 Centre</option>
-    <option value="each">1 Each Side</option>
-  </select>
+  <div style="margin-top:12px;">
+    <div style="text-align:left" class="config-option-title-style">Step Plate</div>
+    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:6px;">
+      <div class="dimension-layout">
+        <div class="rw-button btn-checked" tabindex="0">
+          <label for="STEP_PLATE_NONE">None</label>
+          <input type="radio" style="display:none;" id="STEP_PLATE_NONE" name="StepPlate" value="none" checked>
+        </div>
+        <div class="rw-button" tabindex="0">
+          <label for="STEP_PLATE_LEFT">1 Left Side</label>
+          <input type="radio" style="display:none;" id="STEP_PLATE_LEFT" name="StepPlate" value="left">
+        </div>
+        <div class="rw-button" tabindex="0">
+          <label for="STEP_PLATE_RIGHT">1 Right Side</label>
+          <input type="radio" style="display:none;" id="STEP_PLATE_RIGHT" name="StepPlate" value="right">
+        </div>
+        <div class="rw-button" tabindex="0">
+          <label for="STEP_PLATE_CENTRE">1 Centre</label>
+          <input type="radio" style="display:none;" id="STEP_PLATE_CENTRE" name="StepPlate" value="centre">
+        </div>
+        <div class="rw-button" tabindex="0">
+          <label for="STEP_PLATE_EACH">1 Each Side</label>
+          <input type="radio" style="display:none;" id="STEP_PLATE_EACH" name="StepPlate" value="each">
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- [SO-EXHAUST-PORT] -->
   <div style="margin-top:12px;">
@@ -919,19 +983,19 @@ function loadForm() {
             <input type="radio" style="display:none;" id="EXHAUST_PORT_VIEW_NONE" name="ExhaustPortView" value="none" checked>
           </div>
           <div class="rw-button" tabindex="0">
-            <label for="EXHAUST_PORT_VIEW_LEFT">Left Side</label>
+            <label for="EXHAUST_PORT_VIEW_LEFT">1 Left Side</label>
             <input type="radio" style="display:none;" id="EXHAUST_PORT_VIEW_LEFT" name="ExhaustPortView" value="left">
           </div>
           <div class="rw-button" tabindex="0">
-            <label for="EXHAUST_PORT_VIEW_RIGHT">Right Side</label>
+            <label for="EXHAUST_PORT_VIEW_RIGHT">1 Right Side</label>
             <input type="radio" style="display:none;" id="EXHAUST_PORT_VIEW_RIGHT" name="ExhaustPortView" value="right">
           </div>
           <div class="rw-button" tabindex="0">
-            <label for="EXHAUST_PORT_VIEW_CENTRE">Centre</label>
+            <label for="EXHAUST_PORT_VIEW_CENTRE">1 Centre</label>
             <input type="radio" style="display:none;" id="EXHAUST_PORT_VIEW_CENTRE" name="ExhaustPortView" value="centre">
           </div>
           <div class="rw-button" tabindex="0">
-            <label for="EXHAUST_PORT_VIEW_EACH">Each Side</label>
+            <label for="EXHAUST_PORT_VIEW_EACH">1 Each Side</label>
             <input type="radio" style="display:none;" id="EXHAUST_PORT_VIEW_EACH" name="ExhaustPortView" value="each">
           </div>
         </div>
@@ -1040,6 +1104,63 @@ function loadForm() {
               <input type="radio" style="display:none;" id="ONE_POINT_LATCH_QTY_2" name="OnePointLatchQty" value="2">
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- [SO-OVERLAP-REQUIRED] moved to bottom of Advanced -->
+  <div id="overlap_required_section" style="margin-top:12px;">
+    <div style="text-align:left" class="config-option-title-style">Is Overlap Required</div>
+    <div class="combined-button-container">
+      <div class="combined-button-container-inner">
+        <div class="rw-sliding-button" tabindex="0">
+          <label for="OVERLAP_REQUIRED_0">Yes</label>
+          <input type="radio" style="display:none;" id="OVERLAP_REQUIRED_0" name="OverlapRequired" value="yes">
+        </div>
+        <div class="rw-sliding-button selected" tabindex="0">
+          <label for="OVERLAP_REQUIRED_1">No</label>
+          <input type="radio" style="display:none;" id="OVERLAP_REQUIRED_1" name="OverlapRequired" value="no" checked>
+        </div>
+      </div>
+    </div>
+    <div style="font-size:12px; color:#555; margin-top:4px; font-style:italic;">Overlap Selection Impact The Drawing Only</div>
+    <div id="OVERLAP_NOTE" style="display:none; margin-top:8px; padding:8px 12px; background:#fff8e1; border:1px solid #f0c040; border-left:4px solid #e0a020; color:#7a5a00; font-size:13px; font-weight:600; border-radius:4px;">&#9888; If Yes is selected, the door will be 2&quot; wider than normal width.</div>
+  </div>
+
+  <!-- [SO-CSBB] Cable Fail Safety Bottom Brackets (moved to bottom of Advanced) -->
+  <div style="margin-top:12px;">
+    <div style="text-align:left" class="config-option-title-style">Cable Fail Safety Bottom Brackets</div>
+    <div class="combined-button-container">
+      <div class="combined-button-container-inner">
+        <div class="rw-sliding-button" tabindex="0" id="CSBB_YES_BTN">
+          <label for="CSBB_YES">Yes</label>
+          <input type="radio" style="display:none;" id="CSBB_YES" name="CSBB" value="yes">
+        </div>
+        <div class="rw-sliding-button selected" tabindex="0" id="CSBB_NO_BTN">
+          <label for="CSBB_NO">No</label>
+          <input type="radio" style="display:none;" id="CSBB_NO" name="CSBB" value="no" checked>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- [SO-CSBB-DRHGT] driven by CSBB + Door Height; buttons disabled in JS -->
+  <div id="csbb_drhgt_section" style="display:none;">
+    <div style="text-align:left" class="config-option-title-style">CSBB Door Height</div>
+    <div class="combined-button-container">
+      <div class="combined-button-container-inner">
+        <div class="rw-sliding-button selected" tabindex="0" id="CSBB_DRHGT_NONE_BTN">
+          <label for="CSBB_DRHGT_NONE">No CSBB</label>
+          <input type="radio" style="display:none;" id="CSBB_DRHGT_NONE" name="CSBBDrHgt" value="no_csbb" checked>
+        </div>
+        <div class="rw-sliding-button" tabindex="0" id="CSBB_DRHGT_LTE20_BTN">
+          <label for="CSBB_DRHGT_LTE20">DHLTE20FT</label>
+          <input type="radio" style="display:none;" id="CSBB_DRHGT_LTE20" name="CSBBDrHgt" value="csbb_dhlte20ft">
+        </div>
+        <div class="rw-sliding-button" tabindex="0" id="CSBB_DRHGT_GT20_BTN">
+          <label for="CSBB_DRHGT_GT20">DHGT20</label>
+          <input type="radio" style="display:none;" id="CSBB_DRHGT_GT20" name="CSBBDrHgt" value="csbb_dhgt20">
         </div>
       </div>
     </div>
@@ -1350,8 +1471,9 @@ function loadForm() {
     //Load the caching system.
     rw_init("configurator");
     loadDrivenInputEvents();
-    //loadGlobalNodes();
+    loadGlobalNodes();
     loadTrussStyleLogic();
+    addSectionBundleDrivers()
     //loadTrussSchedule();
     //loadPriceDrivers();
   async function redrawCanvas() {
@@ -1378,9 +1500,7 @@ function loadForm() {
 	 const selectedColor = $("input[name='COLOR']:checked");
 	 const color = selectedColor.attr("hex") || "#654321";
 
-	 const numSections = $("#custom_dimensions").is(":checked")
-		? (parseInt($("#NUM_OF_SEC").val()) || 4)
-		: 4;
+	 const numSections = parseInt($("#NUM_OF_SEC").val()) || 4;
 
 	 await CANVAS_PLUGIN.drawThermatiteDoor({
 		dimensions: {
@@ -1666,14 +1786,18 @@ function renderEndCaps() {
 }
 
 // Re-render end caps when width-affecting inputs change.
+let _endCapsTimer = null;
 $(document).on("change", "#CUSTOM_WIDTH_FEET, #CUSTOM_WIDTH_INCHES, input[name='SIZE'], #custom_dimensions", function() {
-    renderEndCaps();
+    if (_endCapsTimer) clearTimeout(_endCapsTimer);
+    _endCapsTimer = setTimeout(() => {
+        _endCapsTimer = null;
+        renderEndCaps();
+    }, 80);
 });
 
 $(function() { renderEndCaps(); });
 
 // ===== [SECTIONS-PER-HEIGHT] valid section counts keyed by door height in feet.
-// Only used when custom dimensions are active — preset sizes keep numSections=4.
 const HEIGHT_SECTIONS = {
     4:  [2],
     5:  [3],
@@ -1731,11 +1855,16 @@ function renderNumOfSections() {
     $select.val(selected).trigger("change");
 }
 
+let _numOfSecTimer = null;
 $(document).on("change", "#CUSTOM_HEIGHT_FEET, input[name='SIZE']", function() {
-    renderNumOfSections();
-    if (typeof CANVAS_PLUGIN?.redrawFromCurrentForm === "function") {
-        CANVAS_PLUGIN.redrawFromCurrentForm();
-    }
+    if (_numOfSecTimer) clearTimeout(_numOfSecTimer);
+    _numOfSecTimer = setTimeout(() => {
+        _numOfSecTimer = null;
+        renderNumOfSections();
+        if (typeof CANVAS_PLUGIN?.redrawFromCurrentForm === "function") {
+            CANVAS_PLUGIN.redrawFromCurrentForm();
+        }
+    }, 80);
 });
 
 $(document).on("change", "#NUM_OF_SEC", function() {
@@ -1753,8 +1882,27 @@ setTimeout(() => { renderColorRow(); renderPatternRow(); renderNumOfSections(); 
 setTimeout(renderNumOfSections, 200);
 setTimeout(renderNumOfSections, 1000);
 
-$("input[name='SIZE']").on("change", function() {
+$(document).on("click", "input[name='SIZE']", function() {
+    setState("SIZE", $(this).val());
+    ["SIZE_HEIGHT", "SIZE_WIDTH", "DOOR_WIDTH_FEET", "DOOR_WIDTH_INCHES", "DOOR_HEIGHT_FEET", "DOOR_HEIGHT_INCHES", "WIDTH", "HEIGHT"].forEach(id => {
+        if (typeof getNode === "function" && nodeset?.[id]) rw(getNode(id));
+    });
     redrawCanvas();
+});
+
+let _customDimsCascadeTimer = null;
+$(document).on("change", "#CUSTOM_WIDTH_FEET, #CUSTOM_WIDTH_INCHES, #CUSTOM_HEIGHT_FEET, #CUSTOM_HEIGHT_INCHES, #custom_dimensions", function() {
+    if (_customDimsCascadeTimer) clearTimeout(_customDimsCascadeTimer);
+    _customDimsCascadeTimer = setTimeout(() => {
+        _customDimsCascadeTimer = null;
+        // Push leaf values; framework's dep chain handles the section-bundle fan-out from there.
+        ["DOOR_WIDTH_FEET", "DOOR_WIDTH_INCHES", "DOOR_HEIGHT_FEET", "DOOR_HEIGHT_INCHES"].forEach(id => {
+            if (typeof getNode === "function" && nodeset?.[id]) rw(getNode(id));
+        });
+        if (typeof getNode === "function" && nodeset?.["WIDTH"]) rw(getNode("WIDTH"));
+        if (typeof getNode === "function" && nodeset?.["HEIGHT"]) rw(getNode("HEIGHT"));
+        redrawCanvas();
+    }, 80);
 });
 $(document).on("change", "input[name='Pattern']", function() {
     redrawCanvas();
@@ -1920,6 +2068,7 @@ $("#NAVIGATION_SPC").on("click", function() {
     setTimeout(updateBackButton, 300);
 });
 
+
  // const originalFormForward = window.formForward;
  // window.formForward = function() {
 //	 originalFormForward && originalFormForward();
@@ -1959,7 +2108,44 @@ $("#NAVIGATION_SPC").on("click", function() {
     $("#configurator button").on("click", (evt) => evt.preventDefault());
 
     $("#LOAD_DEFAULTS").on("click", applyDefaults);
-    $("#LIFT_TYPE").change((e) => $("#LIFT_TYPE_DISPLAY").html($("#LIFT_TYPE > option:selected").attr("display")));
+    function updateDoorSummary() {
+        const ns = (typeof nodeset !== "undefined") ? nodeset : {};
+        const model = $("input[name='DOOR_MODEL']:checked").val() || ns["DOOR_MODEL"]?.value || "";
+        let wFt, wIn, hFt, hIn;
+        if ($("#custom_dimensions").is(":checked")) {
+            wFt = $("#CUSTOM_WIDTH_FEET").val() || "";
+            wIn = $("#CUSTOM_WIDTH_INCHES").val() || "0";
+            hFt = $("#CUSTOM_HEIGHT_FEET").val() || "";
+            hIn = $("#CUSTOM_HEIGHT_INCHES").val() || "0";
+        } else {
+            const $sz = $("input[name='SIZE']:checked");
+            wFt = $sz.attr("width") || ns["DOOR_WIDTH_FEET"]?.value || "";
+            wIn = $sz.attr("widthInches") || ns["DOOR_WIDTH_INCHES"]?.value || "0";
+            hFt = $sz.attr("height") || ns["DOOR_HEIGHT_FEET"]?.value || "";
+            hIn = $sz.attr("heightInches") || ns["DOOR_HEIGHT_INCHES"]?.value || "0";
+        }
+        const colorRaw = $("input[name='COLOR']:checked").val() || ns["COLOR"]?.value || "";
+        const color = colorRaw ? String(colorRaw).charAt(0).toUpperCase() + String(colorRaw).slice(1) : "";
+        const size = (wFt && hFt) ? `${wFt}'${wIn}" x ${hFt}'${hIn}"` : "";
+        const summary = [model, size, color].filter(Boolean).join(" · ");
+        $("#DOOR_SUMMARY_LABEL").text("Door Summary:");
+        $("#DOOR_SUMMARY_VALUE").text(summary);
+        if (typeof setState === "function" && nodeset?.["DOOR_SUMMARY_VALUE"]) {
+            setState("DOOR_SUMMARY_VALUE", summary);
+        }
+    }
+    window.updateDoorSummary = updateDoorSummary;
+    $(document).on("change", "input[name='DOOR_MODEL'], input[name='COLOR'], input[name='SIZE'], #CUSTOM_WIDTH_FEET, #CUSTOM_WIDTH_INCHES, #CUSTOM_HEIGHT_FEET, #CUSTOM_HEIGHT_INCHES, #custom_dimensions, #LIFT_TYPE", updateDoorSummary);
+    $(document).on("click", "#NAVIGATION_SPC, #tab_0, #tab_1, #tab_2, #tab_3, #tab_4, .button-nextpage", function () {
+        updateDoorSummary();
+        setTimeout(updateDoorSummary, 50);
+        setTimeout(updateDoorSummary, 200);
+        setTimeout(updateDoorSummary, 500);
+    });
+    setTimeout(updateDoorSummary, 300);
+    setTimeout(updateDoorSummary, 1000);
+    setTimeout(updateDoorSummary, 2000);
+
 
     // Changing Color selection and Position
 
@@ -2347,7 +2533,7 @@ $("#NAVIGATION_SPC").on("click", function() {
     else {
         loadInputValues("configurator");
 
-        $("#LIFT_TYPE_DISPLAY").html($("#LIFT_TYPE > option:selected").attr("display"));
+        updateDoorSummary();
     }
 
     // After defaults/restored values are applied, re-sync conditional visibility so refreshed
