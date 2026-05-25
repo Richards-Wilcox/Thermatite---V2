@@ -46,6 +46,13 @@ function loadForm() {
          [SO-EXHAUST-PORT]     Exhaust Port (View / Port Size / Latched dropdowns)
          [SO-BAR-LATCH]        Bar Latch (Bar Latch / Interior-Exterior dropdowns)
          [SO-ONE-POINT-LATCH]  One Point Latch (Yes-No / Qty dropdowns)
+         [SO-FENDER-GUARD]     Fender Guard (dropdown of variants)
+         [SO-NUM-COUPLINGS]    Number of Couplings (number input)
+         [SO-SPRING-FAILURE-DEVICE] Spring Failure Device (Yes / No)
+         [SO-CABLE-TYPE]       Cable Type (Galvanized Cable / Stainless Steel Cable)
+         [SO-THIMBLE-FOR-CABLE] Thimble For Cable Tor (Yes / No)
+         [SO-GALVANIZED-SPRING] Galvanized Spring (Yes / No)
+         [SO-WEIGHT-MODIFIER]  Current / Modify / New Adjusted Springing Weight
 
        RIGHT PANE — section: GLAZING
          [GLAZING-WINDOWS]    None / Slim 40"
@@ -61,7 +68,14 @@ function loadForm() {
          [JAMB-SEAL]          Jamb seal type + colour + screw packages
          [HANGER-ANGLE]       Hanger angle option + qty
          [EXTRA-TRUSS]        Yes / No
-         [SHAFT-TYPE]         Tube / Keyed Tube
+         [HW-SHAFT-TYPE]      Shaft Type — Tube / Keyed Tube / 1" Solid / 1 1/4" Solid (dropdown)
+         [HW-DRUMS-CABLES]    Drums & Cables options table (radio per row)
+         [HW-SPRINGING-SOLUTIONS] Springing Solutions options table (radio per row)
+         [HW-BUMPER-OR-PUSHER-SPRINGS] Bumper or Pusher Springs (dropdown)
+         [HW-HANGER-ANGLE]    Hanger Angle (Type dropdown + Qty number)
+         [HW-COUPLER]         Coupler (Yes / No)
+         [HW-SELF-ALIGNING-FLANGE-BEARINGS] Self-Aligning Flange Bearings (Yes / No)
+         [HW-DUPLEX-SOLUTIONS] Include Duplex Solutions? (Yes / No)
 
        RIGHT PANE — section: OPERATOR_OPTIONS
          [OP-CAROUSEL]        Operator selection carousel
@@ -116,6 +130,9 @@ function loadForm() {
      <div id="CANVAS_PLUGIN" style="display:flex;justify-content:center;">
     		<canvas id="CONFIG_CANVAS" width=1400 height=1000 style="height:65vh; padding-bottom: 30px; border:none;background: transparent;"></canvas>
     	</div>
+     <!-- [HW-LEFT-PANE-LANDING] Landing container for Hardware-tab tables that
+          move here in place of the canvas. Filled by JS when entering Hardware. -->
+     <div id="HW_LEFT_PANE_LANDING" style="display:none; padding: 0 24px;"></div>
 
 
 
@@ -812,6 +829,181 @@ function loadForm() {
 
 	</div>
 
+	<!-- [HW-DRUMS-CABLES] Drums & Cables options table. Radio per row — user
+	     picks exactly one drum option. Filler values for now; replace with real
+	     data when known. -->
+	<div id="drums_cables_section" style="margin-top:18px; padding-top:14px; border-top:1px solid #ddd;">
+	  <div style="text-align:left; font-weight:700; font-size:15px; margin-bottom:10px;">Drums &amp; Cables Options</div>
+	  <table class="drums-cables-table hw-option-table" style="width:100%; border-collapse:collapse; font-size:14px;">
+	    <thead>
+	      <tr style="background:#f5f5f5;">
+	        <th style="width:40px; padding:8px; text-align:center; border:1px solid #ddd;"></th>
+	        <th style="padding:8px; text-align:left; border:1px solid #ddd;">Drum Option</th>
+	        <th style="padding:8px; text-align:left; border:1px solid #ddd;">Drum Stamping</th>
+	      </tr>
+	    </thead>
+	    <tbody>
+	      <tr>
+	        <td style="padding:8px; text-align:center; border:1px solid #ddd;">
+	          <input type="radio" id="DRUM_OPTION_0" name="DrumOption" value="opt_0" checked>
+	        </td>
+	        <td style="padding:8px; border:1px solid #ddd;"><label for="DRUM_OPTION_0">Standard Drum</label></td>
+	        <td style="padding:8px; border:1px solid #ddd;">D525-54</td>
+	      </tr>
+	      <tr>
+	        <td style="padding:8px; text-align:center; border:1px solid #ddd;">
+	          <input type="radio" id="DRUM_OPTION_1" name="DrumOption" value="opt_1">
+	        </td>
+	        <td style="padding:8px; border:1px solid #ddd;"><label for="DRUM_OPTION_1">High-Lift Drum</label></td>
+	        <td style="padding:8px; border:1px solid #ddd;">D600-72</td>
+	      </tr>
+	      <tr>
+	        <td style="padding:8px; text-align:center; border:1px solid #ddd;">
+	          <input type="radio" id="DRUM_OPTION_2" name="DrumOption" value="opt_2">
+	        </td>
+	        <td style="padding:8px; border:1px solid #ddd;"><label for="DRUM_OPTION_2">Vertical Lift Drum</label></td>
+	        <td style="padding:8px; border:1px solid #ddd;">D825-96</td>
+	      </tr>
+	      <tr>
+	        <td style="padding:8px; text-align:center; border:1px solid #ddd;">
+	          <input type="radio" id="DRUM_OPTION_3" name="DrumOption" value="opt_3">
+	        </td>
+	        <td style="padding:8px; border:1px solid #ddd;"><label for="DRUM_OPTION_3">Low-Headroom Drum</label></td>
+	        <td style="padding:8px; border:1px solid #ddd;">D400-36</td>
+	      </tr>
+	      <tr>
+	        <td style="padding:8px; text-align:center; border:1px solid #ddd;">
+	          <input type="radio" id="DRUM_OPTION_4" name="DrumOption" value="opt_4">
+	        </td>
+	        <td style="padding:8px; border:1px solid #ddd;"><label for="DRUM_OPTION_4">Heavy-Duty Drum</label></td>
+	        <td style="padding:8px; border:1px solid #ddd;">D900-108</td>
+	      </tr>
+	      <tr>
+	        <td style="padding:8px; text-align:center; border:1px solid #ddd;">
+	          <input type="radio" id="DRUM_OPTION_5" name="DrumOption" value="opt_5">
+	        </td>
+	        <td style="padding:8px; border:1px solid #ddd;"><label for="DRUM_OPTION_5">Follow-the-Roof Drum</label></td>
+	        <td style="padding:8px; border:1px solid #ddd;">D700-84</td>
+	      </tr>
+	      <tr>
+	        <td style="padding:8px; text-align:center; border:1px solid #ddd;">
+	          <input type="radio" id="DRUM_OPTION_6" name="DrumOption" value="opt_6">
+	        </td>
+	        <td style="padding:8px; border:1px solid #ddd;"><label for="DRUM_OPTION_6">Custom Drum</label></td>
+	        <td style="padding:8px; border:1px solid #ddd;">D000-00</td>
+	      </tr>
+	    </tbody>
+	  </table>
+	</div>
+
+	<!-- [HW-SPRINGING-SOLUTIONS] Springing Solutions options table. Radio per
+	     row — user picks exactly one. Filler values; replace with real data. -->
+	<div id="springing_solutions_section" style="margin-top:18px; padding-top:14px; border-top:1px solid #ddd;">
+	  <div style="text-align:left; font-weight:700; font-size:15px; margin-bottom:10px;">Springing Solutions</div>
+	  <table class="springing-solutions-table hw-option-table" style="width:100%; border-collapse:collapse; font-size:14px;">
+	    <thead>
+	      <tr style="background:#f5f5f5;">
+	        <th style="width:40px; padding:8px; text-align:center; border:1px solid #ddd;"></th>
+	        <th style="padding:8px; text-align:left; border:1px solid #ddd;">Option</th>
+	        <th style="padding:8px; text-align:left; border:1px solid #ddd;">QTY</th>
+	        <th style="padding:8px; text-align:left; border:1px solid #ddd;">Cycle Life (k)</th>
+	        <th style="padding:8px; text-align:left; border:1px solid #ddd;">Length</th>
+	        <th style="padding:8px; text-align:left; border:1px solid #ddd;">Round or Square</th>
+	        <th style="padding:8px; text-align:left; border:1px solid #ddd;">Upcharge</th>
+	      </tr>
+	    </thead>
+	    <tbody>
+	      <tr>
+	        <td style="padding:8px; text-align:center; border:1px solid #ddd;">
+	          <input type="radio" id="SPRING_OPTION_0" name="SpringingSolution" value="spr_0" checked>
+	        </td>
+	        <td style="padding:8px; border:1px solid #ddd;"><label for="SPRING_OPTION_0">Standard Spring</label></td>
+	        <td style="padding:8px; border:1px solid #ddd;">2</td>
+	        <td style="padding:8px; border:1px solid #ddd;">10</td>
+	        <td style="padding:8px; border:1px solid #ddd;">24"</td>
+	        <td style="padding:8px; border:1px solid #ddd;">Round</td>
+	        <td style="padding:8px; border:1px solid #ddd;">$0.00</td>
+	      </tr>
+	      <tr>
+	        <td style="padding:8px; text-align:center; border:1px solid #ddd;">
+	          <input type="radio" id="SPRING_OPTION_1" name="SpringingSolution" value="spr_1">
+	        </td>
+	        <td style="padding:8px; border:1px solid #ddd;"><label for="SPRING_OPTION_1">High-Cycle Spring</label></td>
+	        <td style="padding:8px; border:1px solid #ddd;">2</td>
+	        <td style="padding:8px; border:1px solid #ddd;">25</td>
+	        <td style="padding:8px; border:1px solid #ddd;">28"</td>
+	        <td style="padding:8px; border:1px solid #ddd;">Round</td>
+	        <td style="padding:8px; border:1px solid #ddd;">$75.00</td>
+	      </tr>
+	      <tr>
+	        <td style="padding:8px; text-align:center; border:1px solid #ddd;">
+	          <input type="radio" id="SPRING_OPTION_2" name="SpringingSolution" value="spr_2">
+	        </td>
+	        <td style="padding:8px; border:1px solid #ddd;"><label for="SPRING_OPTION_2">Extra-High-Cycle Spring</label></td>
+	        <td style="padding:8px; border:1px solid #ddd;">2</td>
+	        <td style="padding:8px; border:1px solid #ddd;">50</td>
+	        <td style="padding:8px; border:1px solid #ddd;">32"</td>
+	        <td style="padding:8px; border:1px solid #ddd;">Round</td>
+	        <td style="padding:8px; border:1px solid #ddd;">$150.00</td>
+	      </tr>
+	      <tr>
+	        <td style="padding:8px; text-align:center; border:1px solid #ddd;">
+	          <input type="radio" id="SPRING_OPTION_3" name="SpringingSolution" value="spr_3">
+	        </td>
+	        <td style="padding:8px; border:1px solid #ddd;"><label for="SPRING_OPTION_3">Heavy-Duty Spring</label></td>
+	        <td style="padding:8px; border:1px solid #ddd;">2</td>
+	        <td style="padding:8px; border:1px solid #ddd;">100</td>
+	        <td style="padding:8px; border:1px solid #ddd;">36"</td>
+	        <td style="padding:8px; border:1px solid #ddd;">Square</td>
+	        <td style="padding:8px; border:1px solid #ddd;">$225.00</td>
+	      </tr>
+	      <tr>
+	        <td style="padding:8px; text-align:center; border:1px solid #ddd;">
+	          <input type="radio" id="SPRING_OPTION_4" name="SpringingSolution" value="spr_4">
+	        </td>
+	        <td style="padding:8px; border:1px solid #ddd;"><label for="SPRING_OPTION_4">Dual-Spring System</label></td>
+	        <td style="padding:8px; border:1px solid #ddd;">4</td>
+	        <td style="padding:8px; border:1px solid #ddd;">25</td>
+	        <td style="padding:8px; border:1px solid #ddd;">24"</td>
+	        <td style="padding:8px; border:1px solid #ddd;">Round</td>
+	        <td style="padding:8px; border:1px solid #ddd;">$180.00</td>
+	      </tr>
+	      <tr>
+	        <td style="padding:8px; text-align:center; border:1px solid #ddd;">
+	          <input type="radio" id="SPRING_OPTION_5" name="SpringingSolution" value="spr_5">
+	        </td>
+	        <td style="padding:8px; border:1px solid #ddd;"><label for="SPRING_OPTION_5">Quad-Spring System</label></td>
+	        <td style="padding:8px; border:1px solid #ddd;">4</td>
+	        <td style="padding:8px; border:1px solid #ddd;">50</td>
+	        <td style="padding:8px; border:1px solid #ddd;">30"</td>
+	        <td style="padding:8px; border:1px solid #ddd;">Square</td>
+	        <td style="padding:8px; border:1px solid #ddd;">$320.00</td>
+	      </tr>
+	      <tr>
+	        <td style="padding:8px; text-align:center; border:1px solid #ddd;">
+	          <input type="radio" id="SPRING_OPTION_6" name="SpringingSolution" value="spr_6">
+	        </td>
+	        <td style="padding:8px; border:1px solid #ddd;"><label for="SPRING_OPTION_6">Custom Spring</label></td>
+	        <td style="padding:8px; border:1px solid #ddd;">—</td>
+	        <td style="padding:8px; border:1px solid #ddd;">—</td>
+	        <td style="padding:8px; border:1px solid #ddd;">—</td>
+	        <td style="padding:8px; border:1px solid #ddd;">—</td>
+	        <td style="padding:8px; border:1px solid #ddd;">TBD</td>
+	      </tr>
+	    </tbody>
+	  </table>
+	</div>
+
+	<!-- [HW-BUMPER-OR-PUSHER-SPRINGS] -->
+	<div style="margin-top:12px;">
+	  <div style="text-align:left" class="config-option-title-style">Bumper or Pusher Springs</div>
+	  <select id="BUMPER_OR_PUSHER_SPRINGS" name="BumperOrPusherSprings" class="rw-configurator__select">
+	    <option value="none" selected>None</option>
+	    <option value="bumper">Bumper</option>
+	    <option value="pusher">Pusher</option>
+	  </select>
+	</div>
+
 	<!-- [HW-NOLAP-STEEL-JAMB] -->
 	<div>
 	  <div style="text-align:left" class="config-option-title-style">No Lap Steel Jamb</div>
@@ -828,6 +1020,90 @@ function loadForm() {
 	    </div>
 	  </div>
 	  <div style="font-size:12px; color:#555; margin-top:4px; font-style:italic;">As viewed from the outside.</div>
+	</div>
+
+	<!-- [HW-SHAFT-TYPE] Tube Shaft / Keyed Tube Shaft / 1" Solid Shaft / 1 1/4" Solid Shaft -->
+	<div style="margin-top:12px;">
+	  <div style="text-align:left" class="config-option-title-style">Shaft Type</div>
+	  <select id="SHAFT_TYPE" name="ShaftType" class="rw-configurator__select">
+	    <option value="tube" selected>Tube Shaft</option>
+	    <option value="keyed_tube">Keyed Tube Shaft</option>
+	    <option value="solid_1">1" Solid Shaft</option>
+	    <option value="solid_1_25">1 1/4" Solid Shaft</option>
+	  </select>
+	</div>
+
+	<!-- [HW-HANGER-ANGLE] Type dropdown + Qty number input -->
+	<div style="margin-top:12px;">
+	  <div style="text-align:left" class="config-option-title-style">Hanger Angle</div>
+	  <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap; margin-top:6px;">
+	    <div style="display:flex; align-items:center; gap:8px;">
+	      <span style="font-size:14px;">Type:</span>
+	      <select id="HANGER_ANGLE_TYPE" name="HangerAngleType" class="rw-configurator__select">
+	        <option value="none" selected>None</option>
+	        <option value="hanger_14ga">Hanger 14ga 1.25"x1.25"x10'</option>
+	        <option value="hanger_11ga">Hanger 11ga 1.5"x1.5"x10-8 Slot</option>
+	        <option value="hanger_12ga">Hanger 12ga 2"x2"x10'</option>
+	      </select>
+	    </div>
+	    <div style="display:flex; align-items:center; gap:8px;">
+	      <span style="font-size:14px;">Qty:</span>
+	      <select id="HANGER_ANGLE_QTY_INPUT" name="HangerAngleQtyInput" class="rw-configurator__select">
+	        <option value="0" selected>0</option>
+	      </select>
+	    </div>
+	  </div>
+	</div>
+
+	<!-- [HW-COUPLER] -->
+	<div style="margin-top:12px;">
+	  <div style="text-align:left" class="config-option-title-style">Coupler</div>
+	  <div class="combined-button-container">
+	    <div class="combined-button-container-inner">
+	      <div class="rw-sliding-button" tabindex="0">
+	        <label for="COUPLER_YES">Yes</label>
+	        <input type="radio" style="display:none;" id="COUPLER_YES" name="Coupler" value="yes">
+	      </div>
+	      <div class="rw-sliding-button selected" tabindex="0">
+	        <label for="COUPLER_NO">No</label>
+	        <input type="radio" style="display:none;" id="COUPLER_NO" name="Coupler" value="no" checked>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+
+	<!-- [HW-SELF-ALIGNING-FLANGE-BEARINGS] -->
+	<div style="margin-top:12px;">
+	  <div style="text-align:left" class="config-option-title-style">Self-Aligning Flange Bearings</div>
+	  <div class="combined-button-container">
+	    <div class="combined-button-container-inner">
+	      <div class="rw-sliding-button" tabindex="0">
+	        <label for="SELF_ALIGNING_FLANGE_BEARINGS_YES">Yes</label>
+	        <input type="radio" style="display:none;" id="SELF_ALIGNING_FLANGE_BEARINGS_YES" name="SelfAligningFlangeBearings" value="yes">
+	      </div>
+	      <div class="rw-sliding-button selected" tabindex="0">
+	        <label for="SELF_ALIGNING_FLANGE_BEARINGS_NO">No</label>
+	        <input type="radio" style="display:none;" id="SELF_ALIGNING_FLANGE_BEARINGS_NO" name="SelfAligningFlangeBearings" value="no" checked>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+
+	<!-- [HW-DUPLEX-SOLUTIONS] -->
+	<div style="margin-top:12px;">
+	  <div style="text-align:left" class="config-option-title-style">Include Duplex Solutions?</div>
+	  <div class="combined-button-container">
+	    <div class="combined-button-container-inner">
+	      <div class="rw-sliding-button" tabindex="0">
+	        <label for="DUPLEX_SOLUTIONS_YES">Yes</label>
+	        <input type="radio" style="display:none;" id="DUPLEX_SOLUTIONS_YES" name="DuplexSolutions" value="yes">
+	      </div>
+	      <div class="rw-sliding-button selected" tabindex="0">
+	        <label for="DUPLEX_SOLUTIONS_NO">No</label>
+	        <input type="radio" style="display:none;" id="DUPLEX_SOLUTIONS_NO" name="DuplexSolutions" value="no" checked>
+	      </div>
+	    </div>
+	  </div>
 	</div>
     </section>
 <!-- ============================================================
@@ -1166,6 +1442,133 @@ function loadForm() {
     </div>
   </div>
 
+  <!-- [SO-FENDER-GUARD] dropdown of variants. Filler options for now. -->
+  <div style="margin-top:12px;">
+    <div style="text-align:left" class="config-option-title-style">Fender Guard</div>
+    <select id="FENDER_GUARD" name="FenderGuard" class="rw-configurator__select">
+      <option value="none" selected>None</option>
+      <option value="std">Std</option>
+      <option value="yellow">Yellow</option>
+    </select>
+  </div>
+
+  <!-- [SO-NUM-COUPLINGS] Driven by Hardware-tab Coupler toggle. Coupler=No
+       forces 0 (and disables 1/2). Coupler=Yes enables 1/2 and defaults to 1. -->
+  <div id="num_couplings_section" style="margin-top:12px;">
+    <div style="text-align:left" class="config-option-title-style">Number of Couplings</div>
+    <div style="display:flex; align-items:center; gap:8px; margin-top:6px;">
+      <span style="font-size:14px; color:#000; font-weight:700;">Qty:</span>
+      <div class="combined-button-container">
+        <div class="combined-button-container-inner">
+          <div class="rw-sliding-button selected" tabindex="0" id="NUM_COUPLINGS_0_BTN">
+            <label for="NUM_COUPLINGS_0">0</label>
+            <input type="radio" style="display:none;" id="NUM_COUPLINGS_0" name="NumCouplings" value="0" checked>
+          </div>
+          <div class="rw-sliding-button" tabindex="0" id="NUM_COUPLINGS_1_BTN">
+            <label for="NUM_COUPLINGS_1">1</label>
+            <input type="radio" style="display:none;" id="NUM_COUPLINGS_1" name="NumCouplings" value="1">
+          </div>
+          <div class="rw-sliding-button" tabindex="0" id="NUM_COUPLINGS_2_BTN">
+            <label for="NUM_COUPLINGS_2">2</label>
+            <input type="radio" style="display:none;" id="NUM_COUPLINGS_2" name="NumCouplings" value="2">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- [SO-SPRING-FAILURE-DEVICE] -->
+  <div style="margin-top:12px;">
+    <div style="text-align:left" class="config-option-title-style">Spring Failure Device</div>
+    <div class="combined-button-container">
+      <div class="combined-button-container-inner">
+        <div class="rw-sliding-button" tabindex="0">
+          <label for="SPRING_FAILURE_DEVICE_YES">Yes</label>
+          <input type="radio" style="display:none;" id="SPRING_FAILURE_DEVICE_YES" name="SpringFailureDevice" value="yes">
+        </div>
+        <div class="rw-sliding-button selected" tabindex="0">
+          <label for="SPRING_FAILURE_DEVICE_NO">No</label>
+          <input type="radio" style="display:none;" id="SPRING_FAILURE_DEVICE_NO" name="SpringFailureDevice" value="no" checked>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- [SO-CABLE-TYPE] Galvanized / Stainless -->
+  <div style="margin-top:12px;">
+    <div style="text-align:left" class="config-option-title-style">Cable Type</div>
+    <div class="combined-button-container">
+      <div class="combined-button-container-inner">
+        <div class="rw-sliding-button selected" tabindex="0">
+          <label for="CABLE_TYPE_GALV">Galvanized Cable</label>
+          <input type="radio" style="display:none;" id="CABLE_TYPE_GALV" name="CableType" value="galvanized" checked>
+        </div>
+        <div class="rw-sliding-button" tabindex="0">
+          <label for="CABLE_TYPE_STAINLESS">Stainless Steel Cable</label>
+          <input type="radio" style="display:none;" id="CABLE_TYPE_STAINLESS" name="CableType" value="stainless">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- [SO-THIMBLE-FOR-CABLE] -->
+  <div style="margin-top:12px;">
+    <div style="text-align:left" class="config-option-title-style">Thimble For Cable (Tor)</div>
+    <div class="combined-button-container">
+      <div class="combined-button-container-inner">
+        <div class="rw-sliding-button" tabindex="0">
+          <label for="THIMBLE_FOR_CABLE_YES">Yes</label>
+          <input type="radio" style="display:none;" id="THIMBLE_FOR_CABLE_YES" name="ThimbleForCable" value="yes">
+        </div>
+        <div class="rw-sliding-button selected" tabindex="0">
+          <label for="THIMBLE_FOR_CABLE_NO">No</label>
+          <input type="radio" style="display:none;" id="THIMBLE_FOR_CABLE_NO" name="ThimbleForCable" value="no" checked>
+        </div>
+      </div>
+    </div>
+  </div>
+ 
+  <!-- [SO-GALVANIZED-SPRING] -->
+  <div style="margin-top:12px;">
+    <div style="text-align:left" class="config-option-title-style">Galvanized Spring</div>
+    <div class="combined-button-container">
+      <div class="combined-button-container-inner">
+        <div class="rw-sliding-button" tabindex="0">
+          <label for="GALVANIZED_SPRING_YES">Yes</label>
+          <input type="radio" style="display:none;" id="GALVANIZED_SPRING_YES" name="GalvanizedSpring" value="yes">
+        </div>
+        <div class="rw-sliding-button selected" tabindex="0">
+          <label for="GALVANIZED_SPRING_NO">No</label>
+          <input type="radio" style="display:none;" id="GALVANIZED_SPRING_NO" name="GalvanizedSpring" value="no" checked>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- [SO-WEIGHT-MODIFIER] Weight Modifier subsection. Current = live springing
+       weight (read-only). Modify = user-entered delta. New = Current + Modify
+       (read-only, auto-updated). -->
+  <div id="weight_modifier_section" style="margin-top:18px; padding-top:14px; border-top:1px solid #ddd;">
+    <div style="text-align:left; font-weight:700; font-size:15px; margin-bottom:10px;">Weight Modifier</div>
+    <div style="display:flex; flex-direction:column; gap:8px;">
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+        <label for="CURRENT_SPRINGING_WEIGHT" style="flex:1; font-size:14px;">Current Springing Weight (lbs)</label>
+        <input type="number" id="CURRENT_SPRINGING_WEIGHT" name="CurrentSpringingWeight" readonly
+               style="width:120px; padding:6px 8px; background:#f0f0f0; border:1px solid #ccc; border-radius:4px;" value="0">
+      </div>
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+        <label for="MODIFY_SPRINGING_WEIGHT" style="flex:1; font-size:14px;">Modify Springing Weight (+/-)</label>
+        <input type="number" id="MODIFY_SPRINGING_WEIGHT" name="ModifySpringingWeight" step="any"
+               style="width:120px; padding:6px 8px; border:1px solid #ccc; border-radius:4px;" value="0">
+      </div>
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+        <label for="NEW_ADJUSTED_SPRINGING_WEIGHT" style="flex:1; font-size:14px;">New Adjusted Springing Weight (lbs)</label>
+        <input type="number" id="NEW_ADJUSTED_SPRINGING_WEIGHT" name="NewAdjustedSpringingWeight" readonly
+               style="width:120px; padding:6px 8px; background:#f0f0f0; border:1px solid #ccc; border-radius:4px;" value="0">
+      </div>
+    </div>
+  </div>
+
 </section>
 
     <!-- ============================================================
@@ -1473,7 +1876,10 @@ function loadForm() {
     loadDrivenInputEvents();
     loadGlobalNodes();
     loadTrussStyleLogic();
-    addSectionBundleDrivers()
+    //addSectionBundleDrivers()
+    setTimeout(() => {
+        if (typeof getNode === "function" && nodeset?.["T_DOOR_MODEL"]) rw(getNode("T_DOOR_MODEL"));
+    }, 0);
     //loadTrussSchedule();
     //loadPriceDrivers();
   async function redrawCanvas() {
@@ -1710,6 +2116,7 @@ $(document).on("change", "input[name='DOOR_MODEL']", function() {
     renderPatternRow();
     renderEndCaps();
     redrawCanvas();
+    if (typeof getNode === "function" && nodeset?.["T_DOOR_MODEL"]) rw(getNode("T_DOOR_MODEL"));
 });
 
 // ===== [ENDCAPS-PER-MODEL] availability of single/double end caps by model + total width inches.
@@ -1960,6 +2367,48 @@ $("input[name='DOOR_OPTIONS']").on("change", syncHardwareTabInlineClick);
 syncHardwareTabInlineClick();
 setTimeout(syncHardwareTabInlineClick, 200);
 setTimeout(syncHardwareTabInlineClick, 1000);
+
+// [HARDWARE-TABLE-ROW-SYNC] Shared row-select behavior for option tables on the
+// Hardware tab (Drums & Cables, Springing Solutions): clicking a row selects its
+// radio and the selected row highlights blue.
+function syncHardwareTableRows() {
+    $(".hw-option-table tbody tr").each(function() {
+        const checked = $(this).find("input[type='radio']").is(":checked");
+        $(this).css("background", checked ? "#e3f2fd" : "");
+    });
+}
+$(document).on("change", ".hw-option-table input[type='radio']", syncHardwareTableRows);
+$(document).on("click", ".hw-option-table tbody tr", function(e) {
+    if ($(e.target).is("input,label")) return;
+    $(this).find("input[type='radio']").prop("checked", true).trigger("change");
+});
+setTimeout(syncHardwareTableRows, 0);
+
+// [WEIGHT-MODIFIER-SYNC] Pull live springing weight into Current field, compute
+// New = Current + Modify. getCurrentDoorWeight() relies on nodeset values being
+// populated, so guard against early calls before the framework is ready.
+function syncWeightModifier() {
+    let current = 0;
+    try {
+        if (typeof getCurrentDoorWeight === "function" && typeof nodeset !== "undefined" && nodeset["WEIGHT_BREAKDOWN"]) {
+            const w = getCurrentDoorWeight();
+            if (typeof w === "number" && !isNaN(w)) current = w;
+        }
+    } catch (e) { /* nodeset not ready yet — leave current at 0 */ }
+    $("#CURRENT_SPRINGING_WEIGHT").val(current.toFixed(2));
+    const modify = parseFloat($("#MODIFY_SPRINGING_WEIGHT").val()) || 0;
+    $("#NEW_ADJUSTED_SPRINGING_WEIGHT").val((current + modify).toFixed(2));
+}
+$(document).on("input change", "#MODIFY_SPRINGING_WEIGHT", syncWeightModifier);
+// Recompute when anything that affects weight changes.
+$(document).on("change",
+    "input[name='DOOR_MODEL'], input[name='SIZE'], input[name='COLOR'], " +
+    "input[name='WINDOWS'], input[name='WINDOW_POSITION'], input[name='END_CAPS'], " +
+    "#custom_dimensions, #CUSTOM_WIDTH_FEET, #CUSTOM_WIDTH_INCHES, " +
+    "#CUSTOM_HEIGHT_FEET, #CUSTOM_HEIGHT_INCHES",
+    syncWeightModifier);
+setTimeout(syncWeightModifier, 500);
+setTimeout(syncWeightModifier, 1500);
 
 // T300 only supports HW Size 3 — hide the "2" button and force selection to "3".
 function syncHardwareSizeForModel() {

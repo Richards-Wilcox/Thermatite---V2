@@ -1925,6 +1925,53 @@ option--disabled {
     pointer-events: none !important;
 }
 
+/* [HARDWARE-LAYOUT] When the Hardware tab is active, hide the canvas + window-
+   position picker on the left pane. The Drums & Cables and Springing Solutions
+   tables get moved into #HW_LEFT_PANE_LANDING (which JS un-hides). The nav bar
+   at the top of the left pane stays visible. The left pane keeps its grey
+   radial gradient — table cards have their own borders + light fill so they
+   stay readable against it. */
+#configurator.hardware-active #CANVAS_PLUGIN,
+#configurator.hardware-active .postion-container {
+    display: none !important;
+}
+#configurator.hardware-active #HW_LEFT_PANE_LANDING {
+    flex: 1 1 auto;
+    overflow: hidden;
+    padding: 0 24px;
+}
+#configurator.hardware-active #HW_LEFT_PANE_LANDING #drums_cables_section,
+#configurator.hardware-active #HW_LEFT_PANE_LANDING #springing_solutions_section {
+    border: 1px solid #d0d4d9;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-top: 18px;
+    background: #fafbfc;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+#configurator.hardware-active #HW_LEFT_PANE_LANDING #drums_cables_section:first-child {
+    margin-top: 10px;
+}
+#configurator.hardware-active #HW_LEFT_PANE_LANDING #springing_solutions_section {
+    margin-bottom: 60px;
+}
+/* Section headings inside each card — thinner spacing to save vertical room. */
+#configurator.hardware-active #HW_LEFT_PANE_LANDING #drums_cables_section > div:first-child,
+#configurator.hardware-active #HW_LEFT_PANE_LANDING #springing_solutions_section > div:first-child {
+    border-bottom: 1px solid #e3e6ea;
+    padding-bottom: 6px;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+/* Shrink table cells when on the left pane so both tables fit without scrolling. */
+#configurator.hardware-active #HW_LEFT_PANE_LANDING .hw-option-table {
+    font-size: 12px;
+}
+#configurator.hardware-active #HW_LEFT_PANE_LANDING .hw-option-table th,
+#configurator.hardware-active #HW_LEFT_PANE_LANDING .hw-option-table td {
+    padding: 7px 10px !important;
+}
+
 `
   const stylesheet = document.createElement('style')
   stylesheet.setAttribute('id', 'spcSheet')

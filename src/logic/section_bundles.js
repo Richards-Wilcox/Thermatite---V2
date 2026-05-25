@@ -1,8 +1,3 @@
-//This file contains all the inputs related to section bundle and raw panel.
-//Author Name: Charmi Surati
-//Last Modify Date: May 14, 2026
-
-
 function addSectionBundleDrivers() {
 
     const SECTION_DEPS = [
@@ -31,6 +26,10 @@ function addSectionBundleDrivers() {
         this.value = `${doorType} ${getState("DOOR_WIDTH_FEET")}-0x${getState("DOOR_HEIGHT_FEET")}-0(${num_of_sec}) ${doorModel} ${color} ${panelStyle}`
     }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "DOOR_MODEL", "COLOR", "customSwitch", "FACE"])
 
+
+    addLogic("T_DOOR_MODEL", function () {
+        this.value = $("input[name='DOOR_MODEL']:checked").val() || "";
+    }, ["DOOR_MODEL"])
 
     //each section heights
     addLogic("BTM_SECTION", function () {
@@ -1510,116 +1509,43 @@ function getSectionBundle() {
 
 function bundleByHeight() {
 
-    // BUSINESS-LOGIC TBD: width threshold (199") and pair weight cap (150 lb)
-    // are inherited from Landmark. Awaiting Bill's confirmation for
-    // Thermatite-correct values. Width-split branch and weight-based pair
-    // limit are commented out below; current behavior pairs same-height
-    // sections by first+last regardless of shipping weight.
+    // Thermatite bundling rule: walk the stack from bottom to top, pair
+    // adjacent same-height sections greedily. Different heights never bundle.
+    // Bottom section has no special treatment — it bundles with section 2 if
+    // they share a height, otherwise ships alone.
 
     if (_bundleByHeightCacheKey === _sectionBundleCacheKey && _bundleByHeightCache) {
         return _bundleByHeightCache;
     }
 
     const result = [];
-
-    // const width = Number(getState("WIDTH"));
-    //
-    // // WIDTH >= 199 -> every section ships alone
-    // if (width >= 199) {
-    //     const allSections = getSectionBundle();
-    //     return allSections.map((h, i) => ({
-    //         sections: [h],
-    //         indexes: [i + 1],
-    //         weight: calculateSectionShipWeight(h, false)
-    //     }));
-    // }
-
     const sections = getSectionBundle();
 
     if (!sections.length) {
         return result;
     }
 
-    // =========================================
-    // STEP 1: BOTTOM SECTION ALWAYS SINGLE
-    // =========================================
-
-    result.push({
-        sections: [sections[0]],
-        indexes: [1],
-        weight: calculateSectionShipWeight(sections[0], true)
-    });
-
-    // =========================================
-    // STEP 2:
-    // GROUP SAME HEIGHTS
-    // PRESERVE FIRST APPEARANCE ORDER
-    // =========================================
-
-    const remainingSections = sections.slice(1);
-
-    const processed = new Set();
-
-    remainingSections.forEach((height) => {
-
-        // already handled
-        if (processed.has(height)) {
-            return;
-        }
-
-        processed.add(height);
-
-        // collect indexes for this height
-        const matches = [];
-
-        remainingSections.forEach((h, idx) => {
-
-            if (h === height) {
-                // +2 because:
-                // slice(1) removed first section
-                // and indexes are 1-based
-                matches.push(idx + 2);
-            }
-        });
-
-        // =====================================
-        // CREATE PAIRS
-        // first + last
-        // =====================================
-
-        while (matches.length >= 2) {
-
-            const firstIndex = matches.shift();
-            const lastIndex = matches.pop();
-
-            const pairWeight =
-                calculateSectionShipWeight(height, false) +
-                calculateSectionShipWeight(height, false);
-
-            // if (pairWeight < 150) {
-                result.push({
-                    sections: [height, height],
-                    indexes: [firstIndex, lastIndex],
-                    weight: pairWeight
-                });
-            // } else {
-            //     break;
-            // }
-        }
-
-        // =====================================
-        // LEFTOVER SINGLE
-        // =====================================
-
-        while (matches.length) {
-
+    let i = 0;
+    while (i < sections.length) {
+        const height = sections[i];
+        if (i + 1 < sections.length && sections[i + 1] === height) {
+            result.push({
+                sections: [height, height],
+                indexes: [i + 1, i + 2],
+                weight:
+                    calculateSectionShipWeight(height, i === 0) +
+                    calculateSectionShipWeight(height, false),
+            });
+            i += 2;
+        } else {
             result.push({
                 sections: [height],
-                indexes: [matches.shift()],
-                weight: calculateSectionShipWeight(height, false)
+                indexes: [i + 1],
+                weight: calculateSectionShipWeight(height, i === 0),
             });
+            i += 1;
         }
-    });
+    }
 
     _bundleByHeightCache = result;
     _bundleByHeightCacheKey = _sectionBundleCacheKey;

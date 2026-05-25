@@ -1165,22 +1165,32 @@ function applyTrussStyleResult(result) {
   $sel.append(`<option value="" disabled selected>${message}</option>`);
 }
 
-// Reads NUM_OF_SEC, falling back to the DOM and then to the height-derived
-// table so the truss logic always has a defined sections value.
+// Derive sections directly from the current height. We can't trust
+// #NUM_OF_SEC or getState("NUM_OF_SEC") here because renderNumOfSections()
+// is debounced — the DOM/state values lag behind the height the user just
+// picked. HEIGHT_SECTIONS is the source of truth.
 function getTrussStyleSectionCount() {
-  let sections = parseInt(getState("NUM_OF_SEC"));
-  if (!Number.isNaN(sections)) return sections;
-
-  sections = parseInt($("#NUM_OF_SEC").val());
-  if (!Number.isNaN(sections)) return sections;
-
-  // Last resort: derive from height via HEIGHT_SECTIONS (defined in load_html.js).
-  const heightIn = parseInt(getState("HEIGHT"));
-  if (!Number.isNaN(heightIn) && typeof HEIGHT_SECTIONS !== "undefined") {
+  let heightIn;
+  if ($("#custom_dimensions").is(":checked")) {
+    const hFt = parseInt($("#CUSTOM_HEIGHT_FEET").val()) || 0;
+    const hIn = parseInt($("#CUSTOM_HEIGHT_INCHES").val()) || 0;
+    heightIn = hFt * 12 + hIn;
+  } else {
+    const sel = $("input[name='SIZE']:checked");
+    const hFt = Number(sel.attr("height")) || 0;
+    const hIn = Number(sel.attr("heightInches")) || 0;
+    heightIn = hFt * 12 + hIn;
+  }
+  if (heightIn > 0 && typeof HEIGHT_SECTIONS !== "undefined") {
     const heightFt = Math.round(heightIn / 12);
     const list = HEIGHT_SECTIONS[heightFt];
     if (list && list.length) return list[0];
   }
+  // Fallbacks if height isn't available yet.
+  let sections = parseInt($("#NUM_OF_SEC").val());
+  if (!Number.isNaN(sections)) return sections;
+  sections = parseInt(getState("NUM_OF_SEC"));
+  if (!Number.isNaN(sections)) return sections;
   return 4;
 }
 
@@ -1210,6 +1220,10 @@ function getTrussStyleWidthInches() {
 }
 
 function runTrussStyleLogic() {
+  // Ensure #NUM_OF_SEC reflects the current height before we read it, so a SIZE
+  // radio click or CUSTOM_HEIGHT_FEET change doesn't race the renderNumOfSections
+  // debounce.
+  if (typeof renderNumOfSections === "function") renderNumOfSections();
   ensureSectionsSelected();
   const model    = $("input[name='DOOR_MODEL']:checked").val();
   const wind     = $("input[name='WindLoad']:checked").val();
@@ -1229,6 +1243,8 @@ function loadTrussStyleLogic() {
     "#NUM_OF_SEC",
     "#CUSTOM_WIDTH_FEET",
     "#CUSTOM_WIDTH_INCHES",
+    "#CUSTOM_HEIGHT_FEET",
+    "#CUSTOM_HEIGHT_INCHES",
     "input[name='SIZE']",
     "#custom_dimensions",
   ].join(", ");

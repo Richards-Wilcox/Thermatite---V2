@@ -49,6 +49,26 @@
                           (height + width hooks are re-entrancy guarded)
      [LIFT-TYPE-LOGIC]    LIFT_TYPE — show/hide .lift-option entries based on
                           HARDWARE_SET, SPRINGTYPE, INCLINEDTRACK
+     [NUM-COUPLINGS]      Coupler (Hardware) drives Advanced Number of Couplings —
+                          No → 0 only; Yes → 1/2, default 1
+     [SPRING-FAILURE-DEVICE] Shaft Type drives Spring Failure Device — Tube Shaft
+                          restricts to No; any other shaft type allows Yes/No
+     [DUPLEX-SOLUTIONS]   Shaft Type drives Include Duplex Solutions — only
+                          solid shafts (1" / 1 1/4") allow Yes; tube + keyed
+                          tube restrict to No.
+     [HANGER-ANGLE-QTY]   Hanger Angle Type drives Qty dropdown — None → 0 only;
+                          any other type → 1..10, default 1
+     [FENDER-GUARD]       Door thickness (DOOR_MODEL) + CSBB drive Fender Guard
+                          options. For thickness 150/175/200/300/200C:
+                            CSBB=NO  → None + Std
+                            CSBB=YES → None + Yellow
+     [HARDWARE-LAYOUT]    When the Hardware tab is active, hide canvas +
+                          window-position picker and relocate Drums & Cables
+                          and Springing Solutions tables to the left pane.
+                          Reverses on tab change.
+     [DROPDOWN-DEFAULTS]  Force first option for dropdowns the host framework
+                          hydrates to an empty value (SHAFT_TYPE, JAMB_SEAL,
+                          TOP_WEATHER_SEAL)
    ========================================================================= */
 
 // [WIDTH-LIMITS]
@@ -1055,5 +1075,199 @@ function loadDrivenInputEvents() {
   // Re-run after host framework finishes hydrating selects.
   setTimeout(applyBottomSealConstraint, 0);
   setTimeout(applyBottomSealConstraint, 250);
+
+  // [NUM-COUPLINGS] Coupler (Hardware tab) drives Number of Couplings in
+  // Advanced. Coupler=No → only the 0 button is visible and selected.
+  // Coupler=Yes → only 1 and 2 are visible; default to 1.
+  function syncNumCouplingsState() {
+    const yes = $("input[name='Coupler']:checked").val() === "yes";
+    $("#NUM_COUPLINGS_0_BTN").toggle(!yes);
+    $("#NUM_COUPLINGS_1_BTN, #NUM_COUPLINGS_2_BTN").toggle(yes);
+    if (!yes) {
+      if (!$("#NUM_COUPLINGS_0").is(":checked")) {
+        $("#NUM_COUPLINGS_0").prop("checked", true).trigger("change");
+      }
+    } else if ($("#NUM_COUPLINGS_0").is(":checked")) {
+      $("#NUM_COUPLINGS_1").prop("checked", true).trigger("change");
+    }
+  }
+  $(document).on("change", "input[name='Coupler']", syncNumCouplingsState);
+  syncNumCouplingsState();
+
+  // [SPRING-FAILURE-DEVICE] Shaft Type drives Spring Failure Device. Tube Shaft
+  // (the first option) → only No is valid. Any other shaft type → both Yes and
+  // No are available. When restricting to No, the Yes button is hidden and any
+  // current Yes selection is forced back to No.
+  function syncSpringFailureDeviceState() {
+    const restrictToNo = $("#SHAFT_TYPE").val() === "tube";
+    $("#SPRING_FAILURE_DEVICE_YES").closest(".rw-sliding-button").toggle(!restrictToNo);
+    if (restrictToNo && $("#SPRING_FAILURE_DEVICE_YES").is(":checked")) {
+      $("#SPRING_FAILURE_DEVICE_NO").prop("checked", true).trigger("change");
+    }
+  }
+  $(document).on("change", "#SHAFT_TYPE", syncSpringFailureDeviceState);
+  syncSpringFailureDeviceState();
+
+  // [DUPLEX-SOLUTIONS] Shaft Type drives Include Duplex Solutions. Only solid
+  // shafts (1" and 1 1/4") allow Yes. Tube / Keyed Tube → No only; the Yes
+  // button is hidden and any current Yes selection is forced back to No.
+  function syncDuplexSolutionsState() {
+    const shaft = $("#SHAFT_TYPE").val();
+    const allowYes = shaft === "solid_1" || shaft === "solid_1_25";
+    $("#DUPLEX_SOLUTIONS_YES").closest(".rw-sliding-button").toggle(allowYes);
+    if (!allowYes && $("#DUPLEX_SOLUTIONS_YES").is(":checked")) {
+      $("#DUPLEX_SOLUTIONS_NO").prop("checked", true).trigger("change");
+    }
+  }
+  $(document).on("change", "#SHAFT_TYPE", syncDuplexSolutionsState);
+  syncDuplexSolutionsState();
+
+  // [FENDER-GUARD] Door thickness (via DOOR_MODEL) and CSBB drive Fender Guard
+  // options. T150/T150U → 150, T175/T175U → 175, T200/T200U/T200-20 → 200,
+  // T300 → 300, T200C/U200C → 200C. For any of those thicknesses:
+  //   CSBB = NO  → None + Std allowed (Grey/Yellow hidden).
+  //   CSBB = YES → None + Yellow allowed (Std/Grey hidden).
+  // Grey is never an option in current rules.
+  const FENDER_GUARD_THICKNESS = {
+    "T150": "150", "T150U": "150",
+    "T175": "175", "T175U": "175",
+    "T200": "200", "T200U": "200", "T200-20": "200",
+    "T300": "300",
+    "T200C": "200C", "U200C": "200C",
+  };
+  const FENDER_GUARD_LABEL = {
+    "none":   "None",
+    "std":    "Std",
+    "yellow": "Yellow",
+  };
+  function applyFenderGuardConstraint() {
+    const $sel = $("#FENDER_GUARD");
+    if (!$sel.length) return;
+    const model = $("input[name='DOOR_MODEL']:checked").val();
+    const thickness = FENDER_GUARD_THICKNESS[model];
+    const csbb = $("input[name='CSBB']:checked").val();
+    const validThickness = ["150", "175", "200", "300", "200C"].includes(thickness);
+    let allowed;
+    if (!validThickness) {
+      allowed = ["none", "std", "yellow"];
+    } else if (csbb === "yes") {
+      allowed = ["none", "yellow"];
+    } else {
+      allowed = ["none", "std"];
+    }
+    const prev = $sel.val();
+    // Rebuild options. `<option hidden>` is unreliable across browsers in a
+    // <select>, so we replace the option list outright.
+    $sel[0].innerHTML = allowed.map(v => `<option value="${v}">${FENDER_GUARD_LABEL[v]}</option>`).join("");
+    const next = allowed.includes(prev) ? prev : allowed[0];
+    $sel.val(next);
+    if ($sel.val() !== next) $sel[0].selectedIndex = 0;
+    $sel.trigger("change");
+  }
+  $(document).on("change", "input[name='DOOR_MODEL'], input[name='CSBB']", applyFenderGuardConstraint);
+  applyFenderGuardConstraint();
+  setTimeout(applyFenderGuardConstraint, 0);
+  setTimeout(applyFenderGuardConstraint, 250);
+
+  // [HANGER-ANGLE-QTY] Hanger Angle Type drives the Qty dropdown contents.
+  // Type=None → only 0 is valid. Any other type → 1..10 valid, default 1.
+  function applyHangerAngleQtyOptions() {
+    const type = $("#HANGER_ANGLE_TYPE").val();
+    const $qty = $("#HANGER_ANGLE_QTY_INPUT");
+    if (!$qty.length) return;
+    const allowed = type === "none" ? [0] : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    const prev = parseInt($qty.val(), 10);
+    $qty[0].innerHTML = allowed.map(v => `<option value="${v}">${v}</option>`).join("");
+    const next = allowed.includes(prev) ? prev : allowed[0];
+    $qty.val(String(next));
+    if ($qty.val() !== String(next)) $qty[0].selectedIndex = 0;
+    $qty.trigger("change");
+  }
+  $(document).on("change", "#HANGER_ANGLE_TYPE", applyHangerAngleQtyOptions);
+  applyHangerAngleQtyOptions();
+  setTimeout(applyHangerAngleQtyOptions, 0);
+  setTimeout(applyHangerAngleQtyOptions, 250);
+
+  // [HARDWARE-LAYOUT] When the Hardware tab is active, hide the canvas +
+  // window-position picker on the left pane, and move the Drums & Cables and
+  // Springing Solutions tables into a landing container on the left so the
+  // right pane reads as one continuous form. When leaving Hardware, move the
+  // tables back to their original spot in the right pane.
+  const HW_LEFT_TABLES = ["drums_cables_section", "springing_solutions_section"];
+  const _hwTableHomes = {};  // id → { parent, nextSibling } captured on first move
+
+  function applyHardwareLayout() {
+    const sectionIdx = $("input[name='section_select']:checked").val();
+    const onHardware = sectionIdx === "2";
+    $("#configurator").toggleClass("hardware-active", onHardware);
+
+    const $landing = $("#HW_LEFT_PANE_LANDING");
+    if (!$landing.length) return;
+
+    if (onHardware) {
+      // Move tables into the landing container (in order).
+      HW_LEFT_TABLES.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        // Remember home so we can put it back later.
+        if (!_hwTableHomes[id]) {
+          _hwTableHomes[id] = { parent: el.parentNode, nextSibling: el.nextSibling };
+        }
+        if (el.parentNode !== $landing[0]) $landing[0].appendChild(el);
+      });
+      $landing.show();
+    } else {
+      // Move tables back to their original homes.
+      HW_LEFT_TABLES.forEach(id => {
+        const el = document.getElementById(id);
+        const home = _hwTableHomes[id];
+        if (!el || !home || !home.parent) return;
+        if (el.parentNode !== home.parent) {
+          if (home.nextSibling && home.nextSibling.parentNode === home.parent) {
+            home.parent.insertBefore(el, home.nextSibling);
+          } else {
+            home.parent.appendChild(el);
+          }
+        }
+      });
+      $landing.hide();
+    }
+  }
+  $(document).on("change", "input[name='section_select']", applyHardwareLayout);
+  $(document).on("click", "#NAVIGATION_SPC, #tab_0, #tab_1, #tab_2, #tab_3, #tab_4, .button-nextpage, #BACK_BTN", function () {
+    setTimeout(applyHardwareLayout, 0);
+    setTimeout(applyHardwareLayout, 100);
+  });
+  setTimeout(applyHardwareLayout, 200);
+  setTimeout(applyHardwareLayout, 1000);
+
+  // [DROPDOWN-DEFAULTS] The host framework hydrates <select>s after page load
+  // and blanks out dropdowns whose backing node has no explicit value, even when
+  // the markup has a `selected` attribute. For dropdowns with no driver of their
+  // own, force the first option whenever the value is blank — both on initial
+  // load (polled across the framework's hydration window) and on any future
+  // change that ends up blank.
+  const DEFAULT_DROPDOWN_IDS = ["#SHAFT_TYPE", "#JAMB_SEAL", "#TOP_WEATHER_SEAL"];
+  function ensureDropdownDefaults() {
+    DEFAULT_DROPDOWN_IDS.forEach(id => {
+      const $sel = $(id);
+      if ($sel.length && !$sel.val()) {
+        $sel[0].selectedIndex = 0;
+        $sel.trigger("change");
+      }
+    });
+  }
+  ensureDropdownDefaults();
+  // Poll across the framework's full hydration window (it can re-blank as late
+  // as ~1.5s on slow loads). Final pass at 2000ms catches any tail re-renders.
+  [0, 100, 250, 500, 1000, 1500, 2000].forEach(d => setTimeout(ensureDropdownDefaults, d));
+  // Defensive listener: if the framework (or any other code) later sets one of
+  // these dropdowns to blank, snap it back to the first option.
+  $(document).on("change", DEFAULT_DROPDOWN_IDS.join(", "), function() {
+    if (!this.value) {
+      this.selectedIndex = 0;
+      $(this).trigger("change");
+    }
+  });
 
 }
