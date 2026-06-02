@@ -294,38 +294,25 @@ function addSectionBundleDrivers() {
     //Section bundles part# and Desc
     //SB1
     addLogic("SB1_SPNUM", function () {
-        let doorModelId = getNode("DOOR_MODEL").getAttribute("id").substring(1);
+        let doorModelId = getModelPartCode();
         let bundle1_qty = getState("BUNDLE_1_QTY");
         this.value = bundle1_qty > 0 ? `SB${doorModelId}01` : 'None';
     }, ["DOOR_MODEL", "BUNDLE_1_QTY"])
 
     addLogic("SB1_DESC", function () {
-        // let doorWidthFeet = getState("DOOR_WIDTH_FEET");
-        // doorWidthFeet = String(doorWidthFeet).padStart(2, "0");
-        // let doorWidthInches = getState("DOOR_WIDTH_INCHES");
-        // let doorModelDesc = getNode("DOOR_MODEL").getAttribute("desc")
-        // let color = getState("COLOR").desc;
-        // let panelStyle = getNode("FACE").getAttribute("desc");
-        // let bundle1_height = getState("BUNDLE_1_HEIGHT");
-        // const end_caps = getState("EndCaps");
-        // const double_end_caps = end_caps === 'Y' ? 'DE' : '';
-        // const TALLEST_SECTION_QTY = getState('TALLEST_SECTION_QTY');
-        // let prefix = bundle1_height < 32
-        //     ? 'SB-B'
-        //     : 'SB-BI';
-        // this.value = `${prefix} ${doorWidthFeet}-${doorWidthInches}x${bundle1_height} ${doorModelDesc} ${color} ${panelStyle} ${double_end_caps}`;
         const height = getState("BUNDLE_1_HEIGHT");
         const qty = getState("BUNDLE_1_QTY");
-
-        const prefix = getSBPrefix("SB1", height);
-
-        this.value = buildSBDescription(prefix, height, qty);
-
-    }, [DIMENSION_DEPS, "BUNDLE_1_HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "EndCaps"])
+        try {
+            this.value = buildSBDescription("SB", height, qty, 0, 0);
+        } catch (e) {
+            console.error("SB1_DESC ERROR:", e);
+            this.value = "";
+        }
+    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "BUNDLE_1_HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE"])
 
     //SB2
     addLogic("SB2_SPNUM", function () {
-        let doorModelId = getNode("DOOR_MODEL").getAttribute("id").substring(1);
+        let doorModelId = getModelPartCode();
         let bundle2_qty = getState("BUNDLE_2_QTY");
         this.value = bundle2_qty > 0 ? `SB${doorModelId}02` : 'None';
     }, ["DOOR_MODEL", "BUNDLE_2_QTY"])
@@ -333,13 +320,12 @@ function addSectionBundleDrivers() {
     addLogic("SB2_DESC", function () {
         const height = getState("BUNDLE_2_HEIGHT");
         const qty = getState("BUNDLE_2_QTY");
-        const prefix = getSBPrefix("DEFAULT", height);
-        this.value = buildSBDescription(prefix, height, qty);
-    }, [DIMENSION_DEPS, "BUNDLE_2_HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "EndCaps"])
+        this.value = buildSBDescription("SB", height, qty, 1, 1);
+    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "BUNDLE_2_HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE"])
 
     //SB3
     addLogic("SB3_SPNUM", function () {
-        let doorModelId = getNode("DOOR_MODEL").getAttribute("id").substring(1);
+        let doorModelId = getModelPartCode();
         let bundle3_qty = getState("BUNDLE_3_QTY");
         this.value = bundle3_qty > 0 ? `SB${doorModelId}03` : 'None';
     }, ["DOOR_MODEL", "WIDTH", "HEIGHT", "NUM_OF_SEC", "BUNDLE_3_QTY"])
@@ -347,14 +333,13 @@ function addSectionBundleDrivers() {
     addLogic("SB3_DESC", function () {
         const height = getState("BUNDLE_3_HEIGHT");
         const qty = getState("BUNDLE_3_QTY");
-        const prefix = getSBPrefix("DEFAULT", height);
-        this.value = buildSBDescription(prefix, height, qty);
+        this.value = buildSBDescription("SB", height, qty, 2, 2);
 
-    }, [DIMENSION_DEPS, "BUNDLE_3_HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "EndCaps"])
+    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "BUNDLE_3_HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE"])
 
     //SB 4
     addLogic("SB4_SPNUM", function () {
-        let doorModelId = getNode("DOOR_MODEL").getAttribute("id").substring(1);
+        let doorModelId = getModelPartCode();
         let bundle4_qty = getState("BUNDLE_4_QTY");
         this.value = bundle4_qty > 0 ? `SB${doorModelId}04` : 'None';
     }, ["DOOR_MODEL", "WIDTH", "HEIGHT", "NUM_OF_SEC", "BUNDLE_4_QTY"])
@@ -362,14 +347,13 @@ function addSectionBundleDrivers() {
     addLogic("SB4_DESC", function () {
         const height = getState("BUNDLE_4_HEIGHT");
         const qty = getState("BUNDLE_4_QTY");
-        const prefix = getSBPrefix("DEFAULT", height);
-        this.value = buildSBDescription(prefix, height, qty);
+        this.value = buildSBDescription("SB", height, qty, 3, 3);
 
-    }, [DIMENSION_DEPS, "BUNDLE_4_HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "EndCaps"])
+    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "BUNDLE_4_HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE"])
 
     //SB 5
     addLogic("SB5_SPNUM", function () {
-        let doorModelId = getNode("DOOR_MODEL").getAttribute("id").substring(1);
+        let doorModelId = getModelPartCode();
         let bundle5_qty = getState("BUNDLE_5_QTY");
         this.value = bundle5_qty > 0 ? `SB${doorModelId}05` : 'None';
     }, ["DOOR_MODEL", "WIDTH", "HEIGHT", "NUM_OF_SEC", "BUNDLE_5_QTY"])
@@ -377,14 +361,13 @@ function addSectionBundleDrivers() {
     addLogic("SB5_DESC", function () {
         const height = getState("BUNDLE_5_HEIGHT");
         const qty = getState("BUNDLE_5_QTY");
-        const prefix = getSBPrefix("DEFAULT", height);
-        this.value = buildSBDescription(prefix, height, qty);
+        this.value = buildSBDescription("SB", height, qty, 4, 4);
 
-    }, [DIMENSION_DEPS, "BUNDLE_5_HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "EndCaps"])
+    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "BUNDLE_5_HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE"])
 
     //SB 6
     addLogic("SB6_SPNUM", function () {
-        let doorModelId = getNode("DOOR_MODEL").getAttribute("id").substring(1);
+        let doorModelId = getModelPartCode();
         let bundle6_qty = getState("BUNDLE_6_QTY");
         this.value = bundle6_qty > 0 ? `SB${doorModelId}06` : 'None';
     }, ["DOOR_MODEL", "WIDTH", "HEIGHT", "NUM_OF_SEC", "BUNDLE_6_QTY"])
@@ -392,14 +375,13 @@ function addSectionBundleDrivers() {
     addLogic("SB6_DESC", function () {
         const height = getState("BUNDLE_6_HEIGHT");
         const qty = getState("BUNDLE_6_QTY");
-        const prefix = getSBPrefix("DEFAULT", height);
-        this.value = buildSBDescription(prefix, height, qty);
+        this.value = buildSBDescription("SB", height, qty, 5, 5);
 
-    }, [DIMENSION_DEPS, "BUNDLE_6_HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "EndCaps"])
+    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "BUNDLE_6_HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE"])
 
     //SB 7
     addLogic("SB7_SPNUM", function () {
-        let doorModelId = getNode("DOOR_MODEL").getAttribute("id").substring(1);
+        let doorModelId = getModelPartCode();
         let bundle7_qty = getState("BUNDLE_7_QTY");
         this.value = bundle7_qty > 0 ? `SB${doorModelId}07` : 'None';
     }, ["DOOR_MODEL", "WIDTH", "HEIGHT", "NUM_OF_SEC", "BUNDLE_7_QTY"])
@@ -407,14 +389,13 @@ function addSectionBundleDrivers() {
     addLogic("SB7_DESC", function () {
         const height = getState("BUNDLE_7_HEIGHT");
         const qty = getState("BUNDLE_7_QTY");
-        const prefix = getSBPrefix("DEFAULT", height);
-        this.value = buildSBDescription(prefix, height, qty);
+        this.value = buildSBDescription("SB", height, qty, 6, 6);
 
-    }, [DIMENSION_DEPS, "BUNDLE_7_HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "EndCaps"])
+    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "BUNDLE_7_HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE"])
 
     //SB 8
     addLogic("SB8_SPNUM", function () {
-        let doorModelId = getNode("DOOR_MODEL").getAttribute("id").substring(1);
+        let doorModelId = getModelPartCode();
         let bundle8_qty = getState("BUNDLE_8_QTY");
         this.value = bundle8_qty > 0 ? `SB${doorModelId}08` : 'None';
     }, ["DOOR_MODEL", "WIDTH", "HEIGHT", "NUM_OF_SEC", "BUNDLE_8_QTY"])
@@ -422,14 +403,13 @@ function addSectionBundleDrivers() {
     addLogic("SB8_DESC", function () {
         const height = getState("BUNDLE_8_HEIGHT");
         const qty = getState("BUNDLE_8_QTY");
-        const prefix = getSBPrefix("DEFAULT", height);
-        this.value = buildSBDescription(prefix, height, qty);
+        this.value = buildSBDescription("SB", height, qty, 7, 7);
 
-    }, [DIMENSION_DEPS, "BUNDLE_8_HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "EndCaps"])
+    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "BUNDLE_8_HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE"])
 
     //SB 9
     addLogic("SB9_SPNUM", function () {
-        let doorModelId = getNode("DOOR_MODEL").getAttribute("id").substring(1);
+        let doorModelId = getModelPartCode();
         let bundle9_qty = getState("BUNDLE_9_QTY");
         this.value = bundle9_qty > 0 ? `SB${doorModelId}09` : 'None';
     }, ["DOOR_MODEL", "WIDTH", "HEIGHT", "NUM_OF_SEC", "BUNDLE_9_QTY"])
@@ -437,16 +417,15 @@ function addSectionBundleDrivers() {
     addLogic("SB9_DESC", function () {
         const height = getState("BUNDLE_9_HEIGHT");
         const qty = getState("BUNDLE_9_QTY");
-        const prefix = getSBPrefix("DEFAULT", height);
-        this.value = buildSBDescription(prefix, height, qty);
+        this.value = buildSBDescription("SB", height, qty, 8, 8);
 
-    }, [DIMENSION_DEPS, "BUNDLE_9_HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "EndCaps"])
+    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "BUNDLE_9_HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE"])
 
 
     //Section Components part# and Desc for each bundle
     //SC1
     addLogic("BUNDLE1_SC1_SPNUM", function () {
-        let doorModelId = getNode("DOOR_MODEL").getAttribute("id").substring(1);
+        let doorModelId = getModelPartCode();
         let bundle1_sc1_qty = getState("BUNDLE1_SC1_QTY");
         const bundles = bundleByHeight(getSectionBundle());
         const index = bundles[0] ? bundles[0].indexes[0] : '';
@@ -458,10 +437,10 @@ function addSectionBundleDrivers() {
         const qty = getState("BUNDLE1_SC1_QTY");
         this.value = buildSCDescription(height, qty);
 
-    }, [DIMENSION_DEPS, "BUNDLE1_SC1_HEIGHT", "BUNDLE1_SC1_QTY", "DOOR_MODEL", "COLOR", "FACE", "EndCaps"])
+    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "BUNDLE1_SC1_HEIGHT", "BUNDLE1_SC1_QTY", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE"])
 
     addLogic("BUNDLE1_SC2_SPNUM", function () {
-        let doorModelId = getNode("DOOR_MODEL").getAttribute("id").substring(1);
+        let doorModelId = getModelPartCode();
         let bundle1_sc2_qty = getState("BUNDLE1_SC2_QTY");
         const bundles = bundleByHeight(getSectionBundle());
         const index = bundles[0] ? bundles[0].indexes[1] : '';
@@ -474,11 +453,11 @@ function addSectionBundleDrivers() {
         const qty = getState("BUNDLE1_SC2_QTY");
         this.value = buildSCDescription(height, qty);
 
-    }, [DIMENSION_DEPS, "BUNDLE1_SC2_HEIGHT", "BUNDLE1_SC2_QTY", "DOOR_MODEL", "COLOR", "FACE", "EndCaps"])
+    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "BUNDLE1_SC2_HEIGHT", "BUNDLE1_SC2_QTY", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE"])
 
     //SC2
     addLogic("BUNDLE2_SC1_SPNUM", function () {
-        let doorModelId = getNode("DOOR_MODEL").getAttribute("id").substring(1);
+        let doorModelId = getModelPartCode();
         let bundle2_sc1_qty = getState("BUNDLE2_SC1_QTY");
         const bundles = bundleByHeight(getSectionBundle());
         const index = bundles[1] ? bundles[1].indexes[0] : '';
@@ -491,10 +470,10 @@ function addSectionBundleDrivers() {
         const qty = getState("BUNDLE2_SC1_QTY");
         this.value = buildSCDescription(height, qty);
 
-    }, [DIMENSION_DEPS, "BUNDLE2_SC1_HEIGHT", "BUNDLE2_SC1_QTY", "DOOR_MODEL", "COLOR", "FACE", "EndCaps"])
+    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "BUNDLE2_SC1_HEIGHT", "BUNDLE2_SC1_QTY", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE"])
 
     addLogic("BUNDLE2_SC2_SPNUM", function () {
-        let doorModelId = getNode("DOOR_MODEL").getAttribute("id").substring(1);
+        let doorModelId = getModelPartCode();
         let bundle2_sc2_qty = getState("BUNDLE2_SC2_QTY");
         const bundles = bundleByHeight(getSectionBundle());
         const index = bundles[1] ? bundles[1].indexes[1] : '';
@@ -507,11 +486,11 @@ function addSectionBundleDrivers() {
         const qty = getState("BUNDLE2_SC2_QTY");
         this.value = buildSCDescription(height, qty);
 
-    }, [DIMENSION_DEPS, "BUNDLE2_SC2_HEIGHT", "BUNDLE2_SC2_QTY", "DOOR_MODEL", "COLOR", "FACE", "EndCaps"])
+    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "BUNDLE2_SC2_HEIGHT", "BUNDLE2_SC2_QTY", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE"])
 
     //SC 3
     addLogic("BUNDLE3_SC1_SPNUM", function () {
-        let doorModelId = getNode("DOOR_MODEL").getAttribute("id").substring(1);
+        let doorModelId = getModelPartCode();
         let bundle3_sc1_qty = getState("BUNDLE3_SC1_QTY");
         const bundles = bundleByHeight(getSectionBundle());
         const index = bundles[2] ? bundles[2].indexes[0] : '';
@@ -524,10 +503,10 @@ function addSectionBundleDrivers() {
         const qty = getState("BUNDLE3_SC1_QTY");
         this.value = buildSCDescription(height, qty);
 
-    }, ["DOOR_MODEL", "COLOR", "FACE", DIMENSION_DEPS, "BUNDLE3_SC1_HEIGHT", "BUNDLE3_SC1_QTY", "EndCaps"])
+    }, ["WIDTH", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE", DIMENSION_DEPS, "HEIGHT", "BUNDLE3_SC1_HEIGHT", "BUNDLE3_SC1_QTY"])
 
     addLogic("BUNDLE3_SC2_SPNUM", function () {
-        let doorModelId = getNode("DOOR_MODEL").getAttribute("id").substring(1);
+        let doorModelId = getModelPartCode();
         let bundle3_sc2_qty = getState("BUNDLE3_SC2_QTY");
         const bundles = bundleByHeight(getSectionBundle());
         const index = bundles[2] ? bundles[2].indexes[1] : '';
@@ -541,11 +520,11 @@ function addSectionBundleDrivers() {
         const qty = getState("BUNDLE3_SC2_QTY");
         this.value = buildSCDescription(height, qty);
 
-    }, [DIMENSION_DEPS, "BUNDLE3_SC2_HEIGHT", "BUNDLE3_SC2_QTY", "DOOR_MODEL", "COLOR", "FACE", "EndCaps"])
+    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "BUNDLE3_SC2_HEIGHT", "BUNDLE3_SC2_QTY", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE"])
 
     //sc 4
     addLogic("BUNDLE4_SC1_SPNUM", function () {
-        let doorModelId = getNode("DOOR_MODEL").getAttribute("id").substring(1);
+        let doorModelId = getModelPartCode();
         let bundle4_sc1_qty = getState("BUNDLE4_SC1_QTY");
         const bundles = bundleByHeight(getSectionBundle());
         const index = bundles[3] ? bundles[3].indexes[0] : '';
@@ -558,10 +537,10 @@ function addSectionBundleDrivers() {
         const qty = getState("BUNDLE4_SC1_QTY");
         this.value = buildSCDescription(height, qty);
 
-    }, ["DOOR_MODEL", "COLOR", "FACE", DIMENSION_DEPS, "BUNDLE4_SC1_HEIGHT", "BUNDLE4_SC1_QTY", "EndCaps"])
+    }, ["WIDTH", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE", DIMENSION_DEPS, "HEIGHT", "BUNDLE4_SC1_HEIGHT", "BUNDLE4_SC1_QTY"])
 
     addLogic("BUNDLE4_SC2_SPNUM", function () {
-        let doorModelId = getNode("DOOR_MODEL").getAttribute("id").substring(1);
+        let doorModelId = getModelPartCode();
         let bundle4_sc2_qty = getState("BUNDLE4_SC2_QTY");
         const bundles = bundleByHeight(getSectionBundle());
         const index = bundles[3] ? bundles[3].indexes[1] : '';
@@ -575,11 +554,11 @@ function addSectionBundleDrivers() {
         const qty = getState("BUNDLE4_SC2_QTY");
         this.value = buildSCDescription(height, qty);
 
-    }, [DIMENSION_DEPS, "BUNDLE4_SC2_HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "EndCaps", "BUNDLE4_SC2_QTY"])
+    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "BUNDLE4_SC2_HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE", "BUNDLE4_SC2_QTY"])
 
     //sc 5
     addLogic("BUNDLE5_SC1_SPNUM", function () {
-        let doorModelId = getNode("DOOR_MODEL").getAttribute("id").substring(1);
+        let doorModelId = getModelPartCode();
         let bundle5_sc1_qty = getState("BUNDLE5_SC1_QTY");
         const bundles = bundleByHeight(getSectionBundle());
         const index = bundles[4] ? bundles[4].indexes[0] : '';
@@ -592,11 +571,11 @@ function addSectionBundleDrivers() {
         const qty = getState("BUNDLE5_SC1_QTY");
         this.value = buildSCDescription(height, qty);
 
-    }, [DIMENSION_DEPS, "BUNDLE5_SC1_HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "EndCaps", "BUNDLE5_SC1_QTY"])
+    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "BUNDLE5_SC1_HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE", "BUNDLE5_SC1_QTY"])
 
     //BUNDLE 6
     addLogic("BUNDLE6_SC1_SPNUM", function () {
-        let doorModelId = getNode("DOOR_MODEL").getAttribute("id").substring(1);
+        let doorModelId = getModelPartCode();
         let bundle6_sc1_qty = getState("BUNDLE6_SC1_QTY");
         const bundles = bundleByHeight(getSectionBundle());
         const index = bundles[5] ? bundles[5].indexes[0] : '';
@@ -608,11 +587,11 @@ function addSectionBundleDrivers() {
         const height = getState("BUNDLE6_SC1_HEIGHT");
         const qty = getState("BUNDLE6_SC1_QTY");
         this.value = buildSCDescription(height, qty);
-    }, [DIMENSION_DEPS, "BUNDLE6_SC1_HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "EndCaps", "BUNDLE6_SC1_QTY"])
+    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "BUNDLE6_SC1_HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE", "BUNDLE6_SC1_QTY"])
 
     //BUNDLE 7
     addLogic("BUNDLE7_SC1_SPNUM", function () {
-        let doorModelId = getNode("DOOR_MODEL").getAttribute("id").substring(1);
+        let doorModelId = getModelPartCode();
         let bundle7_sc1_qty = getState("BUNDLE7_SC1_QTY");
         const bundles = bundleByHeight(getSectionBundle());
         const index = bundles[6] ? bundles[6].indexes[0] : '';
@@ -624,11 +603,11 @@ function addSectionBundleDrivers() {
         const height = getState("BUNDLE7_SC1_HEIGHT");
         const qty = getState("BUNDLE7_SC1_QTY");
         this.value = buildSCDescription(height, qty);
-    }, [DIMENSION_DEPS, "BUNDLE7_SC1_HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "EndCaps", "BUNDLE7_SC1_QTY"])
+    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "BUNDLE7_SC1_HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE", "BUNDLE7_SC1_QTY"])
 
     //BUNDLE 8
     addLogic("BUNDLE8_SC1_SPNUM", function () {
-        let doorModelId = getNode("DOOR_MODEL").getAttribute("id").substring(1);
+        let doorModelId = getModelPartCode();
         let bundle8_sc1_qty = getState("BUNDLE8_SC1_QTY");
         const bundles = bundleByHeight(getSectionBundle());
         const index = bundles[7] ? bundles[7].indexes[0] : '';
@@ -640,11 +619,11 @@ function addSectionBundleDrivers() {
         const height = getState("BUNDLE8_SC1_HEIGHT");
         const qty = getState("BUNDLE8_SC1_QTY");
         this.value = buildSCDescription(height, qty);
-    }, [DIMENSION_DEPS, "BUNDLE8_SC1_HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "EndCaps", "BUNDLE8_SC1_QTY"])
+    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "BUNDLE8_SC1_HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE", "BUNDLE8_SC1_QTY"])
 
     //BUNDLE 9
     addLogic("BUNDLE9_SC1_SPNUM", function () {
-        let doorModelId = getNode("DOOR_MODEL").getAttribute("id").substring(1);
+        let doorModelId = getModelPartCode();
         let bundle9_sc1_qty = getState("BUNDLE9_SC1_QTY");
         const bundles = bundleByHeight(getSectionBundle());
         const index = bundles[8] ? bundles[8].indexes[0] : '';
@@ -656,7 +635,7 @@ function addSectionBundleDrivers() {
         const height = getState("BUNDLE9_SC1_HEIGHT");
         const qty = getState("BUNDLE9_SC1_QTY");
         this.value = buildSCDescription(height, qty);
-    }, [DIMENSION_DEPS, "BUNDLE9_SC1_HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "EndCaps", "BUNDLE9_SC1_QTY"])
+    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "BUNDLE9_SC1_HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE", "BUNDLE9_SC1_QTY"])
 
 
     //Raw panel Part# and Desc for Each bundle
@@ -671,9 +650,9 @@ function addSectionBundleDrivers() {
         const height = getState("BUNDLE1_SC1_HEIGHT");
         const qty = getState("BUNDLE1_SC1_QTY");
 
-        this.value = buildRPDescription(height, qty);
+        this.value = buildRPDescription(height, qty, 0, 0);
 
-    }, [DIMENSION_DEPS, "DOOR_MODEL", "COLOR", "FACE", "BUNDLE1_SC1_HEIGHT", "BUNDLE1_SC1_QTY"])
+    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE", "BUNDLE1_SC1_HEIGHT", "BUNDLE1_SC1_QTY"])
 
     // set bundle 1 rp2 part#
     addLogic("BUNDLE1_RP2_SPNUM", function () {
@@ -686,8 +665,8 @@ function addSectionBundleDrivers() {
         const height = getState("BUNDLE1_SC2_HEIGHT");
         const qty = getState("BUNDLE1_SC2_QTY");
 
-        this.value = buildRPDescription(height, qty);
-    }, [DIMENSION_DEPS, "DOOR_MODEL", "COLOR", "FACE", "BUNDLE1_SC2_HEIGHT", "BUNDLE1_SC2_QTY"])
+        this.value = buildRPDescription(height, qty, 0, 0);
+    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE", "BUNDLE1_SC2_HEIGHT", "BUNDLE1_SC2_QTY"])
 
     // bundle2 rp1 part#
     addLogic("BUNDLE2_RP1_SPNUM", function () {
@@ -700,8 +679,8 @@ function addSectionBundleDrivers() {
         const height = getState("BUNDLE2_SC1_HEIGHT");
         const qty = getState("BUNDLE2_SC1_QTY");
 
-        this.value = buildRPDescription(height, qty);
-    }, [DIMENSION_DEPS, "DOOR_MODEL", "COLOR", "FACE", "BUNDLE2_SC1_HEIGHT", "BUNDLE2_SC1_QTY"])
+        this.value = buildRPDescription(height, qty, 1, 1);
+    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE", "BUNDLE2_SC1_HEIGHT", "BUNDLE2_SC1_QTY"])
 
     // bundle 2 rp2 part#
     addLogic("BUNDLE2_RP2_SPNUM", function () {
@@ -714,9 +693,9 @@ function addSectionBundleDrivers() {
         const height = getState("BUNDLE2_SC2_HEIGHT");
         const qty = getState("BUNDLE2_SC2_QTY");
 
-        this.value = buildRPDescription(height, qty);
+        this.value = buildRPDescription(height, qty, 1, 1);
 
-    }, [DIMENSION_DEPS, "DOOR_MODEL", "COLOR", "FACE", "BUNDLE2_SC2_HEIGHT", "BUNDLE2_SC2_QTY"])
+    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE", "BUNDLE2_SC2_HEIGHT", "BUNDLE2_SC2_QTY"])
 
     //bundle 3 rp1 part#
     addLogic("BUNDLE3_RP1_SPNUM", function () {
@@ -730,9 +709,9 @@ function addSectionBundleDrivers() {
         const height = getState("BUNDLE3_SC1_HEIGHT");
         const qty = getState("BUNDLE3_SC1_QTY");
 
-        this.value = buildRPDescription(height, qty);
+        this.value = buildRPDescription(height, qty, 2, 2);
 
-    }, [DIMENSION_DEPS, "DOOR_MODEL", "COLOR", "FACE", "BUNDLE3_SC1_HEIGHT", "BUNDLE3_SC1_QTY"])
+    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE", "BUNDLE3_SC1_HEIGHT", "BUNDLE3_SC1_QTY"])
 
     //bundle3 rp2 
     addLogic("BUNDLE3_RP2_SPNUM", function () {
@@ -745,9 +724,9 @@ function addSectionBundleDrivers() {
         const height = getState("BUNDLE3_SC2_HEIGHT");
         const qty = getState("BUNDLE3_SC2_QTY");
 
-        this.value = buildRPDescription(height, qty);
+        this.value = buildRPDescription(height, qty, 2, 2);
 
-    }, [DIMENSION_DEPS, "DOOR_MODEL", "COLOR", "FACE", "BUNDLE3_SC2_HEIGHT", "BUNDLE3_SC2_QTY"])
+    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE", "BUNDLE3_SC2_HEIGHT", "BUNDLE3_SC2_QTY"])
 
     //BUNDLE 4
     //BUNDLE4 RP1    
@@ -761,9 +740,9 @@ function addSectionBundleDrivers() {
         const height = getState("BUNDLE4_SC1_HEIGHT");
         const qty = getState("BUNDLE4_SC1_QTY");
 
-        this.value = buildRPDescription(height, qty);
+        this.value = buildRPDescription(height, qty, 3, 3);
 
-    }, [DIMENSION_DEPS, "DOOR_MODEL", "COLOR", "FACE", "BUNDLE4_SC1_HEIGHT", "BUNDLE4_SC1_QTY"])
+    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE", "BUNDLE4_SC1_HEIGHT", "BUNDLE4_SC1_QTY"])
 
     //bundle4 RP2 PART#
     addLogic("BUNDLE4_RP2_SPNUM", function () {
@@ -777,9 +756,9 @@ function addSectionBundleDrivers() {
         const height = getState("BUNDLE4_SC2_HEIGHT");
         const qty = getState("BUNDLE4_SC2_QTY");
 
-        this.value = buildRPDescription(height, qty);
+        this.value = buildRPDescription(height, qty, 3, 3);
 
-    }, [DIMENSION_DEPS, "DOOR_MODEL", "COLOR", "FACE", "BUNDLE4_SC2_HEIGHT", "BUNDLE4_SC2_QTY"])
+    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE", "BUNDLE4_SC2_HEIGHT", "BUNDLE4_SC2_QTY"])
 
     //BUNDLE 5
     //BUNDLE5 RP1    
@@ -793,9 +772,9 @@ function addSectionBundleDrivers() {
         const height = getState("BUNDLE5_SC1_HEIGHT");
         const qty = getState("BUNDLE5_SC1_QTY");
 
-        this.value = buildRPDescription(height, qty);
+        this.value = buildRPDescription(height, qty, 4, 4);
 
-    }, [DIMENSION_DEPS, "DOOR_MODEL", "COLOR", "FACE", "BUNDLE5_SC1_HEIGHT", "BUNDLE5_SC1_QTY"])
+    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE", "BUNDLE5_SC1_HEIGHT", "BUNDLE5_SC1_QTY"])
 
     //BUNDLE 6
     //BUNDLE6 RP1    
@@ -811,9 +790,9 @@ function addSectionBundleDrivers() {
         const height = getState("BUNDLE6_SC1_HEIGHT");
         const qty = getState("BUNDLE6_SC1_QTY");
 
-        this.value = buildRPDescription(height, qty);
+        this.value = buildRPDescription(height, qty, 5, 5);
 
-    }, [DIMENSION_DEPS, "DOOR_MODEL", "COLOR", "FACE", "BUNDLE6_SC1_HEIGHT", "BUNDLE6_SC1_QTY"])
+    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE", "BUNDLE6_SC1_HEIGHT", "BUNDLE6_SC1_QTY"])
 
     //BUNDLE 7
     //BUNDLE7 RP1    
@@ -828,9 +807,9 @@ function addSectionBundleDrivers() {
         const height = getState("BUNDLE7_SC1_HEIGHT");
         const qty = getState("BUNDLE7_SC1_QTY");
 
-        this.value = buildRPDescription(height, qty);
+        this.value = buildRPDescription(height, qty, 6, 6);
 
-    }, [DIMENSION_DEPS, "DOOR_MODEL", "COLOR", "FACE", "BUNDLE7_SC1_HEIGHT", "BUNDLE7_SC1_QTY"])
+    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE", "BUNDLE7_SC1_HEIGHT", "BUNDLE7_SC1_QTY"])
 
     //BUNDLE 8
     //BUNDLE8 RP1    
@@ -840,14 +819,14 @@ function addSectionBundleDrivers() {
 
     }, ["DOOR_MODEL", "BUNDLE8_SC1_HEIGHT", DIMENSION_DEPS])
 
-    //BUNDLE7 RP1 DESC
+    //BUNDLE8 RP1 DESC
     addLogic("BUNDLE8_RP1_DESC", function () {
         const height = getState("BUNDLE8_SC1_HEIGHT");
         const qty = getState("BUNDLE8_SC1_QTY");
 
-        this.value = buildRPDescription(height, qty);
+        this.value = buildRPDescription(height, qty, 7, 7);
 
-    }, [DIMENSION_DEPS, "DOOR_MODEL", "COLOR", "FACE", "BUNDLE8_SC1_HEIGHT", "BUNDLE8_SC1_QTY"])
+    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE", "BUNDLE8_SC1_HEIGHT", "BUNDLE8_SC1_QTY"])
 
     //BUNDLE 9
     //BUNDLE9 RP1    
@@ -857,13 +836,13 @@ function addSectionBundleDrivers() {
 
     }, ["DOOR_MODEL", "BUNDLE9_SC1_HEIGHT", DIMENSION_DEPS])
 
-    //BUNDLE7 RP1 DESC
+    //BUNDLE9 RP1 DESC
     addLogic("BUNDLE9_RP1_DESC", function () {
         const height = getState("BUNDLE9_SC1_HEIGHT");
         const qty = getState("BUNDLE9_SC1_QTY");
-        this.value = buildRPDescription(height, qty);
+        this.value = buildRPDescription(height, qty, 8, 8);
 
-    }, [DIMENSION_DEPS, "DOOR_MODEL", "COLOR", "FACE", "BUNDLE9_SC1_HEIGHT", "BUNDLE9_SC1_QTY"])
+    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE", "BUNDLE9_SC1_HEIGHT", "BUNDLE9_SC1_QTY"])
 
 
     // RP BASE Part# for each section
@@ -1069,34 +1048,24 @@ function addSectionBundleDrivers() {
         this.value = ((Number(width_feet)) + 2)
     }, ["DOOR_WIDTH_FEET"])
 
-    //Calculate the section bundle logic
+    //Calculate the section bundle logic.
+    // Heights are reconciled against getStackChart() (source of truth) with the
+    // HEIGHT/NUM_OF_SEC arithmetic as a cross-check — see resolveSectionHeights.
     addLogic("SHORTEST_SECTION", function () { //find the shortest value
-        let door_height = getState("HEIGHT");
-        let num_of_sec = getState("NUM_OF_SEC");
-        this.value = Math.floor((door_height / num_of_sec) / 3) * 3;
+        this.value = resolveSectionHeights().shortest;
     }, ["HEIGHT", "NUM_OF_SEC", "WIDTH"])
 
     addLogic("SHORTEST_SECTIONS_QTY", function () {
-        let num_of_sec = getState("NUM_OF_SEC");
-        let door_height = getState("HEIGHT");
-        let shortest_section = getState("SHORTEST_SECTION");
-        let diff = (door_height / num_of_sec) - shortest_section;
-
-        this.value = Math.round((1 - (diff) / 3) * num_of_sec);
-
+        this.value = resolveSectionHeights().shortestQty;
     }, ["HEIGHT", "NUM_OF_SEC", "SHORTEST_SECTION"])
 
 
     addLogic("TALLEST_SECTION", function () {
-        let door_height = getState("HEIGHT");
-        let num_of_sec = getState("NUM_OF_SEC");
-        this.value = Math.ceil((door_height / num_of_sec) / 3) * 3;
+        this.value = resolveSectionHeights().tallest;
     }, ["HEIGHT", "NUM_OF_SEC"])
 
     addLogic("TALLEST_SECTION_QTY", function () {
-        let door_height = getState("HEIGHT");
-        let num_of_sec = getState("NUM_OF_SEC");
-        this.value = Math.round((((door_height / num_of_sec) - getState("SHORTEST_SECTION")) / 3) * num_of_sec);
+        this.value = resolveSectionHeights().tallestQty;
     }, ["HEIGHT", "NUM_OF_SEC", "SHORTEST_SECTION"])
 
 
@@ -1329,6 +1298,7 @@ function getEndCapsPartNum(section_height, door_model, end_caps) {
 function getSectionHeight(height, num_of_sec) {
     let stackChart = getStackChart();
     let configArray = stackChart[String(height)];
+    if (!configArray) return undefined;
 
     for (let i = 0; i < configArray.length; i++) {
         const item = configArray[i];
@@ -1337,6 +1307,79 @@ function getSectionHeight(height, num_of_sec) {
             return item;
         }
     }
+}
+
+// Pull the individual section heights out of a stack-chart entry.
+// Entry keys are top_section_height / btm_section_height / int*_height,
+// all in inches and always one of 18 / 21 / 24.
+function chartEntryHeights(entry) {
+    if (!entry) return [];
+    return Object.keys(entry)
+        .filter(k => k.endsWith("_height"))
+        .map(k => Number(entry[k]))
+        .filter(n => Number.isFinite(n));
+}
+
+// Double-authentication height resolver. The stack chart (getStackChart) is the
+// source of truth, but section_bundles also derives heights arithmetically from
+// HEIGHT / NUM_OF_SEC. This reconciles the two: when the chart has a matching
+// (height, num_of_sec) entry we trust it; otherwise we fall back to the rounded
+// arithmetic. Returns { tallest, shortest, tallestQty, shortestQty, source }.
+function resolveSectionHeights() {
+    const doorHeight = Number(getState("HEIGHT")) || 0;
+    const numOfSec = Number(getState("NUM_OF_SEC")) || 0;
+
+    // Arithmetic estimate (3" granularity) — kept as the cross-check / fallback.
+    const per = numOfSec > 0 ? doorHeight / numOfSec : 0;
+    const arithTallest = Math.ceil(per / 3) * 3;
+    const arithShortest = Math.floor(per / 3) * 3;
+
+    // Chart lookup. Chart keys step every 3"; snap non-charted heights (e.g. 122)
+    // to the nearest 3" key so a 10'2" door still authenticates against the chart.
+    const snapped = Math.round(doorHeight / 3) * 3;
+    const entry = getSectionHeight(doorHeight, numOfSec) || getSectionHeight(snapped, numOfSec);
+    const heights = chartEntryHeights(entry);
+
+    if (heights.length) {
+        const tallest = Math.max(...heights);
+        const shortest = Math.min(...heights);
+        const tallestQty = heights.filter(h => h === tallest).length;
+        // When every section is the same height, count them all as "tallest"
+        // and leave shortest qty at 0 so getSectionBundle doesn't double-count.
+        const shortestQty = tallest === shortest
+            ? 0
+            : heights.filter(h => h === shortest).length;
+
+        if (tallest !== arithTallest || shortest !== arithShortest) {
+            console.warn(
+                `[section heights] chart/arithmetic mismatch for HEIGHT=${doorHeight} ` +
+                `NUM_OF_SEC=${numOfSec}: chart tallest/shortest=${tallest}/${shortest}, ` +
+                `arithmetic=${arithTallest}/${arithShortest}. Using chart.`
+            );
+        }
+        return { tallest, shortest, tallestQty, shortestQty, source: "chart" };
+    }
+
+    // No chart entry — fall back to arithmetic (clamped so an out-of-range
+    // NUM_OF_SEC can't produce a section taller than the chart ever allows).
+    const tallest = Math.min(arithTallest, 24);
+    const shortest = arithShortest;
+    const diff = per - shortest;
+    const shortestQty = Math.round((1 - diff / 3) * numOfSec) || 0;
+    const tallestQty = Math.max(numOfSec - shortestQty, 0);
+
+    // Only warn for a genuinely off-chart HEIGHT. When the height IS charted but
+    // the (height, num_of_sec) combo isn't, it's almost always the transient
+    // default NUM_OF_SEC=4 before renderNumOfSections() corrects it — not worth
+    // spamming the console on every early-render pass.
+    const heightIsCharted = !!(getStackChart()[String(doorHeight)] || getStackChart()[String(snapped)]);
+    if (!heightIsCharted) {
+        console.warn(
+            `[section heights] no stack-chart entry for HEIGHT=${doorHeight} ` +
+            `(snapped ${snapped}) NUM_OF_SEC=${numOfSec}; using arithmetic fallback.`
+        );
+    }
+    return { tallest, shortest, tallestQty, shortestQty, source: "arithmetic" };
 }
 
 // function getSectionBundle() {
@@ -1507,44 +1550,114 @@ function getSectionBundle() {
 //     return result;
 // }
 
+// Maximum bundle weight in pounds. Pairs whose combined ship weight would
+// meet or exceed this cap must ship as singles instead.
+const MAX_BUNDLE_WEIGHT_LBS = 150;
+
 function bundleByHeight() {
 
-    // Thermatite bundling rule: walk the stack from bottom to top, pair
-    // adjacent same-height sections greedily. Different heights never bundle.
-    // Bottom section has no special treatment — it bundles with section 2 if
-    // they share a height, otherwise ships alone.
+    // Thermatite bundling rules (based on Landmark v2):
+    // - Width >= 199: All sections ship alone (no bundling)
+    // - If tallest section qty is odd (or all sections have same height with odd count),
+    //   the bottom section always ships alone. Remaining sections pair up.
+    // - If tallest section qty is even, pair up adjacent same-height sections from the start.
+    // - Forward nearest match: pair each section with the next same-height section
+    // - Weight cap: if a paired bundle would be >= 150 lbs, the two sections ship as singles
 
     if (_bundleByHeightCacheKey === _sectionBundleCacheKey && _bundleByHeightCache) {
         return _bundleByHeightCache;
     }
 
-    const result = [];
+    const width = Number(getState("WIDTH"));
     const sections = getSectionBundle();
+    const result = [];
 
-    if (!sections.length) {
+    if (!sections.length) return result;
+
+    // WIDTH RULE: ship every section alone if width >= 199
+    if (width >= 199) {
+        sections.forEach((h, i) => {
+            result.push({
+                sections: [h],
+                indexes: [i + 1],
+                weight: calculateSectionShipWeight(h, i === 0),
+            });
+        });
+        _bundleByHeightCache = result;
+        _bundleByHeightCacheKey = _sectionBundleCacheKey;
         return result;
     }
 
-    let i = 0;
-    while (i < sections.length) {
+    // Determine if all sections are the same height (edge case).
+    // In this case TALLEST_SECTION_QTY may be 0, so use total section count instead.
+    const allSameHeight = sections.every(h => h === sections[0]);
+    const tallestQty = allSameHeight
+        ? sections.length
+        : Math.ceil(Number(getState("TALLEST_SECTION_QTY"))) || 0;
+    const bottomShipsAlone = tallestQty % 2 === 1;
+
+    const used = new Array(sections.length).fill(false);
+    let startIndex = 0;
+
+    // BOTTOM RULE: bottom section ships alone only when tallest qty is odd
+    if (bottomShipsAlone) {
+        result.push({
+            sections: [sections[0]],
+            indexes: [1],
+            weight: calculateSectionShipWeight(sections[0], true),
+        });
+        used[0] = true;
+        startIndex = 1;
+    }
+
+    // FORWARD NEAREST MATCH BUNDLING for remaining sections.
+    // If pairing would push combined weight >= MAX_BUNDLE_WEIGHT_LBS, ship as singles.
+    for (let i = startIndex; i < sections.length; i++) {
+        if (used[i]) continue;
+
         const height = sections[i];
-        if (i + 1 < sections.length && sections[i + 1] === height) {
-            result.push({
-                sections: [height, height],
-                indexes: [i + 1, i + 2],
-                weight:
-                    calculateSectionShipWeight(height, i === 0) +
-                    calculateSectionShipWeight(height, false),
-            });
-            i += 2;
-        } else {
-            result.push({
-                sections: [height],
-                indexes: [i + 1],
-                weight: calculateSectionShipWeight(height, i === 0),
-            });
-            i += 1;
+        const isBottom = i === 0;
+        const sectionWeight = calculateSectionShipWeight(height, isBottom);
+
+        // Search forward for next same-height section to pair with.
+        let pairIndex = -1;
+        for (let j = i + 1; j < sections.length; j++) {
+            if (!used[j] && sections[j] === height) {
+                pairIndex = j;
+                break;
+            }
         }
+
+        if (pairIndex !== -1) {
+            // Neither section in a pair is the bottom (bottom ships alone above),
+            // so both are computed with isBottomSection = false.
+            const pairWeight =
+                calculateSectionShipWeight(height, false) +
+                calculateSectionShipWeight(height, false);
+
+            // WEIGHT CAP: only pair if combined weight stays under the cap.
+            // While weights are 0 (early render / retainer placeholder) this is
+            // always true, so pairing still happens — matching prior behavior.
+            if (pairWeight < MAX_BUNDLE_WEIGHT_LBS) {
+                result.push({
+                    sections: [height, height],
+                    indexes: [i + 1, pairIndex + 1],
+                    weight: pairWeight,
+                });
+                used[i] = true;
+                used[pairIndex] = true;
+                continue;
+            }
+            // Too heavy to pair — fall through and ship section i as a single.
+        }
+
+        // Ship as single
+        result.push({
+            sections: [height],
+            indexes: [i + 1],
+            weight: sectionWeight,
+        });
+        used[i] = true;
     }
 
     _bundleByHeightCache = result;
@@ -1554,12 +1667,14 @@ function bundleByHeight() {
 
 
 // =====================================================================
-// BUSINESS-LOGIC TBD: weight constants/thresholds below are inherited
-// from Landmark (DOOR_MODEL === "A" branches, 0.4 lb/ft retainer,
-// 150 lb pair cap, etc.). Awaiting confirmation from Bill for
-// Thermatite-correct values. Stubbed to 0 in the meantime so packing
-// logic still runs; pair cap in bundleByHeight will treat everything
-// as pairable while weights are stubbed.
+// SKELETON ENABLED: the Thermatite weight calc below is live (non-glazed).
+// One value is still a placeholder pending Bill's calculator:
+//   - bottom-retainer rate: currently the Landmark 0.4 lb/ft (see
+//     calculateBTMRetainerWeight). Bill indicated this is the component
+//     most likely to differ for Thermatite — swap when confirmed.
+// The 150 lb pair cap (MAX_BUNDLE_WEIGHT_LBS) is also re-enabled.
+// The commented-out Landmark v2 originals below are kept as a reference
+// for cross-checking against Bill's numbers.
 // =====================================================================
 
 // function calculateRawPanelWeight(sectionHeightInInches) {
@@ -1593,49 +1708,173 @@ function bundleByHeight() {
 //     return Number((width * 0.4).toFixed(2));
 // }
 
-// Stub: returns 0 until Thermatite weight constants are confirmed.
-function calculateSectionShipWeight(/* sectionHeightInInches, isBottomSection = true */) {
-    return 0;
+// Thermatite weight calculation - mirrors Landmark V2 structure.
+// Uses values from weight_controller.js where available, Landmark defaults elsewhere.
+// BUSINESS-LOGIC TBD: confirm Thermatite-specific values with Bill.
+
+function calculateRawPanelWeight(sectionHeightInInches) {
+    // Panel weight per sq ft. The value lives as a weight="" attribute on the
+    // checked COLOR radio (2.2 for all Thermatite colors — see COLOR_DEFS /
+    // colorSwatchHTML in load_html.js). NOTE: getNode("COLOR") is the state node,
+    // not the <input>, so it has no weight attr — read the radio directly.
+    // Falls back to 1.74 (Landmark default) if missing.
+    const RPWeight = Number($("input[name='COLOR']:checked").attr("weight")) || 1.74;
+
+    // WIDTH is total width in INCHES and already folds in custom dimensions +
+    // inches (DOOR_WIDTH_FEET drops the inches part). Convert to feet here.
+    const widthFt = (Number(safeState("WIDTH")) || 0) / 12;
+    const sectionHeightInFeet = sectionHeightInInches / 12;
+    const areaSqFt = widthFt * sectionHeightInFeet;
+    return Number((RPWeight * areaSqFt).toFixed(2));
+}
+
+function calculateEndCapsWeight(sectionHeightInInches) {
+    // Per-foot end cap weight. Thermatite-specific values from weight_controller.js
+    // are per-section (21"/24"), so we derive lbs/ft by dividing by section height in feet.
+    // Falls back to Landmark values (1.14 single / 3.3 double) for non-standard heights.
+    // The live selection is the radio name="EndCaps": value "0" = single, "1" = double.
+    // (The END_CAPS node is unreliable here — undefined during this calc — so we read
+    // the input directly.)
+    const isDouble = $("input[name='EndCaps']:checked").val() === "1";
+    const sectionHeightInFeet = sectionHeightInInches / 12;
+
+    // Lookup table from weight_controller.js (per-piece weight, multiply by 2 for both ends).
+    // Section height (inches) → { single, double } per piece.
+    const endCapTable = {
+        21: { single: 0.921, double: 1.485 },
+        24: { single: 1.06,  double: 1.71  },
+    };
+
+    const entry = endCapTable[sectionHeightInInches];
+    if (entry) {
+        const perPiece = isDouble ? entry.double : entry.single;
+        return Number((perPiece * 2).toFixed(2));
+    }
+
+    // Fallback: per-foot calculation using Landmark rates.
+    const weightPerFoot = isDouble ? 3.3 : 1.14;
+    return Number((sectionHeightInFeet * weightPerFoot).toFixed(2));
+}
+
+function calculateBTMRetainerWeight(isBottomSection) {
+    if (!isBottomSection) return 0;
+    // WIDTH (inches, custom-dim aware) → feet, so inches aren't dropped.
+    const widthFt = (Number(safeState("WIDTH")) || 0) / 12;
+    // Landmark uses 0.4 lbs/ft - assume same for Thermatite until confirmed.
+    return Number((widthFt * 0.4).toFixed(2));
+}
+
+function calculateSectionShipWeight(sectionHeightInInches, isBottomSection = true) {
+    if (!sectionHeightInInches) return 0;
+
+    // Early-render guard: during applyDefaults the nodes feeding this calc aren't
+    // registered yet. safeState swallows the throw and returns undefined. A
+    // missing width makes the whole calc meaningless, so bail to 0 until the
+    // form is populated. (WIDTH = total inches, custom-dim aware — same basis
+    // the sub-calcs use.)
+    const width = Number(safeState("WIDTH"));
+    if (!width) return 0;
+
+    // SKELETON — Thermatite weight model (non-glazed). Mirrors Landmark v2.
+    // BUSINESS-LOGIC TBD: bottom-retainer rate is still the Landmark 0.4 lb/ft
+    // placeholder pending Bill's calculator; glazing (lites) intentionally 0
+    // until glazed doors are implemented.
+    const RPWeight     = calculateRawPanelWeight(sectionHeightInInches);
+    const endCaps      = calculateEndCapsWeight(sectionHeightInInches);
+    const btmRetainer  = calculateBTMRetainerWeight(isBottomSection);
+    const lites        = 0;     // TBD: glazing weight contribution when glazed doors implemented
+    const pckWeight    = 0.15;  // Landmark default packaging weight
+
+    return Number((RPWeight + endCaps + btmRetainer + lites + pckWeight).toFixed(2));
 }
 
 //function to get the section component desc
+// Mirrors Landmark's buildSCDescription format
+//   SC <ft>-<in>x<height> <model> <color> <panelStyle> <DE>
+// but sourced the Thermatite way: custom-dim-aware width, COLOR/Pattern radios,
+// and the EndCaps radio ("1" = double) instead of Landmark's .desc/FACE/"Y".
 function buildSCDescription(height, qty) {
 
-    let doorWidthFeet = getState("DOOR_WIDTH_FEET");
+    if (qty <= 0) return "";
+
+    let doorWidthFeet, doorWidthInches;
+    if ($("#custom_dimensions").is(":checked")) {
+        doorWidthFeet = $("#CUSTOM_WIDTH_FEET").val() || "";
+        doorWidthInches = $("#CUSTOM_WIDTH_INCHES").val() || "0";
+    } else {
+        const $sz = $("input[name='SIZE']:checked");
+        doorWidthFeet = $sz.attr("width") || getNode("DOOR_WIDTH_FEET")?.value || "";
+        doorWidthInches = $sz.attr("widthInches") || getNode("DOOR_WIDTH_INCHES")?.value || "0";
+    }
     doorWidthFeet = String(doorWidthFeet).padStart(2, "0");
 
-    const doorWidthInches = getState("DOOR_WIDTH_INCHES");
-    const doorModelDesc = getNode("DOOR_MODEL").getAttribute("desc");
-    const color = getState("COLOR").desc;
-    const panelStyle = getNode("FACE").getAttribute("desc");
+    const doorModelDesc = getNode("DOOR_MODEL")?.getAttribute("desc");
+    const colorRaw = $("input[name='COLOR']:checked").val() || "";
+    const color = colorRaw ? String(colorRaw).charAt(0).toUpperCase() + String(colorRaw).slice(1) : "";
+    const panelStyle = $("input[name='Pattern']:checked").val() || "Standard Rib";
 
-    const endCaps = getState("EndCaps");
-    const doubleEndCaps = endCaps === "Y" ? "DE" : "";
+    const colorShortMap = {
+        "White":      "Wht",
+        "Brown":      "Brn",
+        "Silver":     "Slv",
+        "Bronze":     "Brnz",
+        "Slate Grey": "SltGry",
+        "Iron Ore":   "IronOre",
+        "Black":      "Blk",
+        "Sandstone":  "Sand",
+        "Almond":     "Alm",
+        "Cafe":       "Caf"
+    };
+    const colorShort = colorShortMap[color] || color;
 
-    return qty > 0
-        ? `SC ${doorWidthFeet}-${doorWidthInches}x${height} ${doorModelDesc} ${color} ${panelStyle} ${doubleEndCaps}`
-        : "";
+    const doubleEndCaps = $("input[name='EndCaps']:checked").val() === "1" ? "DE" : "";
+
+    return `SC ${doorWidthFeet}-${doorWidthInches}x${height} ${doorModelDesc} ${colorShort} ${panelStyle} ${doubleEndCaps}`;
 }
 
 //function to get the desc of raw panel 
-function buildRPDescription(height, qty) {
+function buildRPDescription(height, qty, isBundleIndex = 0, bundleIndex = 0) {
 
-    let doorWidthFeet = getState("DOOR_WIDTH_FEET");
+    if (qty <= 0) return "";
+
+    let doorWidthFeet, doorWidthInches;
+    if ($("#custom_dimensions").is(":checked")) {
+        doorWidthFeet = $("#CUSTOM_WIDTH_FEET").val() || "";
+        doorWidthInches = $("#CUSTOM_WIDTH_INCHES").val() || "0";
+    } else {
+        const $sz = $("input[name='SIZE']:checked");
+        doorWidthFeet = $sz.attr("width") || getNode("DOOR_WIDTH_FEET")?.value || "";
+        doorWidthInches = $sz.attr("widthInches") || getNode("DOOR_WIDTH_INCHES")?.value || "0";
+    }
     doorWidthFeet = String(doorWidthFeet).padStart(2, "0");
 
-    const doorWidthInches = getState("DOOR_WIDTH_INCHES");
-    const doorModelDesc = getNode("DOOR_MODEL").getAttribute("desc");
-    const color = getState("COLOR").desc;
-    const panelStyle = getNode("FACE").getAttribute("desc");
+    const doorModelDesc = getNode("DOOR_MODEL")?.getAttribute("desc");
+    const colorRaw = $("input[name='COLOR']:checked").val() || "";
+    const color = colorRaw ? String(colorRaw).charAt(0).toUpperCase() + String(colorRaw).slice(1) : "";
+    const panelStyle = $("input[name='Pattern']:checked").val() || "Standard Rib";
 
-    return qty > 0
-        ? `SR ${doorWidthFeet}-${doorWidthInches}x${height} ${doorModelDesc} ${color} ${panelStyle}`
-        : "";
+    const colorShortMap = {
+        "White":      "Wht",
+        "Brown":      "Brn",
+        "Silver":     "Slv",
+        "Bronze":     "Brnz",
+        "Slate Grey": "SltGry",
+        "Iron Ore":   "IronOre",
+        "Black":      "Blk",
+        "Sandstone":  "Sand",
+        "Almond":     "Alm",
+        "Cafe":       "Caf"
+    };
+    const colorShort = colorShortMap[color] || color;
+
+    // Flat Landmark format: SR <ft>-<in>x<h> <model> <color> <panelStyle>.
+    // (No Btm/Int or SR-B/SR-BI prefixing — matches buildRPDescription in exmaple.js.)
+    return `SR ${doorWidthFeet}-${doorWidthInches}x${height} ${doorModelDesc} ${colorShort} ${panelStyle}`;
 }
 
 //function to get the raw panel base part#
 function buildRPBaseSpNum(height) {
-    const doorModelId = getNode("DOOR_MODEL").getAttribute("id");
+    const doorModelId = $("input[name='DOOR_MODEL']:checked").val() || "";
     return `${doorModelId}-${height}`;
 }
 
@@ -1646,23 +1885,89 @@ function buildRPTopSpNum(height) {
 }
 
 //function to build section bundle desc
-function buildSBDescription(prefix, height, qty) {
+function buildSBDescription(prefix, height, qty, isBundleIndex = 0, bundleIndex = 0) {
 
     if (qty <= 0) return "";
 
-    let doorWidthFeet = getState("DOOR_WIDTH_FEET");
+    let doorWidthFeet, doorWidthInches;
+    if ($("#custom_dimensions").is(":checked")) {
+        doorWidthFeet = $("#CUSTOM_WIDTH_FEET").val() || "";
+        doorWidthInches = $("#CUSTOM_WIDTH_INCHES").val() || "0";
+    } else {
+        const $sz = $("input[name='SIZE']:checked");
+        doorWidthFeet = $sz.attr("width") || getNode("DOOR_WIDTH_FEET")?.value || "";
+        doorWidthInches = $sz.attr("widthInches") || getNode("DOOR_WIDTH_INCHES")?.value || "0";
+    }
     doorWidthFeet = String(doorWidthFeet).padStart(2, "0");
 
-    const doorWidthInches = getState("DOOR_WIDTH_INCHES");
-    const doorModelDesc = getNode("DOOR_MODEL").getAttribute("desc");
-    const color = getState("COLOR").desc;
-    const panelStyle = getNode("FACE").getAttribute("desc");
+    const doorModelDesc = getNode("DOOR_MODEL")?.getAttribute("desc");
+    const colorRaw = $("input[name='COLOR']:checked").val() || "";
+    const color = colorRaw ? String(colorRaw).charAt(0).toUpperCase() + String(colorRaw).slice(1) : "";
+    const panelStyle = $("input[name='Pattern']:checked").val() || "Standard Rib";
 
-    const endCaps = getState("EndCaps");
-    const doubleEndCaps = endCaps === "Y" ? "DE" : "";
+    const colorShortMap = {
+        "White":      "Wht",
+        "Brown":      "Brn",
+        "Silver":     "Slv",
+        "Bronze":     "Brnz",
+        "Slate Grey": "SltGry",
+        "Iron Ore":   "IronOre",
+        "Black":      "Blk",
+        "Sandstone":  "Sand",
+        "Almond":     "Alm",
+        "Cafe":       "Caf"
+    };
+    const colorShort = colorShortMap[color] || color;
 
+    // Determine if this bundle is a pair (double) or single by checking the bundleByHeight result
+    const bundles = bundleByHeight();
+    const bundle = bundles[bundleIndex];
+    const isDouble = bundle && bundle.sections.length === 2;
 
-    return `${prefix} ${doorWidthFeet}-${doorWidthInches}x${height} ${doorModelDesc} ${color} ${panelStyle} ${doubleEndCaps}`;
+    const bundlePosition = isBundleIndex === 0 ? "Btm" : "Int";
+
+    // SB-B = bottom single, SB-BI = bottom double
+    // SB-I = intermediate single, SB-II = intermediate double
+    let sbPrefix;
+    if (isBundleIndex === 0) {
+        sbPrefix = isDouble ? "SB-BI" : "SB-B";
+    } else {
+        sbPrefix = isDouble ? "SB-II" : "SB-I";
+    }
+
+    return `${sbPrefix} ${bundlePosition} ${doorWidthFeet}-${doorWidthInches}x${height} ${doorModelDesc} ${colorShort} ${panelStyle}`;
+}
+
+// Maps the selected DOOR_MODEL to the part-number code segment used in
+// SB*/SR* part numbers. The convention is to drop the leading mount letter
+// (T150 -> 150, T200C -> 200C, etc.), but a few models need explicit codes
+// because the naive strip would collide or lose information. Notably:
+//   U200C -> "U200C"  (NOT "200C": that strip collides with T200C; the
+//                       designated part# is SBU200C0x, i.e. the full model name)
+// Add future exceptions to MODEL_CODE_OVERRIDES rather than special-casing
+// individual blocks.
+const MODEL_CODE_OVERRIDES = {
+    "U200C": "U200C",
+};
+
+// getState throws when a node isn't registered yet. During applyDefaults / early
+// render, weight + description logic can run before every dependency node exists.
+// safeState delegates to the framework's own getState (so DOM-backed nodes like
+// DOOR_WIDTH_FEET / END_CAPS / COLOR resolve correctly — reimplementing the read
+// via nodeset[id].value misses those) but swallows the early-render throw and
+// returns undefined so callers can guard cleanly.
+function safeState(id) {
+    try {
+        return getState(id);
+    } catch (e) {
+        return undefined;
+    }
+}
+
+function getModelPartCode() {
+    const model = $("input[name='DOOR_MODEL']:checked").val() || "";
+    if (MODEL_CODE_OVERRIDES[model]) return MODEL_CODE_OVERRIDES[model];
+    return model.substring(1);
 }
 
 // BUSINESS-LOGIC TBD: SB prefix thresholds (< 32 / > 32) and codes
@@ -1684,9 +1989,7 @@ function getSBPrefix(/* type, height */) {
 //function to create raw panel part#
 function buildRPSPNum(height, suffix = "01") {
 
-    const doorModelId = getNode("DOOR_MODEL")
-        .getAttribute("id")
-        .substring(1);
+    const doorModelId = getModelPartCode();
 
     return height > 0
         ? `SR${doorModelId}${suffix}`

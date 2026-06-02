@@ -62,7 +62,7 @@ function loadForm() {
        RIGHT PANE — section: HARDWARE  (id="HARDWARE")
          [LIFT-TYPE]          Std 12R/15R/32R, LHF, LHR, High Lift dropdown
          [HIGHLIFT]           Highlift inches dropdown (hidden by default)
-         [TRACK-MOUNT]        TRK_MOUNT_TYP — Track Mount dropdown
+         [TRACK-MOUNT]        TRK_MOUNT_TYP — Track Mount buttons (filtered by thickness × HW size × CSBB × No Lap Steel Jamb)
          [LOWER-SPLICE]       LOWER_SPLICE — Lower Splice dropdown
          [JAMB]               JAMB select (hidden)
          [JAMB-SEAL]          Jamb seal type + colour + screw packages
@@ -597,26 +597,53 @@ function loadForm() {
       </div>
 
 
-      <!-- [TRACK-MOUNT] + [JAMB] -->
-      <div class="horizontal-inputs" style="display:flex; gap:24px; flex-wrap:wrap; margin-top:8px;">
-        <div>
-          <div style="text-align:left" class="config-option-title-style">Track Mount</div>
-          <select id="TRK_MOUNT_TYP" name="TRK_MOUNT_TYP" style="width:fit-content; padding:5px 8px; border:1px solid black; border-radius:6px;">
-            <option value="ADCA_3" hwset="ADCA3">3 IN ADCA</option>
-            <option value="ADCA_2" hwset="ADCA2">2 IN ADCA</option>
-            <option value="CLIP_3" hwset="CLIP3">3 IN Clip Angle</option>
-            <option value="CLIP_2" hwset="CLIP2">2 IN Clip Angle</option>
-            <option value="B" hwset="BM" selected>Bracket Mount</option>
-            <option value="NONE" hwset="NONE">None</option>
-          </select>
+      <!-- [TRACK-MOUNT] -->
+      <div style="margin-top:8px;">
+        <div style="text-align:left" class="config-option-title-style">Track Mount</div>
+        <div class="dimension-layout" id="TRK_MOUNT_TYP_GROUP">
+          <div class="rw-button" tabindex="0">
+            <label for="TRK_MOUNT_ADCA_3">3 IN ADCA</label>
+            <input type="radio" id="TRK_MOUNT_ADCA_3" name="TRK_MOUNT_TYP" value="ADCA_3" hwset="ADCA3">
+          </div>
+          <div class="rw-button" tabindex="0">
+            <label for="TRK_MOUNT_ADCA_2">2 IN ADCA</label>
+            <input type="radio" id="TRK_MOUNT_ADCA_2" name="TRK_MOUNT_TYP" value="ADCA_2" hwset="ADCA2">
+          </div>
+          <div class="rw-button" tabindex="0">
+            <label for="TRK_MOUNT_CLIP_3">3 IN Clip Angle</label>
+            <input type="radio" id="TRK_MOUNT_CLIP_3" name="TRK_MOUNT_TYP" value="CLIP_3" hwset="CLIP3">
+          </div>
+          <div class="rw-button" tabindex="0">
+            <label for="TRK_MOUNT_CLIP_2">2 IN Clip Angle</label>
+            <input type="radio" id="TRK_MOUNT_CLIP_2" name="TRK_MOUNT_TYP" value="CLIP_2" hwset="CLIP2">
+          </div>
+          <div class="rw-button" tabindex="0">
+            <label for="TRK_MOUNT_B">Bracket Mount</label>
+            <input type="radio" id="TRK_MOUNT_B" name="TRK_MOUNT_TYP" value="B" hwset="BM" checked>
+          </div>
+          <div class="rw-button" tabindex="0">
+            <label for="TRK_MOUNT_NONE">None</label>
+            <input type="radio" id="TRK_MOUNT_NONE" name="TRK_MOUNT_TYP" value="NONE" hwset="NONE">
+          </div>
         </div>
-        <div>
-          <div style="text-align:left" class="config-option-title-style">Jamb</div>
-          <select id="JAMB" name="JAMB" style="width:fit-content; padding:5px 8px; border:1px solid black; border-radius:6px;">
-            <option value="steel" hwset="SJ">Steel</option>
-            <option value="wood" hwset="WJ" selected>Wood</option>
-            <option value="masonry" hwset="MJ">Masonry</option>
-          </select>
+      </div>
+
+      <!-- [JAMB] -->
+      <div style="margin-top:8px;">
+        <div style="text-align:left" class="config-option-title-style">Jamb</div>
+        <div class="dimension-layout" id="JAMB_GROUP">
+          <div class="rw-button" tabindex="0">
+            <label for="JAMB_STEEL">Steel</label>
+            <input type="radio" id="JAMB_STEEL" name="JAMB" value="steel" hwset="SJ">
+          </div>
+          <div class="rw-button" tabindex="0">
+            <label for="JAMB_WOOD">Wood</label>
+            <input type="radio" id="JAMB_WOOD" name="JAMB" value="wood" hwset="WJ" checked>
+          </div>
+          <div class="rw-button" tabindex="0">
+            <label for="JAMB_MASONRY">Masonry</label>
+            <input type="radio" id="JAMB_MASONRY" name="JAMB" value="masonry" hwset="MJ">
+          </div>
         </div>
       </div>
 
@@ -997,11 +1024,24 @@ function loadForm() {
 	<!-- [HW-BUMPER-OR-PUSHER-SPRINGS] -->
 	<div style="margin-top:12px;">
 	  <div style="text-align:left" class="config-option-title-style">Bumper or Pusher Springs</div>
-	  <select id="BUMPER_OR_PUSHER_SPRINGS" name="BumperOrPusherSprings" class="rw-configurator__select">
-	    <option value="none" selected>None</option>
-	    <option value="bumper">Bumper</option>
-	    <option value="pusher">Pusher</option>
-	  </select>
+	  <div class="dimension-layout">
+	    <div class="rw-button" tabindex="0">
+	      <label for="BUMPER_NONE">None</label>
+	      <input type="radio" id="BUMPER_NONE" name="BumperOrPusherSprings" value="none" checked>
+	    </div>
+	    <div class="rw-button" tabindex="0">
+	      <label for="BUMPER_SPRG">BumperSprg</label>
+	      <input type="radio" id="BUMPER_SPRG" name="BumperOrPusherSprings" value="bumper_sprg">
+	    </div>
+	    <div class="rw-button" tabindex="0">
+	      <label for="BUMPER_LEAF_SPRG">BumperLeafSprg</label>
+	      <input type="radio" id="BUMPER_LEAF_SPRG" name="BumperOrPusherSprings" value="bumper_leaf_sprg">
+	    </div>
+	    <div class="rw-button" tabindex="0">
+	      <label for="PUSH_SPRG">PushSprg</label>
+	      <input type="radio" id="PUSH_SPRG" name="BumperOrPusherSprings" value="push_sprg">
+	    </div>
+	  </div>
 	</div>
 
 	<!-- [HW-NOLAP-STEEL-JAMB] -->
@@ -1025,12 +1065,24 @@ function loadForm() {
 	<!-- [HW-SHAFT-TYPE] Tube Shaft / Keyed Tube Shaft / 1" Solid Shaft / 1 1/4" Solid Shaft -->
 	<div style="margin-top:12px;">
 	  <div style="text-align:left" class="config-option-title-style">Shaft Type</div>
-	  <select id="SHAFT_TYPE" name="ShaftType" class="rw-configurator__select">
-	    <option value="tube" selected>Tube Shaft</option>
-	    <option value="keyed_tube">Keyed Tube Shaft</option>
-	    <option value="solid_1">1" Solid Shaft</option>
-	    <option value="solid_1_25">1 1/4" Solid Shaft</option>
-	  </select>
+	  <div class="dimension-layout">
+	    <div class="rw-button" tabindex="0">
+	      <label for="SHAFT_TYPE_TUBE">Tube Shaft</label>
+	      <input type="radio" id="SHAFT_TYPE_TUBE" name="ShaftType" value="tube" checked>
+	    </div>
+	    <div class="rw-button" tabindex="0">
+	      <label for="SHAFT_TYPE_KEYED_TUBE">Keyed Tube Shaft</label>
+	      <input type="radio" id="SHAFT_TYPE_KEYED_TUBE" name="ShaftType" value="keyed_tube">
+	    </div>
+	    <div class="rw-button" tabindex="0">
+	      <label for="SHAFT_TYPE_SOLID_1">1" Solid Shaft</label>
+	      <input type="radio" id="SHAFT_TYPE_SOLID_1" name="ShaftType" value="solid_1">
+	    </div>
+	    <div class="rw-button" tabindex="0">
+	      <label for="SHAFT_TYPE_SOLID_1_25">1 1/4" Solid Shaft</label>
+	      <input type="radio" id="SHAFT_TYPE_SOLID_1_25" name="ShaftType" value="solid_1_25">
+	    </div>
+	  </div>
 	</div>
 
 	<!-- [HW-HANGER-ANGLE] Type dropdown + Qty number input -->
@@ -1445,11 +1497,20 @@ function loadForm() {
   <!-- [SO-FENDER-GUARD] dropdown of variants. Filler options for now. -->
   <div style="margin-top:12px;">
     <div style="text-align:left" class="config-option-title-style">Fender Guard</div>
-    <select id="FENDER_GUARD" name="FenderGuard" class="rw-configurator__select">
-      <option value="none" selected>None</option>
-      <option value="std">Std</option>
-      <option value="yellow">Yellow</option>
-    </select>
+    <div class="dimension-layout">
+      <div class="rw-button" tabindex="0">
+        <label for="FENDER_GUARD_NONE">None</label>
+        <input type="radio" id="FENDER_GUARD_NONE" name="FenderGuard" value="none" checked>
+      </div>
+      <div class="rw-button" tabindex="0">
+        <label for="FENDER_GUARD_STD">Std</label>
+        <input type="radio" id="FENDER_GUARD_STD" name="FenderGuard" value="std">
+      </div>
+      <div class="rw-button" tabindex="0">
+        <label for="FENDER_GUARD_YELLOW">Yellow</label>
+        <input type="radio" id="FENDER_GUARD_YELLOW" name="FenderGuard" value="yellow">
+      </div>
+    </div>
   </div>
 
   <!-- [SO-NUM-COUPLINGS] Driven by Hardware-tab Coupler toggle. Coupler=No
@@ -1545,28 +1606,19 @@ function loadForm() {
     </div>
   </div>
 
-  <!-- [SO-WEIGHT-MODIFIER] Weight Modifier subsection. Current = live springing
-       weight (read-only). Modify = user-entered delta. New = Current + Modify
-       (read-only, auto-updated). -->
-  <div id="weight_modifier_section" style="margin-top:18px; padding-top:14px; border-top:1px solid #ddd;">
-    <div style="text-align:left; font-weight:700; font-size:15px; margin-bottom:10px;">Weight Modifier</div>
-    <div style="display:flex; flex-direction:column; gap:8px;">
-      <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
-        <label for="CURRENT_SPRINGING_WEIGHT" style="flex:1; font-size:14px;">Current Springing Weight (lbs)</label>
-        <input type="number" id="CURRENT_SPRINGING_WEIGHT" name="CurrentSpringingWeight" readonly
-               style="width:120px; padding:6px 8px; background:#f0f0f0; border:1px solid #ccc; border-radius:4px;" value="0">
-      </div>
-      <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
-        <label for="MODIFY_SPRINGING_WEIGHT" style="flex:1; font-size:14px;">Modify Springing Weight (+/-)</label>
-        <input type="number" id="MODIFY_SPRINGING_WEIGHT" name="ModifySpringingWeight" step="any"
-               style="width:120px; padding:6px 8px; border:1px solid #ccc; border-radius:4px;" value="0">
-      </div>
-      <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
-        <label for="NEW_ADJUSTED_SPRINGING_WEIGHT" style="flex:1; font-size:14px;">New Adjusted Springing Weight (lbs)</label>
-        <input type="number" id="NEW_ADJUSTED_SPRINGING_WEIGHT" name="NewAdjustedSpringingWeight" readonly
-               style="width:120px; padding:6px 8px; background:#f0f0f0; border:1px solid #ccc; border-radius:4px;" value="0">
-      </div>
+  <!-- [SO-WEIGHT-MODIFIER] Weight Modifier subsection. Inline label-value pairs
+       separated by a pipe; slider drives the Modify delta. New = Current + Modify. -->
+  <div id="weight_modifier_section" class="weight-modifier">
+    <div class="weight-modifier-title">Weight Modifier</div>
+    <div class="weight-modifier-summary">
+      <span class="weight-modifier-stat">Current (lbs) : <span id="CURRENT_SPRINGING_WEIGHT">0</span></span>
+      <span class="weight-modifier-divider">|</span>
+      <span class="weight-modifier-stat">Modify (lbs) : <span id="MODIFY_SPRINGING_WEIGHT_VALUE">0</span></span>
+      <span class="weight-modifier-divider">|</span>
+      <span class="weight-modifier-stat weight-modifier-stat--result">New Adjusted (lbs) : <span id="NEW_ADJUSTED_SPRINGING_WEIGHT">0</span></span>
     </div>
+    <input type="range" id="MODIFY_SPRINGING_WEIGHT" name="ModifySpringingWeight"
+           class="range-slider weight-modifier-slider" min="-100" max="100" step="1" value="0">
   </div>
 
 </section>
@@ -2311,11 +2363,46 @@ $(document).on("change", "#CUSTOM_WIDTH_FEET, #CUSTOM_WIDTH_INCHES, #CUSTOM_HEIG
         redrawCanvas();
     }, 80);
 });
+// Refresh all bundle description fields (SB, SC, RP) when inputs that affect
+// their text values change. The framework's dep chain doesn't always catch
+// radio input attribute changes (SIZE/COLOR/Pattern), so we trigger explicitly.
+function refreshAllBundleDescs() {
+    const descIds = [
+        // SB descriptions
+        "SB1_DESC", "SB2_DESC", "SB3_DESC", "SB4_DESC", "SB5_DESC",
+        "SB6_DESC", "SB7_DESC", "SB8_DESC", "SB9_DESC",
+        // SC descriptions
+        "BUNDLE1_SC1_DESC", "BUNDLE1_SC2_DESC",
+        "BUNDLE2_SC1_DESC", "BUNDLE2_SC2_DESC",
+        "BUNDLE3_SC1_DESC", "BUNDLE3_SC2_DESC",
+        "BUNDLE4_SC1_DESC", "BUNDLE4_SC2_DESC",
+        "BUNDLE5_SC1_DESC", "BUNDLE6_SC1_DESC",
+        "BUNDLE7_SC1_DESC", "BUNDLE8_SC1_DESC",
+        "BUNDLE9_SC1_DESC",
+        // RP (raw panel) descriptions
+        "BUNDLE1_RP1_DESC", "BUNDLE1_RP2_DESC",
+        "BUNDLE2_RP1_DESC", "BUNDLE2_RP2_DESC",
+        "BUNDLE3_RP1_DESC", "BUNDLE3_RP2_DESC",
+        "BUNDLE4_RP1_DESC", "BUNDLE4_RP2_DESC",
+        "BUNDLE5_RP1_DESC", "BUNDLE6_RP1_DESC",
+        "BUNDLE7_RP1_DESC", "BUNDLE8_RP1_DESC",
+        "BUNDLE9_RP1_DESC",
+    ];
+    descIds.forEach(id => {
+        if (typeof getNode === "function" && nodeset?.[id]) rw(getNode(id));
+    });
+}
+
 $(document).on("change", "input[name='Pattern']", function() {
     redrawCanvas();
+    refreshAllBundleDescs();
 });
 $(document).on("change", "input[name='COLOR']", function() {
     redrawCanvas();
+    refreshAllBundleDescs();
+});
+$(document).on("change", "input[name='SIZE']", function() {
+    refreshAllBundleDescs();
 });
   
 function syncHardwareVisibility() {
@@ -2384,31 +2471,6 @@ $(document).on("click", ".hw-option-table tbody tr", function(e) {
 });
 setTimeout(syncHardwareTableRows, 0);
 
-// [WEIGHT-MODIFIER-SYNC] Pull live springing weight into Current field, compute
-// New = Current + Modify. getCurrentDoorWeight() relies on nodeset values being
-// populated, so guard against early calls before the framework is ready.
-function syncWeightModifier() {
-    let current = 0;
-    try {
-        if (typeof getCurrentDoorWeight === "function" && typeof nodeset !== "undefined" && nodeset["WEIGHT_BREAKDOWN"]) {
-            const w = getCurrentDoorWeight();
-            if (typeof w === "number" && !isNaN(w)) current = w;
-        }
-    } catch (e) { /* nodeset not ready yet — leave current at 0 */ }
-    $("#CURRENT_SPRINGING_WEIGHT").val(current.toFixed(2));
-    const modify = parseFloat($("#MODIFY_SPRINGING_WEIGHT").val()) || 0;
-    $("#NEW_ADJUSTED_SPRINGING_WEIGHT").val((current + modify).toFixed(2));
-}
-$(document).on("input change", "#MODIFY_SPRINGING_WEIGHT", syncWeightModifier);
-// Recompute when anything that affects weight changes.
-$(document).on("change",
-    "input[name='DOOR_MODEL'], input[name='SIZE'], input[name='COLOR'], " +
-    "input[name='WINDOWS'], input[name='WINDOW_POSITION'], input[name='END_CAPS'], " +
-    "#custom_dimensions, #CUSTOM_WIDTH_FEET, #CUSTOM_WIDTH_INCHES, " +
-    "#CUSTOM_HEIGHT_FEET, #CUSTOM_HEIGHT_INCHES",
-    syncWeightModifier);
-setTimeout(syncWeightModifier, 500);
-setTimeout(syncWeightModifier, 1500);
 
 // T300 only supports HW Size 3 — hide the "2" button and force selection to "3".
 function syncHardwareSizeForModel() {

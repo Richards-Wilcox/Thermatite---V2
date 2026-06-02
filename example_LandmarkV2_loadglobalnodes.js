@@ -1,97 +1,96 @@
 function loadGlobalNodes() {
-  //   addNode({id:"DOOR_MODEL", value:""}, [])
 
-  // addNode({id:"WEIGHT",logic:function(){
-  //   this.value = getCurrentDoorWeight()
-  // }, value:500}, ["WIDTH", "HEIGHT","COLOR","HANGER_ANGLE", "HANGER_ANGLE_QTY",  "END_CAPS_OUTPUT","TRUSS_QTY","WINDOW_POSITION" ,"WINDOWS","LIFT_TYPE"])
+  addLogic("SIZE", function () {
+    let toggle_Switch = getState("customSwitch");
+    //if (toggle_Switch === "off") {
+    this.value = $("input[name='SIZE']:checked").val();
+    // }
+  }, ["customSwitch"])
+
 
   addNode({
     id: "SIZE_HEIGHT",
     logic() {
-      const $checked = $("input[name='SIZE']:checked");
-      this.value = Number($checked.attr("height")) || 0;
+      const sizeNode = getNode("SIZE");
+      this.value = sizeNode
+        ? Number(sizeNode.getAttribute("height")) || 0
+        : 0;
     }
   }, ["SIZE"]);
 
+  //this node fetch the with from the size radio button
   addNode({
     id: "SIZE_WIDTH",
     logic() {
-      const $checked = $("input[name='SIZE']:checked");
-      this.value = Number($checked.attr("width")) || 0;
+      const sizeNode = getNode("SIZE");
+      this.value = sizeNode
+        ? Number(sizeNode.getAttribute("width")) || 0
+        : 0;
+      // const selectedSize = getState("SIZE");
+      // const sizeNode = getNode(selectedSize);
+
+      // this.value = sizeNode
+      //   ? Number(sizeNode.getAttribute("width")) || 0
+      //   : 0;
     }
   }, ["SIZE"]);
 
   addNode({
     id: "WIDTH",
     logic: function () {
-      const sizeWidth = nodeset["SIZE_WIDTH"]?.value ?? 0;
-      this.value = $("#custom_dimensions").is(":checked")
-        ? getGlobalDoorWidthFromFeetInches()
-        : sizeWidth * 12;
+      let toggle_Switch = getState("customSwitch");
+      this.value =
+        getState("customSwitch") === "on"
+          ? getGlobalDoorWidthFromFeetInches()
+          : getState("SIZE_WIDTH") * 12;
     }
   },
-    ["SIZE_WIDTH"])
+    ["SIZE_WIDTH", "DOOR_WIDTH_FEET", "DOOR_WIDTH_INCHES", "customSwitch"])
 
   addNode({
     id: "HEIGHT",
     logic: function () {
-      const sizeHeight = nodeset["SIZE_HEIGHT"]?.value ?? 0;
-      this.value = $("#custom_dimensions").is(":checked")
-        ? getGlobalDoorHeightFromFeetInches()
-        : sizeHeight * 12;
+      let toggle_Switch = getState("customSwitch");
+      this.value =
+        getState("customSwitch") === "on"
+          ? getGlobalDoorHeightFromFeetInches()
+          : getState("SIZE_HEIGHT") * 12;
+
+      // console.log("GET STATE HEIGHT", getState("HEIGHT"), toggle_Switch);
     }
   },
-    ["SIZE_HEIGHT"]);
+    ["SIZE_HEIGHT", "DOOR_HEIGHT_FEET", "DOOR_HEIGHT_INCHES", "customSwitch"]);
 
   addLogic("DOOR_WIDTH_FEET", function () {
-    if ($("#custom_dimensions").is(":checked")) {
-      this.value = parseInt($("#CUSTOM_WIDTH_FEET").val()) || 0;
-    } else {
-      this.value = getDoorWidthFeetFromSize();
+    let toggle_Switch = getState("customSwitch");
+    if (toggle_Switch === "off") {
+      this.value = getState("SIZE_WIDTH");
     }
-  }, ["SIZE"])
+
+    // this.value =
+    //   getState("customSwitch") === "on"
+    //     ? getDoorWidthFeetFromSize()
+    //     : getState("SIZE_WIDTH");
+  }, ["customSwitch", "SIZE"])
 
   addLogic("DOOR_HEIGHT_FEET", function () {
-    if ($("#custom_dimensions").is(":checked")) {
-      this.value = parseInt($("#CUSTOM_HEIGHT_FEET").val()) || 0;
-    } else {
+    let toggle_Switch = getState("customSwitch");
+    if (toggle_Switch === "off") {
       this.value = getDoorHeightFeetFromSize();
     }
-  }, ["SIZE"])
+  }, ["customSwitch", "SIZE"])
 
   addLogic("DOOR_WIDTH_INCHES", function () {
-    if ($("#custom_dimensions").is(":checked")) {
-      this.value = parseInt($("#CUSTOM_WIDTH_INCHES").val()) || 0;
-    } else {
+    let toggle_Switch = getState("customSwitch");
+    if (toggle_Switch === "off") {
       this.value = 0;
     }
-  }, ["SIZE"])
-
-  addLogic("DOOR_HEIGHT_INCHES", function () {
-    if ($("#custom_dimensions").is(":checked")) {
-      this.value = parseInt($("#CUSTOM_HEIGHT_INCHES").val()) || 0;
-    } else {
-      this.value = 0;
-    }
-  }, ["SIZE"])
+  }, ["customSwitch", "SIZE"])
 
 
   addLogic("LM_DOOR_MODEL", function () {
     this.value = getNode("DOOR_MODEL").getAttribute("id")
   }, ["DOOR_MODEL"])
-
-  addNode({ id: "WEIGHT_BREAKDOWN", value: "" }, [])
-  addNode({ id: "HDWR_BREAKDOWN", value: "" }, [])
-
-  addNode({
-    id: "WEIGHT",
-    logic: function () {
-      // this.value = getCurrentDoorWeight()
-    }
-  }, ["WIDTH", "HEIGHT", "COLOR", "WINDOWS", "WINDOW_POSITION",
-      "DOOR_WIDTH_FEET", "DOOR_HEIGHT_FEET",
-      "TRUSS_LENGTH", "TRUSS_QTY",
-      "END_CAPS", "END_CAPS_OUTPUT", "CENTER_HINGE_QTY"])
 }
 
 function updatePrice() {
@@ -170,31 +169,27 @@ function getGlobalDoorHeight() {
 }
 
 function getGlobalDoorWidthFromFeetInches() {
-  const feet = parseInt($("#CUSTOM_WIDTH_FEET").val()) || 0;
-  const inches = parseInt($("#CUSTOM_WIDTH_INCHES").val()) || 0;
-  return feet * 12 + inches;
+  return (parseInt(getState("DOOR_WIDTH_FEET")) * 12 + parseInt(getState("DOOR_WIDTH_INCHES")));
 }
 
 function getGlobalDoorWidthFromSizeRadio() {
-  return (parseInt($("input[name='SIZE']:checked").attr("width")) || 0) * 12;
+  return (parseInt(getNode("SIZE").getAttribute("width")) || 0) * 12; // convert feet to inches
 };
 
 function getDoorWidthFeetFromSize() {
-  return parseInt($("input[name='SIZE']:checked").attr("width")) || 0;
+  return (parseInt(getNode("SIZE").getAttribute("width")));
 };
 
 function getGlobalDoorHeightFromFeetInches() {
-  const feet = parseInt($("#CUSTOM_HEIGHT_FEET").val()) || 0;
-  const inches = parseInt($("#CUSTOM_HEIGHT_INCHES").val()) || 0;
-  return feet * 12 + inches;
+  return (parseInt(getState("DOOR_HEIGHT_FEET")) * 12 + parseInt(getState("DOOR_HEIGHT_INCHES")));
 }
 
 function getDoorHeightFeetFromSize() {
-  return parseInt($("input[name='SIZE']:checked").attr("height")) || 0;
+  return (parseInt(getNode("SIZE").getAttribute("height")) || 0);
 }
 
 function getGlobalDoorHeightFromSizeRadio() {
-  return (parseInt($("input[name='SIZE']:checked").attr("height")) || 0) * 12;
+  return (parseInt(getNode("SIZE").getAttribute("height")) || 0) * 12; // convert feet to inches
 };
 
 function getEndCapsData() {
@@ -225,7 +220,7 @@ function getStackChart() {
       { num_sections: 4, top_section_height: 24, btm_section_height: 21, int1_rp1_height: 21, int1_rp2_height: 21 }, //7-3    
     ],
     '90': [
-      { num_sections: 4, top_section_height: 24, btm_section_height: 24, int1_rp1_height: 21, int1_rp2_height: 21 }, //7-6
+      { num_sections: 4, top_section_height: 24, btm_section_height: 24, int1_rp1_height: 21, int1_rp1_height: 21 }, //7-6
       { num_sections: 5, top_section_height: 18, btm_section_height: 18, int1_rp1_height: 18, int1_rp2_height: 18, int2_rp1_height: 18 },//7-6- optional
     ],
     '93': [
@@ -293,28 +288,28 @@ function getStackChart() {
       { num_sections: 7, top_section_height: 21, btm_section_height: 21, int1_rp1_height: 21, int1_rp2_height: 21, int2_rp1_height: 18, int2_rp2_height: 21, int3_rp1_height: 18 }, //11-9 optional
     ],
     '144': [
-      { num_sections: 6, top_section_height: 24, btm_section_height: 24, int1_rp1_height: 24, int1_rp2_height: 24, int2_rp1_height: 24, int2_rp2_height: 24 }, //12-0
+      { num_sections: 6, top_section_height: 24, btm_section_height: 24, int1_r1_height: 24, int1_rp2_height: 24, int2_rp1_height: 24, int2_rp2_height: 24 }, //12-0
       { num_sections: 7, top_section_height: 21, btm_section_height: 21, int1_rp1_height: 21, int1_rp2_height: 21, int2_rp1_height: 21, int2_rp2_height: 21, int3_rp1_height: 18 }, //12-0 optional
     ],
     '147': [
-      { num_sections: 7, top_section_height: 21, btm_section_height: 21, int1_rp1_height: 21, int1_rp2_height: 21, int2_rp1_height: 21, int2_rp2_height: 21, int3_rp1_height: 21 }, //12-3
-      { num_sections: 8, top_section_height: 21, btm_section_height: 18, int1_rp1_height: 18, int1_rp2_height: 18, int2_rp1_height: 18, int2_rp2_height: 18, int3_rp1_height: 18, int3_rp2_height: 18 }, //12-3 optional
+      { num_sections: 7, top_section_height: 21, btm_section_height: 21, int1_r1_height: 21, int1_rp2_height: 21, int2_rp1_height: 21, int2_rp2_height: 21, int3_rp1_height: 21 }, //12-3
+      { num_sections: 8, top_section_height: 21, btm_section_height: 18, int1_r1_height: 18, int1_rp2_height: 18, int2_rp1_height: 18, int2_rp2_height: 18, int3_rp1_height: 18, int3_rp2_height: 18 }, //12-3 optional
     ],
     '150': [
-      { num_sections: 7, top_section_height: 24, btm_section_height: 21, int1_rp1_height: 21, int1_rp2_height: 21, int2_rp1_height: 21, int2_rp2_height: 21, int3_rp1_height: 21 }, //12-6
-      { num_sections: 8, top_section_height: 21, btm_section_height: 21, int1_rp1_height: 18, int1_rp2_height: 18, int2_rp1_height: 18, int2_rp2_height: 18, int3_rp1_height: 18, int3_rp2_height: 18 }, //12-6 optional
+      { num_sections: 7, top_section_height: 24, btm_section_height: 21, int1_rp1_height: 21, int1_r2_height: 21, int2_rp1_height: 21, int2_rp2_height: 21, int3_rp1_height: 21 }, //12-6
+      { num_sections: 8, top_section_height: 21, btm_section_height: 21, int1_r1_height: 18, int1_rp2_height: 18, int2_rp1_height: 18, int2_rp2_height: 18, int3_rp1_height: 18, int3_rp2_height: 18 }, //12-6 optional
     ],
     '153': [
-      { num_sections: 7, top_section_height: 24, btm_section_height: 24, int1_rp1_height: 21, int1_rp2_height: 21, int2_rp1_height: 21, int2_rp2_height: 21, int3_rp1_height: 21 }, //12-9
-      { num_sections: 8, top_section_height: 21, btm_section_height: 21, int1_rp1_height: 18, int1_rp2_height: 21, int2_rp1_height: 18, int2_rp2_height: 18, int3_rp1_height: 18, int3_rp2_height: 18 }, //12-9 optional
+      { num_sections: 7, top_section_height: 24, btm_section_height: 24, int1_rp1_height: 21, int1_r2_height: 21, int2_rp1_height: 21, int2_rp2_height: 21, int3_rp1_height: 21 }, //12-9
+      { num_sections: 8, top_section_height: 21, btm_section_height: 21, int1_rp1_height: 18, int1_r2_height: 21, int2_rp1_height: 18, int2_rp2_height: 18, int3_rp1_height: 18, int3_rp2_height: 18 }, //12-9 optional
     ],
     '156': [
       { num_sections: 7, top_section_height: 24, btm_section_height: 24, int1_rp1_height: 21, int1_rp2_height: 24, int2_rp1_height: 21, int2_rp2_height: 21, int3_rp1_height: 21 }, //13-0
-      { num_sections: 8, top_section_height: 21, btm_section_height: 21, int1_rp1_height: 18, int1_rp2_height: 21, int2_rp1_height: 18, int2_rp2_height: 18, int3_rp1_height: 18, int3_rp2_height: 18 }, //13-0 optional
+      { num_sections: 8, top_section_height: 21, btm_section_height: 21, int1_rp1_height: 18, int1_r2_height: 21, int2_rp1_height: 18, int2_rp2_height: 18, int3_rp1_height: 18, int3_rp2_height: 18 }, //13-0 optional
     ],
     '159': [
       { num_sections: 7, top_section_height: 24, btm_section_height: 24, int1_rp1_height: 24, int1_rp2_height: 24, int2_rp1_height: 21, int2_rp2_height: 21, int3_rp1_height: 21 }, //13-3
-      { num_sections: 8, top_section_height: 21, btm_section_height: 21, int1_rp1_height: 21, int1_rp2_height: 21, int2_rp1_height: 18, int2_rp2_height: 21, int3_rp1_height: 18, int3_rp2_height: 18 }, //13-3 optional
+      { num_sections: 8, top_section_height: 21, btm_section_height: 21, int1_rp1_height: 21, int1_r2_height: 21, int2_rp1_height: 18, int2_rp2_height: 21, int3_rp1_height: 18, int3_rp2_height: 18 }, //13-3 optional
     ],
     '162': [
       { num_sections: 7, top_section_height: 24, btm_section_height: 24, int1_rp1_height: 24, int1_rp2_height: 24, int2_rp1_height: 24, int2_rp2_height: 21, int3_rp1_height: 21 }, //13-6
@@ -322,8 +317,8 @@ function getStackChart() {
       { num_sections: 9, top_section_height: 18, btm_section_height: 18, int1_rp1_height: 18, int1_rp2_height: 18, int2_rp1_height: 18, int2_rp2_height: 18, int3_rp1_height: 18, int3_rp2_height: 18, int4_rp1_height: 18 }, //13-6 optional
     ],
     '165': [
-      { num_sections: 7, top_section_height: 24, btm_section_height: 24, int1_rp1_height: 24, int1_rp2_height: 24, int2_rp1_height: 24, int2_rp2_height: 24, int3_rp1_height: 21 }, //13-9
-      { num_sections: 8, top_section_height: 21, btm_section_height: 21, int1_rp1_height: 21, int1_rp2_height: 21, int2_rp1_height: 21, int2_rp2_height: 21, int3_rp1_height: 18, int3_rp2_height: 21 }, //13-9 optional
+      { num_sections: 7, top_section_height: 24, btm_section_height: 24, int1_rp1_height: 24, int2_rp2_height: 24, int2_rp1_height: 24, int2_rp2_height: 24, int3_rp1_height: 21 }, //13-9
+      { num_sections: 8, top_section_height: 21, btm_section_height: 21, int1_rp1_height: 21, int2_rp2_height: 21, int2_rp1_height: 21, int2_rp2_height: 21, int3_rp1_height: 18, int3_rp2_height: 21 }, //13-9 optional
       { num_sections: 9, top_section_height: 21, btm_section_height: 18, int1_rp1_height: 18, int1_rp2_height: 18, int2_rp1_height: 18, int2_rp2_height: 18, int3_rp1_height: 18, int3_rp2_height: 18, int4_rp1_height: 18 }, //13-9 optional
     ],
     '168': [
@@ -333,3 +328,4 @@ function getStackChart() {
     ]
   }
 }
+s

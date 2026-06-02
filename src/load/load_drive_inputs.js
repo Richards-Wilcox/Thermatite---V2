@@ -66,9 +66,15 @@
                           window-position picker and relocate Drums & Cables
                           and Springing Solutions tables to the left pane.
                           Reverses on tab change.
+     [WEIGHT-MODIFIER]    Pull live springing weight into Current, sync the
+                          Modify slider's value readout, compute New = Current
+                          + Modify. Recomputes when any weight-affecting input
+                          changes.
+     [BUMPER-OR-PUSHER-SPRINGS] Operator drives the spring options dropdown.
+                          DC Pulse → only None. All other operators → all 4
+                          options (None / BumperSprg / BumperLeafSprg / PushSprg).
      [DROPDOWN-DEFAULTS]  Force first option for dropdowns the host framework
-                          hydrates to an empty value (SHAFT_TYPE, JAMB_SEAL,
-                          TOP_WEATHER_SEAL)
+                          hydrates to an empty value (JAMB_SEAL, TOP_WEATHER_SEAL)
    ========================================================================= */
 
 // [WIDTH-LIMITS]
@@ -597,8 +603,8 @@ function loadDrivenInputEvents() {
     "NONE":   "NONE",
   };
   function applyTrackMountConstraint() {
-    const $sel = $("#TRK_MOUNT_TYP");
-    if (!$sel.length) return;
+    const $group = $("#TRK_MOUNT_TYP_GROUP");
+    if (!$group.length) return;
     const model    = $("input[name='DOOR_MODEL']:checked").val();
     const hwSize   = $("input[name='HARDWARE_SIZE']:checked").val();
     const csbbDr   = $("input[name='CSBBDrHgt']:checked").val()    || "no_csbb";
@@ -608,13 +614,15 @@ function loadDrivenInputEvents() {
     const key = `${thickness}|${hwSize}|${csbbDr}|${noLap}`;
     const allowed = TRK_MOUNT_RULES[key];
     if (!allowed) return;
-    const prev = $sel.val();
-    $sel[0].innerHTML = allowed.map(v =>
-      `<option value="${v}" hwset="${TRK_MOUNT_HWSET[v]}">${TRK_MOUNT_LABEL[v]}</option>`
-    ).join("");
-    const next = allowed.includes(prev) ? prev : allowed[0];
-    $sel.val(next);
-    if ($sel.val() !== next) $sel[0].selectedIndex = 0;
+    // Toggle visibility of each button based on whether its value is allowed.
+    $group.find("input[name='TRK_MOUNT_TYP']").each(function () {
+      $(this).closest(".rw-button").toggle(allowed.includes(this.value));
+    });
+    const prev = $("input[name='TRK_MOUNT_TYP']:checked").val();
+    if (!allowed.includes(prev)) {
+      $(`input[name='TRK_MOUNT_TYP'][value='${allowed[0]}']`)
+        .prop("checked", true).trigger("change");
+    }
   }
   $(document).on("change",
     "input[name='DOOR_MODEL'], input[name='HARDWARE_SIZE'], input[name='CSBBDrHgt'], input[name='NoLapSteelJamb']",
@@ -635,7 +643,7 @@ function loadDrivenInputEvents() {
   function applyLowerSpliceConstraint() {
     const $sel = $("#LOWER_SPLICE");
     if (!$sel.length) return;
-    const trkMount = $("#TRK_MOUNT_TYP").val();
+    const trkMount = $("input[name='TRK_MOUNT_TYP']:checked").val();
     const liftType = $("#LIFT_TYPE").val();
     const allowed = trkMount === "NONE" || LIFT_TYPES_STD.includes(liftType)
       ? ["NONE"]
@@ -646,7 +654,7 @@ function loadDrivenInputEvents() {
     $sel.val(next);
     if ($sel.val() !== next) $sel[0].selectedIndex = 0;
   }
-  $(document).on("change", "#TRK_MOUNT_TYP, #LIFT_TYPE", applyLowerSpliceConstraint);
+  $(document).on("change", "input[name='TRK_MOUNT_TYP'], #LIFT_TYPE", applyLowerSpliceConstraint);
   applyLowerSpliceConstraint();
   setTimeout(applyLowerSpliceConstraint, 0);
   setTimeout(applyLowerSpliceConstraint, 250);
@@ -924,7 +932,7 @@ function loadDrivenInputEvents() {
     const $sel = $("#JAMB_SEAL");
     if (!$sel.length) return;
     const colorKey = $("input[name='COLOR']:checked").val();
-    const mountVal = $("#TRK_MOUNT_TYP").val();
+    const mountVal = $("input[name='TRK_MOUNT_TYP']:checked").val();
     const model    = $("input[name='DOOR_MODEL']:checked").val();
     const coverage = $("input[name='WeatherSealCoverage']:checked").val() || "complete";
     const colorPrefix = WS_COLOR_KEY[colorKey];
@@ -969,7 +977,7 @@ function loadDrivenInputEvents() {
     $("input[name='WeatherSealCoverage']").prop("disabled", isNone);
   }
   $(document).on("change",
-    "input[name='COLOR'], #TRK_MOUNT_TYP, input[name='DOOR_MODEL'], input[name='WeatherSealCoverage']",
+    "input[name='COLOR'], input[name='TRK_MOUNT_TYP'], input[name='DOOR_MODEL'], input[name='WeatherSealCoverage']",
     applyJambSealConstraint);
   $(document).on("change", "#JAMB_SEAL", applyCoverageEnablement);
   applyJambSealConstraint();
@@ -988,7 +996,7 @@ function loadDrivenInputEvents() {
     if (!$yes.length) return;
     const $yesBtn = $("#NOLAP_STEEL_JAMB_YES_BTN");
     const $noBtn  = $("#NOLAP_STEEL_JAMB_NO_BTN");
-    const jamb    = $("#JAMB").val();
+    const jamb    = $("input[name='JAMB']:checked").val();
     const overlap = $("input[name='OverlapRequired']:checked").val();
     let forced;
     if (jamb === "steel") forced = overlap === "yes" ? "no" : "yes";
@@ -1000,7 +1008,7 @@ function loadDrivenInputEvents() {
     if (typeof window.syncSlidingButtonGroup === "function") window.syncSlidingButtonGroup("NoLapSteelJamb");
     if (typeof applyTrackMountConstraint === "function") applyTrackMountConstraint();
   }
-  $(document).on("change", "#JAMB, input[name='OverlapRequired']", applyNoLapSteelJambConstraint);
+  $(document).on("change", "input[name='JAMB'], input[name='OverlapRequired']", applyNoLapSteelJambConstraint);
   applyNoLapSteelJambConstraint();
   setTimeout(applyNoLapSteelJambConstraint, 0);
   setTimeout(applyNoLapSteelJambConstraint, 250);
@@ -1099,27 +1107,27 @@ function loadDrivenInputEvents() {
   // No are available. When restricting to No, the Yes button is hidden and any
   // current Yes selection is forced back to No.
   function syncSpringFailureDeviceState() {
-    const restrictToNo = $("#SHAFT_TYPE").val() === "tube";
+    const restrictToNo = $("input[name='ShaftType']:checked").val() === "tube";
     $("#SPRING_FAILURE_DEVICE_YES").closest(".rw-sliding-button").toggle(!restrictToNo);
     if (restrictToNo && $("#SPRING_FAILURE_DEVICE_YES").is(":checked")) {
       $("#SPRING_FAILURE_DEVICE_NO").prop("checked", true).trigger("change");
     }
   }
-  $(document).on("change", "#SHAFT_TYPE", syncSpringFailureDeviceState);
+  $(document).on("change", "input[name='ShaftType']", syncSpringFailureDeviceState);
   syncSpringFailureDeviceState();
 
   // [DUPLEX-SOLUTIONS] Shaft Type drives Include Duplex Solutions. Only solid
   // shafts (1" and 1 1/4") allow Yes. Tube / Keyed Tube → No only; the Yes
   // button is hidden and any current Yes selection is forced back to No.
   function syncDuplexSolutionsState() {
-    const shaft = $("#SHAFT_TYPE").val();
+    const shaft = $("input[name='ShaftType']:checked").val();
     const allowYes = shaft === "solid_1" || shaft === "solid_1_25";
     $("#DUPLEX_SOLUTIONS_YES").closest(".rw-sliding-button").toggle(allowYes);
     if (!allowYes && $("#DUPLEX_SOLUTIONS_YES").is(":checked")) {
       $("#DUPLEX_SOLUTIONS_NO").prop("checked", true).trigger("change");
     }
   }
-  $(document).on("change", "#SHAFT_TYPE", syncDuplexSolutionsState);
+  $(document).on("change", "input[name='ShaftType']", syncDuplexSolutionsState);
   syncDuplexSolutionsState();
 
   // [FENDER-GUARD] Door thickness (via DOOR_MODEL) and CSBB drive Fender Guard
@@ -1135,14 +1143,7 @@ function loadDrivenInputEvents() {
     "T300": "300",
     "T200C": "200C", "U200C": "200C",
   };
-  const FENDER_GUARD_LABEL = {
-    "none":   "None",
-    "std":    "Std",
-    "yellow": "Yellow",
-  };
   function applyFenderGuardConstraint() {
-    const $sel = $("#FENDER_GUARD");
-    if (!$sel.length) return;
     const model = $("input[name='DOOR_MODEL']:checked").val();
     const thickness = FENDER_GUARD_THICKNESS[model];
     const csbb = $("input[name='CSBB']:checked").val();
@@ -1155,14 +1156,13 @@ function loadDrivenInputEvents() {
     } else {
       allowed = ["none", "std"];
     }
-    const prev = $sel.val();
-    // Rebuild options. `<option hidden>` is unreliable across browsers in a
-    // <select>, so we replace the option list outright.
-    $sel[0].innerHTML = allowed.map(v => `<option value="${v}">${FENDER_GUARD_LABEL[v]}</option>`).join("");
-    const next = allowed.includes(prev) ? prev : allowed[0];
-    $sel.val(next);
-    if ($sel.val() !== next) $sel[0].selectedIndex = 0;
-    $sel.trigger("change");
+    $("#FENDER_GUARD_NONE, #FENDER_GUARD_STD, #FENDER_GUARD_YELLOW").each(function () {
+      $(this).closest(".rw-button").toggle(allowed.includes(this.value));
+    });
+    const prev = $("input[name='FenderGuard']:checked").val();
+    if (!allowed.includes(prev)) {
+      $(`#FENDER_GUARD_${allowed[0].toUpperCase()}`).prop("checked", true).trigger("change");
+    }
   }
   $(document).on("change", "input[name='DOOR_MODEL'], input[name='CSBB']", applyFenderGuardConstraint);
   applyFenderGuardConstraint();
@@ -1187,6 +1187,59 @@ function loadDrivenInputEvents() {
   applyHangerAngleQtyOptions();
   setTimeout(applyHangerAngleQtyOptions, 0);
   setTimeout(applyHangerAngleQtyOptions, 250);
+
+  // [BUMPER-OR-PUSHER-SPRINGS] Operator drives valid spring options. DC Pulse
+  // (Operation=3) restricts to None — the other three buttons hide. Every
+  // other operator shows all four buttons. Same matrix applies for every Lift
+  // Type currently; extend to a lift-type key if that changes.
+  function applyBumperOrPusherSpringsConstraint() {
+    const operation = $("input[name='Operation']:checked").val();
+    const restrictToNone = operation === "3"; // DC Pulse
+    const $others = $("#BUMPER_SPRG, #BUMPER_LEAF_SPRG, #PUSH_SPRG").closest(".rw-button");
+    $others.toggle(!restrictToNone);
+    if (restrictToNone && !$("#BUMPER_NONE").is(":checked")) {
+      $("#BUMPER_NONE").prop("checked", true).trigger("change");
+    }
+  }
+  $(document).on("change", "input[name='Operation']", applyBumperOrPusherSpringsConstraint);
+  applyBumperOrPusherSpringsConstraint();
+  setTimeout(applyBumperOrPusherSpringsConstraint, 0);
+  setTimeout(applyBumperOrPusherSpringsConstraint, 250);
+
+  // [WEIGHT-MODIFIER] Pull live springing weight into Current, sync slider
+  // readout, compute New = Current + Modify. getCurrentDoorWeight() relies on
+  // nodeset being populated — guard against early calls.
+  function syncWeightModifier() {
+    let current = 0;
+    try {
+      if (typeof getCurrentDoorWeight === "function" && typeof nodeset !== "undefined" && nodeset["WEIGHT_BREAKDOWN"]) {
+        const w = getCurrentDoorWeight();
+        if (typeof w === "number" && !isNaN(w)) current = w;
+      }
+    } catch (e) { /* nodeset not ready yet */ }
+    $("#CURRENT_SPRINGING_WEIGHT").text(current.toFixed(2));
+    const $slider = $("#MODIFY_SPRINGING_WEIGHT");
+    const modify = parseFloat($slider.val()) || 0;
+    const sign = modify > 0 ? "+" : "";
+    $("#MODIFY_SPRINGING_WEIGHT_VALUE").text(`${sign}${modify}`);
+    $("#NEW_ADJUSTED_SPRINGING_WEIGHT").text((current + modify).toFixed(2));
+    // Update --fill so the slider track shows a purple progress to the thumb.
+    if ($slider.length) {
+      const min = parseFloat($slider.attr("min")) || 0;
+      const max = parseFloat($slider.attr("max")) || 100;
+      const pct = ((modify - min) / (max - min)) * 100;
+      $slider[0].style.setProperty("--fill", `${pct}%`);
+    }
+  }
+  $(document).on("input change", "#MODIFY_SPRINGING_WEIGHT", syncWeightModifier);
+  $(document).on("change",
+    "input[name='DOOR_MODEL'], input[name='SIZE'], input[name='COLOR'], " +
+    "input[name='WINDOWS'], input[name='WINDOW_POSITION'], input[name='END_CAPS'], " +
+    "#custom_dimensions, #CUSTOM_WIDTH_FEET, #CUSTOM_WIDTH_INCHES, " +
+    "#CUSTOM_HEIGHT_FEET, #CUSTOM_HEIGHT_INCHES",
+    syncWeightModifier);
+  setTimeout(syncWeightModifier, 500);
+  setTimeout(syncWeightModifier, 1500);
 
   // [HARDWARE-LAYOUT] When the Hardware tab is active, hide the canvas +
   // window-position picker on the left pane, and move the Drums & Cables and
@@ -1247,7 +1300,7 @@ function loadDrivenInputEvents() {
   // own, force the first option whenever the value is blank — both on initial
   // load (polled across the framework's hydration window) and on any future
   // change that ends up blank.
-  const DEFAULT_DROPDOWN_IDS = ["#SHAFT_TYPE", "#JAMB_SEAL", "#TOP_WEATHER_SEAL"];
+  const DEFAULT_DROPDOWN_IDS = ["#JAMB_SEAL", "#TOP_WEATHER_SEAL"];
   function ensureDropdownDefaults() {
     DEFAULT_DROPDOWN_IDS.forEach(id => {
       const $sel = $(id);

@@ -1909,6 +1909,68 @@ option--disabled {
     }
 }
 
+/* [WEIGHT-MODIFIER] Weight Modifier subsection on the Advanced tab. Inline
+   Label-Value summary above a flat slider (no card / boxes). Slider styled
+   to match the Landmark example: thin track, purple fill to the thumb. */
+.weight-modifier {
+    margin-top: 18px;
+    padding-top: 12px;
+    border-top: 1px solid #ddd;
+}
+.weight-modifier-title {
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 8px;
+    color: #333;
+}
+.weight-modifier-summary {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 10px;
+}
+.weight-modifier-stat {
+    white-space: nowrap;
+}
+.weight-modifier-stat--result {
+    font-weight: 700;
+}
+.weight-modifier-divider {
+    color: #999;
+}
+/* Slider reuses the Landmark .range-slider base (grey 10px track, 20px thumb,
+   opacity hover). These overrides switch the thumb to a purple circle and
+   render a purple progress fill on the left side of the track up to the thumb.
+   --fill is set in JS as a 0-100% string based on slider position. */
+.weight-modifier-slider {
+    background: linear-gradient(
+        to right,
+        #b86bd1 0%,
+        #b86bd1 var(--fill, 50%),
+        transparent var(--fill, 50%),
+        transparent 100%
+    ) !important;
+    border: 1px solid #000 !important;
+    padding: 0 !important;
+}
+.weight-modifier-slider::-webkit-slider-thumb {
+    border-radius: 50%;
+    background: #b86bd1;
+}
+.weight-modifier-slider::-moz-range-thumb {
+    border-radius: 50%;
+    background: #b86bd1;
+}
+.weight-modifier-slider::-moz-range-progress {
+    background: #b86bd1;
+}
+.weight-modifier-slider::-ms-fill-lower {
+    background: #b86bd1;
+}
+
 /* [HARDWARE-TAB-FACE-ONLY] hide the Hardware tab in the nav when Door Face Only is selected.
    Toggled via the .face-only class added to #configurator by load_html.js. The framework
    wraps each tab in a div.radio-layout with id="tab_N" matching the section's index.
