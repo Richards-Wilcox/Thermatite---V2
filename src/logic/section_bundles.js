@@ -1884,6 +1884,80 @@ function buildRPTopSpNum(height) {
     return `LND-${height}${color}`;
 }
 
+// SB-description segment d: door colour -> abbreviation.
+// Thermatite Kynar colours are included as storage only; they are NOT offered
+// in the configurator yet but the abbreviations are ready for when they are.
+const SB_COLOR_ABBR = {
+    "Almond":      "Alm",
+    "Black":       "Blk",
+    "Bronze":      "Brz",
+    "Brown":       "Brn",
+    "Cafe":        "Cafe",
+    "Desert Tan":  "DTan",
+    "Iron Ore":    "Ore",
+    "Silver":      "Slv",
+    "Sandstone":   "Snd",
+    "Slate Grey":  "SGr",
+    "White":       "Wht",
+    // Kynar — storage only, not wired into the configurator.
+    "Kynar Beige": "K-Bge",
+    "Kynar Ivory": "K-Ivr",
+    "Kynar Sepia": "K-Sep",
+    "Kynar White": "K-Wht",
+};
+
+// SB-description segment c: fixed pattern -> number, keyed by pattern NAME (the
+// number is fixed per pattern, not by its position in a model's pattern list).
+// Only Multi Rib also carries the "MR" suffix (segment c -> e.g. "T150-2MR").
+// BUSINESS-LOGIC TBD: Flush (4) / Plank (5) numbers are assumed — confirm with Bill.
+const SB_PATTERN_NUMBER = {
+    "Standard Rib":   1,
+    "Multi Rib":      2,
+    "Raynor Profile": 3,
+    "Flush":          4,
+    "Plank":          5,
+};
+
+// SB-description segment e (step plate part): StepPlate radio -> text.
+// "each" (1 Each Side) = two plates -> "2xSP"; any other non-none -> "SP".
+function buildStepPlateText() {
+    const sp = $("input[name='StepPlate']:checked").val() || "none";
+    if (sp === "none") return "";
+    return sp === "each" ? "2xSP" : "SP";
+}
+
+// SB-description segment e (exhaust port part): ExhaustPortView + ExhaustPortSize.
+// "each" (1 Each Side) -> "2x{size}EP"; any other non-none -> "{size}EP".
+// Sizes 3/4/5/6 are supported; 5" is programmed in but not yet offered in the UI.
+// Size "0" (or any unrecognised size) yields no text.
+function buildExhaustPortText() {
+    const view = $("input[name='ExhaustPortView']:checked").val() || "none";
+    if (view === "none") return "";
+
+    const size = $("input[name='ExhaustPortSize']:checked").val() || "0";
+    if (!["3", "4", "5", "6"].includes(String(size))) return "";
+
+    return view === "each" ? `2x${size}EP` : `${size}EP`;
+}
+
+// SB-description segment e: section options (step plate / exhaust port).
+// Both present -> step-plate text + "+" + exhaust-port text (no surrounding
+// spaces), e.g. "2xSP+2x4EP". Glazing/lites (e.g. "5xE") are deferred until
+// glazing is implemented.
+function buildSectionOptionsText() {
+    const stepPlate = buildStepPlateText();
+    const exhaustPort = buildExhaustPortText();
+
+    if (stepPlate && exhaustPort) return `${stepPlate}+${exhaustPort}`;
+    return stepPlate || exhaustPort;
+}
+
+// SB-description segment f: double end caps -> "DE", single -> nothing.
+// EndCaps radio value "1" = double.
+function buildEndCapsText() {
+    return $("input[name='EndCaps']:checked").val() === "1" ? "DE" : "";
+}
+
 //function to build section bundle desc
 function buildSBDescription(prefix, height, qty, isBundleIndex = 0, bundleIndex = 0) {
 
@@ -1903,31 +1977,22 @@ function buildSBDescription(prefix, height, qty, isBundleIndex = 0, bundleIndex 
     const doorModelDesc = getNode("DOOR_MODEL")?.getAttribute("desc");
     const colorRaw = $("input[name='COLOR']:checked").val() || "";
     const color = colorRaw ? String(colorRaw).charAt(0).toUpperCase() + String(colorRaw).slice(1) : "";
-    const panelStyle = $("input[name='Pattern']:checked").val() || "Standard Rib";
+    const colorShort = SB_COLOR_ABBR[color] || color;
 
-    const colorShortMap = {
-        "White":      "Wht",
-        "Brown":      "Brn",
-        "Silver":     "Slv",
-        "Bronze":     "Brnz",
-        "Slate Grey": "SltGry",
-        "Iron Ore":   "IronOre",
-        "Black":      "Blk",
-        "Sandstone":  "Sand",
-        "Almond":     "Alm",
-        "Cafe":       "Caf"
-    };
-    const colorShort = colorShortMap[color] || color;
+    // Segment c: model + pattern number, with "MR" suffix for Multi Rib only.
+    const patternName = $("input[name='Pattern']:checked").val() || "Standard Rib";
+    const patternNumber = SB_PATTERN_NUMBER[patternName] ?? "";
+    const patternSuffix = patternName === "Multi Rib" ? "MR" : "";
+    const modelPattern = `${doorModelDesc}-${patternNumber}${patternSuffix}`;
 
-    // Determine if this bundle is a pair (double) or single by checking the bundleByHeight result
+    // Segment a: bundle type. A bundle is a "double" when it pairs two sections.
+    // SB-B / SB-BI = bottom single / double, SB-I / SB-II = intermediate.
+    // SB-T / SB-TI (top) and SB-G / SB-GG / SB-IG (glazed) are defined here but
+    // dormant: top-section detection and glazing are not implemented yet.
     const bundles = bundleByHeight();
     const bundle = bundles[bundleIndex];
     const isDouble = bundle && bundle.sections.length === 2;
 
-    const bundlePosition = isBundleIndex === 0 ? "Btm" : "Int";
-
-    // SB-B = bottom single, SB-BI = bottom double
-    // SB-I = intermediate single, SB-II = intermediate double
     let sbPrefix;
     if (isBundleIndex === 0) {
         sbPrefix = isDouble ? "SB-BI" : "SB-B";
@@ -1935,7 +2000,18 @@ function buildSBDescription(prefix, height, qty, isBundleIndex = 0, bundleIndex 
         sbPrefix = isDouble ? "SB-II" : "SB-I";
     }
 
-    return `${sbPrefix} ${bundlePosition} ${doorWidthFeet}-${doorWidthInches}x${height} ${doorModelDesc} ${colorShort} ${panelStyle}`;
+    // Segments a–d are always present; e (section options) and f (end caps) are
+    // conditional. Join with single spaces, dropping any empty conditional segment.
+    const segments = [
+        sbPrefix,                                            // a
+        `${doorWidthFeet}-${doorWidthInches}x${height}`,     // b
+        modelPattern,                                        // c
+        colorShort,                                          // d
+        buildSectionOptionsText(),                           // e (conditional)
+        buildEndCapsText(),                                  // f (conditional)
+    ];
+
+    return segments.filter(Boolean).join(" ");
 }
 
 // Maps the selected DOOR_MODEL to the part-number code segment used in
@@ -1969,22 +2045,6 @@ function getModelPartCode() {
     if (MODEL_CODE_OVERRIDES[model]) return MODEL_CODE_OVERRIDES[model];
     return model.substring(1);
 }
-
-// BUSINESS-LOGIC TBD: SB prefix thresholds (< 32 / > 32) and codes
-// (SB-B / SB-BI / SB-I / SB-II) inherited from Landmark. Awaiting
-// confirmation from Bill on Thermatite part-number conventions.
-function getSBPrefix(/* type, height */) {
-    return "SB";
-}
-
-// function getSBPrefix(type, height) {
-//     switch (type) {
-//         case "SB1":
-//             return height < 32 ? "SB-B" : "SB-BI";
-//         default:
-//             return height > 32 ? "SB-II" : "SB-I";
-//     }
-// }
 
 //function to create raw panel part#
 function buildRPSPNum(height, suffix = "01") {

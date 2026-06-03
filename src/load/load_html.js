@@ -2404,6 +2404,15 @@ $(document).on("change", "input[name='COLOR']", function() {
 $(document).on("change", "input[name='SIZE']", function() {
     refreshAllBundleDescs();
 });
+// Section-options (segment e) and end-caps (segment f) inputs feed the SB
+// descriptions but aren't on the framework dep chain, so refresh explicitly.
+$(document).on(
+    "change",
+    "input[name='StepPlate'], input[name='ExhaustPortView'], input[name='ExhaustPortSize'], input[name='EndCaps']",
+    function() {
+        refreshAllBundleDescs();
+    }
+);
   
 function syncHardwareVisibility() {
     const faceOnly = $("input[name='DOOR_OPTIONS']:checked").val() === "1";
