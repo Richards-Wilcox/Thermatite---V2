@@ -1,4 +1,68 @@
+// IDs of every section-bundle output node, recorded at registration so they can
+// be recomputed on demand (at Configure) instead of living in the framework's
+// dependency graph. REACT_WILCOX's getWalk() is O(n²) in the walk size, so having
+// ~186 of these as live dependents of HEIGHT/WIDTH/NUM_OF_SEC/COLOR made every
+// input change build an enormous walk (the multi-second freeze). Registering
+// them with NO edges keeps them out of input walks entirely; recomputeSectionBundles()
+// fills their values when the BOM actually needs them.
+let _sectionBundleNodeIds = [];
+
+// Recompute every section-bundle node's value once, in registration order
+// (upstream → downstream, which is how they're declared). Call before reading
+// the BOM (Configure / serialization) and after dimension/colour/model changes
+// if a live preview is desired.
+function recomputeSectionBundles() {
+    // Two passes: nodes are recomputed in registration order, but a few outputs
+    // are declared before the upstream nodes they read (e.g. SB1_DESC before
+    // SHORTEST_SECTION). Most logic recomputes from primitives (HEIGHT/NUM_OF_SEC
+    // via resolveSectionHeights), so one pass usually suffices; a second pass
+    // guarantees any node-to-node reads settle. It's a plain loop (~186×2),
+    // nothing like the framework's O(n²) walk.
+    for (let pass = 0; pass < 2; pass++) {
+        for (const id of _sectionBundleNodeIds) {
+            const node = nodeset?.[id];
+            if (node && typeof node.logic === "function") {
+                try { node.logic.call(node); } catch (e) { /* leave stale value */ }
+            }
+        }
+    }
+
+    // Push node values to their DOM elements. These nodes are out of the framework
+    // walk, so rw()'s end-of-walk DOM sync (REACT_WILCOX ~line 286) never runs for
+    // them — without this the BOM inputs/labels show stale values even though the
+    // node state is correct.
+    for (const id of _sectionBundleNodeIds) {
+        const node = nodeset?.[id];
+        const el = node && node.element;
+        if (!el) continue;
+        const tag = el.tagName;
+        if (tag === "SELECT" || tag === "INPUT" || tag === "OPTION") {
+            el.value = node.value;
+        } else if (node.type === "LABEL" && !node.text) {
+            el.innerText = node.value;
+        } else if (node.type !== "CONTAINER" && node.text) {
+            el.innerText = node.text;
+        }
+    }
+}
+
 function addSectionBundleDrivers() {
+
+    // Shadow addLogic locally: register the node's logic but DROP its edges so it
+    // never enters an input-driven walk. Record the id for recomputeSectionBundles().
+    // Declared as a hoisted function (not const) so the 186 call sites below bind
+    // to THIS one, with no temporal-dead-zone issues.
+    _sectionBundleNodeIds = [];
+    // Mirror the framework's addLogic EXACTLY (REACT_WILCOX:188) except we DON'T
+    // register the edges — so these nodes never enter an input-driven walk. Like
+    // the original, skip ids with no existing node (don't create detached nodes;
+    // that broke the post-walk DOM loop / layout). recomputeSectionBundles() runs
+    // their logic on demand.
+    function addLogic(id, logic, _edges) {
+        if (!nodeset[id]) return;
+        nodeset[id].logic = logic;
+        _sectionBundleNodeIds.push(id);
+    }
 
     const SECTION_DEPS = [
         "SHORTEST_SECTION",
@@ -308,7 +372,7 @@ function addSectionBundleDrivers() {
             console.error("SB1_DESC ERROR:", e);
             this.value = "";
         }
-    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "BUNDLE_1_HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE"])
+    }, ["WIDTH", "BUNDLE_1_HEIGHT", "BUNDLE_1_QTY", "DOOR_MODEL", "COLOR", "Pattern"])
 
     //SB2
     addLogic("SB2_SPNUM", function () {
@@ -321,7 +385,7 @@ function addSectionBundleDrivers() {
         const height = getState("BUNDLE_2_HEIGHT");
         const qty = getState("BUNDLE_2_QTY");
         this.value = buildSBDescription("SB", height, qty, 1, 1);
-    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "BUNDLE_2_HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE"])
+    }, ["WIDTH", "BUNDLE_2_HEIGHT", "BUNDLE_2_QTY", "DOOR_MODEL", "COLOR", "Pattern"])
 
     //SB3
     addLogic("SB3_SPNUM", function () {
@@ -335,7 +399,7 @@ function addSectionBundleDrivers() {
         const qty = getState("BUNDLE_3_QTY");
         this.value = buildSBDescription("SB", height, qty, 2, 2);
 
-    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "BUNDLE_3_HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE"])
+    }, ["WIDTH", "BUNDLE_3_HEIGHT", "BUNDLE_3_QTY", "DOOR_MODEL", "COLOR", "Pattern"])
 
     //SB 4
     addLogic("SB4_SPNUM", function () {
@@ -349,7 +413,7 @@ function addSectionBundleDrivers() {
         const qty = getState("BUNDLE_4_QTY");
         this.value = buildSBDescription("SB", height, qty, 3, 3);
 
-    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "BUNDLE_4_HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE"])
+    }, ["WIDTH", "BUNDLE_4_HEIGHT", "BUNDLE_4_QTY", "DOOR_MODEL", "COLOR", "Pattern"])
 
     //SB 5
     addLogic("SB5_SPNUM", function () {
@@ -363,7 +427,7 @@ function addSectionBundleDrivers() {
         const qty = getState("BUNDLE_5_QTY");
         this.value = buildSBDescription("SB", height, qty, 4, 4);
 
-    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "BUNDLE_5_HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE"])
+    }, ["WIDTH", "BUNDLE_5_HEIGHT", "BUNDLE_5_QTY", "DOOR_MODEL", "COLOR", "Pattern"])
 
     //SB 6
     addLogic("SB6_SPNUM", function () {
@@ -377,7 +441,7 @@ function addSectionBundleDrivers() {
         const qty = getState("BUNDLE_6_QTY");
         this.value = buildSBDescription("SB", height, qty, 5, 5);
 
-    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "BUNDLE_6_HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE"])
+    }, ["WIDTH", "BUNDLE_6_HEIGHT", "BUNDLE_6_QTY", "DOOR_MODEL", "COLOR", "Pattern"])
 
     //SB 7
     addLogic("SB7_SPNUM", function () {
@@ -391,7 +455,7 @@ function addSectionBundleDrivers() {
         const qty = getState("BUNDLE_7_QTY");
         this.value = buildSBDescription("SB", height, qty, 6, 6);
 
-    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "BUNDLE_7_HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE"])
+    }, ["WIDTH", "BUNDLE_7_HEIGHT", "BUNDLE_7_QTY", "DOOR_MODEL", "COLOR", "Pattern"])
 
     //SB 8
     addLogic("SB8_SPNUM", function () {
@@ -405,7 +469,7 @@ function addSectionBundleDrivers() {
         const qty = getState("BUNDLE_8_QTY");
         this.value = buildSBDescription("SB", height, qty, 7, 7);
 
-    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "BUNDLE_8_HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE"])
+    }, ["WIDTH", "BUNDLE_8_HEIGHT", "BUNDLE_8_QTY", "DOOR_MODEL", "COLOR", "Pattern"])
 
     //SB 9
     addLogic("SB9_SPNUM", function () {
@@ -419,7 +483,7 @@ function addSectionBundleDrivers() {
         const qty = getState("BUNDLE_9_QTY");
         this.value = buildSBDescription("SB", height, qty, 8, 8);
 
-    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "BUNDLE_9_HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE"])
+    }, ["WIDTH", "BUNDLE_9_HEIGHT", "BUNDLE_9_QTY", "DOOR_MODEL", "COLOR", "Pattern"])
 
 
     //Section Components part# and Desc for each bundle
@@ -437,7 +501,7 @@ function addSectionBundleDrivers() {
         const qty = getState("BUNDLE1_SC1_QTY");
         this.value = buildSCDescription(height, qty);
 
-    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "BUNDLE1_SC1_HEIGHT", "BUNDLE1_SC1_QTY", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE"])
+    }, ["WIDTH", "BUNDLE1_SC1_HEIGHT", "BUNDLE1_SC1_QTY", "DOOR_MODEL", "COLOR", "Pattern"])
 
     addLogic("BUNDLE1_SC2_SPNUM", function () {
         let doorModelId = getModelPartCode();
@@ -453,7 +517,7 @@ function addSectionBundleDrivers() {
         const qty = getState("BUNDLE1_SC2_QTY");
         this.value = buildSCDescription(height, qty);
 
-    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "BUNDLE1_SC2_HEIGHT", "BUNDLE1_SC2_QTY", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE"])
+    }, ["WIDTH", "BUNDLE1_SC2_HEIGHT", "BUNDLE1_SC2_QTY", "DOOR_MODEL", "COLOR", "Pattern"])
 
     //SC2
     addLogic("BUNDLE2_SC1_SPNUM", function () {
@@ -470,7 +534,7 @@ function addSectionBundleDrivers() {
         const qty = getState("BUNDLE2_SC1_QTY");
         this.value = buildSCDescription(height, qty);
 
-    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "BUNDLE2_SC1_HEIGHT", "BUNDLE2_SC1_QTY", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE"])
+    }, ["WIDTH", "BUNDLE2_SC1_HEIGHT", "BUNDLE2_SC1_QTY", "DOOR_MODEL", "COLOR", "Pattern"])
 
     addLogic("BUNDLE2_SC2_SPNUM", function () {
         let doorModelId = getModelPartCode();
@@ -486,7 +550,7 @@ function addSectionBundleDrivers() {
         const qty = getState("BUNDLE2_SC2_QTY");
         this.value = buildSCDescription(height, qty);
 
-    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "BUNDLE2_SC2_HEIGHT", "BUNDLE2_SC2_QTY", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE"])
+    }, ["WIDTH", "BUNDLE2_SC2_HEIGHT", "BUNDLE2_SC2_QTY", "DOOR_MODEL", "COLOR", "Pattern"])
 
     //SC 3
     addLogic("BUNDLE3_SC1_SPNUM", function () {
@@ -503,7 +567,7 @@ function addSectionBundleDrivers() {
         const qty = getState("BUNDLE3_SC1_QTY");
         this.value = buildSCDescription(height, qty);
 
-    }, ["WIDTH", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE", DIMENSION_DEPS, "HEIGHT", "BUNDLE3_SC1_HEIGHT", "BUNDLE3_SC1_QTY"])
+    }, ["WIDTH", "BUNDLE3_SC1_HEIGHT", "BUNDLE3_SC1_QTY", "DOOR_MODEL", "COLOR", "Pattern"])
 
     addLogic("BUNDLE3_SC2_SPNUM", function () {
         let doorModelId = getModelPartCode();
@@ -520,7 +584,7 @@ function addSectionBundleDrivers() {
         const qty = getState("BUNDLE3_SC2_QTY");
         this.value = buildSCDescription(height, qty);
 
-    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "BUNDLE3_SC2_HEIGHT", "BUNDLE3_SC2_QTY", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE"])
+    }, ["WIDTH", "BUNDLE3_SC2_HEIGHT", "BUNDLE3_SC2_QTY", "DOOR_MODEL", "COLOR", "Pattern"])
 
     //sc 4
     addLogic("BUNDLE4_SC1_SPNUM", function () {
@@ -537,7 +601,7 @@ function addSectionBundleDrivers() {
         const qty = getState("BUNDLE4_SC1_QTY");
         this.value = buildSCDescription(height, qty);
 
-    }, ["WIDTH", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE", DIMENSION_DEPS, "HEIGHT", "BUNDLE4_SC1_HEIGHT", "BUNDLE4_SC1_QTY"])
+    }, ["WIDTH", "BUNDLE4_SC1_HEIGHT", "BUNDLE4_SC1_QTY", "DOOR_MODEL", "COLOR", "Pattern"])
 
     addLogic("BUNDLE4_SC2_SPNUM", function () {
         let doorModelId = getModelPartCode();
@@ -554,7 +618,7 @@ function addSectionBundleDrivers() {
         const qty = getState("BUNDLE4_SC2_QTY");
         this.value = buildSCDescription(height, qty);
 
-    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "BUNDLE4_SC2_HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE", "BUNDLE4_SC2_QTY"])
+    }, ["WIDTH", "BUNDLE4_SC2_HEIGHT", "BUNDLE4_SC2_QTY", "DOOR_MODEL", "COLOR", "Pattern"])
 
     //sc 5
     addLogic("BUNDLE5_SC1_SPNUM", function () {
@@ -571,7 +635,7 @@ function addSectionBundleDrivers() {
         const qty = getState("BUNDLE5_SC1_QTY");
         this.value = buildSCDescription(height, qty);
 
-    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "BUNDLE5_SC1_HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE", "BUNDLE5_SC1_QTY"])
+    }, ["WIDTH", "BUNDLE5_SC1_HEIGHT", "BUNDLE5_SC1_QTY", "DOOR_MODEL", "COLOR", "Pattern"])
 
     //BUNDLE 6
     addLogic("BUNDLE6_SC1_SPNUM", function () {
@@ -587,7 +651,7 @@ function addSectionBundleDrivers() {
         const height = getState("BUNDLE6_SC1_HEIGHT");
         const qty = getState("BUNDLE6_SC1_QTY");
         this.value = buildSCDescription(height, qty);
-    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "BUNDLE6_SC1_HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE", "BUNDLE6_SC1_QTY"])
+    }, ["WIDTH", "BUNDLE6_SC1_HEIGHT", "BUNDLE6_SC1_QTY", "DOOR_MODEL", "COLOR", "Pattern"])
 
     //BUNDLE 7
     addLogic("BUNDLE7_SC1_SPNUM", function () {
@@ -603,7 +667,7 @@ function addSectionBundleDrivers() {
         const height = getState("BUNDLE7_SC1_HEIGHT");
         const qty = getState("BUNDLE7_SC1_QTY");
         this.value = buildSCDescription(height, qty);
-    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "BUNDLE7_SC1_HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE", "BUNDLE7_SC1_QTY"])
+    }, ["WIDTH", "BUNDLE7_SC1_HEIGHT", "BUNDLE7_SC1_QTY", "DOOR_MODEL", "COLOR", "Pattern"])
 
     //BUNDLE 8
     addLogic("BUNDLE8_SC1_SPNUM", function () {
@@ -619,7 +683,7 @@ function addSectionBundleDrivers() {
         const height = getState("BUNDLE8_SC1_HEIGHT");
         const qty = getState("BUNDLE8_SC1_QTY");
         this.value = buildSCDescription(height, qty);
-    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "BUNDLE8_SC1_HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE", "BUNDLE8_SC1_QTY"])
+    }, ["WIDTH", "BUNDLE8_SC1_HEIGHT", "BUNDLE8_SC1_QTY", "DOOR_MODEL", "COLOR", "Pattern"])
 
     //BUNDLE 9
     addLogic("BUNDLE9_SC1_SPNUM", function () {
@@ -635,7 +699,7 @@ function addSectionBundleDrivers() {
         const height = getState("BUNDLE9_SC1_HEIGHT");
         const qty = getState("BUNDLE9_SC1_QTY");
         this.value = buildSCDescription(height, qty);
-    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "BUNDLE9_SC1_HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE", "BUNDLE9_SC1_QTY"])
+    }, ["WIDTH", "BUNDLE9_SC1_HEIGHT", "BUNDLE9_SC1_QTY", "DOOR_MODEL", "COLOR", "Pattern"])
 
 
     //Raw panel Part# and Desc for Each bundle
@@ -652,7 +716,7 @@ function addSectionBundleDrivers() {
 
         this.value = buildRPDescription(height, qty, 0, 0);
 
-    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE", "BUNDLE1_SC1_HEIGHT", "BUNDLE1_SC1_QTY"])
+    }, ["WIDTH", "BUNDLE1_SC1_HEIGHT", "BUNDLE1_SC1_QTY", "DOOR_MODEL", "COLOR", "Pattern"])
 
     // set bundle 1 rp2 part#
     addLogic("BUNDLE1_RP2_SPNUM", function () {
@@ -666,7 +730,7 @@ function addSectionBundleDrivers() {
         const qty = getState("BUNDLE1_SC2_QTY");
 
         this.value = buildRPDescription(height, qty, 0, 0);
-    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE", "BUNDLE1_SC2_HEIGHT", "BUNDLE1_SC2_QTY"])
+    }, ["WIDTH", "BUNDLE1_SC2_HEIGHT", "BUNDLE1_SC2_QTY", "DOOR_MODEL", "COLOR", "Pattern"])
 
     // bundle2 rp1 part#
     addLogic("BUNDLE2_RP1_SPNUM", function () {
@@ -680,7 +744,7 @@ function addSectionBundleDrivers() {
         const qty = getState("BUNDLE2_SC1_QTY");
 
         this.value = buildRPDescription(height, qty, 1, 1);
-    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE", "BUNDLE2_SC1_HEIGHT", "BUNDLE2_SC1_QTY"])
+    }, ["WIDTH", "BUNDLE2_SC1_HEIGHT", "BUNDLE2_SC1_QTY", "DOOR_MODEL", "COLOR", "Pattern"])
 
     // bundle 2 rp2 part#
     addLogic("BUNDLE2_RP2_SPNUM", function () {
@@ -695,7 +759,7 @@ function addSectionBundleDrivers() {
 
         this.value = buildRPDescription(height, qty, 1, 1);
 
-    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE", "BUNDLE2_SC2_HEIGHT", "BUNDLE2_SC2_QTY"])
+    }, ["WIDTH", "BUNDLE2_SC2_HEIGHT", "BUNDLE2_SC2_QTY", "DOOR_MODEL", "COLOR", "Pattern"])
 
     //bundle 3 rp1 part#
     addLogic("BUNDLE3_RP1_SPNUM", function () {
@@ -711,7 +775,7 @@ function addSectionBundleDrivers() {
 
         this.value = buildRPDescription(height, qty, 2, 2);
 
-    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE", "BUNDLE3_SC1_HEIGHT", "BUNDLE3_SC1_QTY"])
+    }, ["WIDTH", "BUNDLE3_SC1_HEIGHT", "BUNDLE3_SC1_QTY", "DOOR_MODEL", "COLOR", "Pattern"])
 
     //bundle3 rp2 
     addLogic("BUNDLE3_RP2_SPNUM", function () {
@@ -726,7 +790,7 @@ function addSectionBundleDrivers() {
 
         this.value = buildRPDescription(height, qty, 2, 2);
 
-    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE", "BUNDLE3_SC2_HEIGHT", "BUNDLE3_SC2_QTY"])
+    }, ["WIDTH", "BUNDLE3_SC2_HEIGHT", "BUNDLE3_SC2_QTY", "DOOR_MODEL", "COLOR", "Pattern"])
 
     //BUNDLE 4
     //BUNDLE4 RP1    
@@ -742,7 +806,7 @@ function addSectionBundleDrivers() {
 
         this.value = buildRPDescription(height, qty, 3, 3);
 
-    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE", "BUNDLE4_SC1_HEIGHT", "BUNDLE4_SC1_QTY"])
+    }, ["WIDTH", "BUNDLE4_SC1_HEIGHT", "BUNDLE4_SC1_QTY", "DOOR_MODEL", "COLOR", "Pattern"])
 
     //bundle4 RP2 PART#
     addLogic("BUNDLE4_RP2_SPNUM", function () {
@@ -758,7 +822,7 @@ function addSectionBundleDrivers() {
 
         this.value = buildRPDescription(height, qty, 3, 3);
 
-    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE", "BUNDLE4_SC2_HEIGHT", "BUNDLE4_SC2_QTY"])
+    }, ["WIDTH", "BUNDLE4_SC2_HEIGHT", "BUNDLE4_SC2_QTY", "DOOR_MODEL", "COLOR", "Pattern"])
 
     //BUNDLE 5
     //BUNDLE5 RP1    
@@ -774,7 +838,7 @@ function addSectionBundleDrivers() {
 
         this.value = buildRPDescription(height, qty, 4, 4);
 
-    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE", "BUNDLE5_SC1_HEIGHT", "BUNDLE5_SC1_QTY"])
+    }, ["WIDTH", "BUNDLE5_SC1_HEIGHT", "BUNDLE5_SC1_QTY", "DOOR_MODEL", "COLOR", "Pattern"])
 
     //BUNDLE 6
     //BUNDLE6 RP1    
@@ -792,7 +856,7 @@ function addSectionBundleDrivers() {
 
         this.value = buildRPDescription(height, qty, 5, 5);
 
-    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE", "BUNDLE6_SC1_HEIGHT", "BUNDLE6_SC1_QTY"])
+    }, ["WIDTH", "BUNDLE6_SC1_HEIGHT", "BUNDLE6_SC1_QTY", "DOOR_MODEL", "COLOR", "Pattern"])
 
     //BUNDLE 7
     //BUNDLE7 RP1    
@@ -809,7 +873,7 @@ function addSectionBundleDrivers() {
 
         this.value = buildRPDescription(height, qty, 6, 6);
 
-    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE", "BUNDLE7_SC1_HEIGHT", "BUNDLE7_SC1_QTY"])
+    }, ["WIDTH", "BUNDLE7_SC1_HEIGHT", "BUNDLE7_SC1_QTY", "DOOR_MODEL", "COLOR", "Pattern"])
 
     //BUNDLE 8
     //BUNDLE8 RP1    
@@ -826,7 +890,7 @@ function addSectionBundleDrivers() {
 
         this.value = buildRPDescription(height, qty, 7, 7);
 
-    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE", "BUNDLE8_SC1_HEIGHT", "BUNDLE8_SC1_QTY"])
+    }, ["WIDTH", "BUNDLE8_SC1_HEIGHT", "BUNDLE8_SC1_QTY", "DOOR_MODEL", "COLOR", "Pattern"])
 
     //BUNDLE 9
     //BUNDLE9 RP1    
@@ -842,7 +906,7 @@ function addSectionBundleDrivers() {
         const qty = getState("BUNDLE9_SC1_QTY");
         this.value = buildRPDescription(height, qty, 8, 8);
 
-    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "DOOR_MODEL", "COLOR", "FACE", "Pattern", "SIZE", "BUNDLE9_SC1_HEIGHT", "BUNDLE9_SC1_QTY"])
+    }, ["WIDTH", "BUNDLE9_SC1_HEIGHT", "BUNDLE9_SC1_QTY", "DOOR_MODEL", "COLOR", "Pattern"])
 
 
     // RP BASE Part# for each section
@@ -1296,17 +1360,24 @@ function getEndCapsPartNum(section_height, door_model, end_caps) {
 }
 
 function getSectionHeight(height, num_of_sec) {
-    let stackChart = getStackChart();
-    let configArray = stackChart[String(height)];
-    if (!configArray) return undefined;
+    // Thermatite has exactly ONE section configuration per height: the PRIMARY
+    // (first) chart row. The additional "// optional" rows in getStackChart() are
+    // Landmark-only alternates and must be ignored — selecting by num_of_sec could
+    // otherwise pick an optional row (or miss entirely and fall back to wrong
+    // arithmetic). Always return the first entry for the height. num_of_sec is
+    // accepted for signature compatibility but no longer used for selection.
+    const configArray = getStackChart()[String(height)];
+    if (!configArray || !configArray.length) return undefined;
+    return configArray[0];
+}
 
-    for (let i = 0; i < configArray.length; i++) {
-        const item = configArray[i];
-        if (Number(item.num_sections) === Number(num_of_sec)) {
-            // return item.btm_section_height;
-            return item;
-        }
-    }
+// The single valid section count for a given door height (inches) per the
+// Thermatite stack chart's primary row. Drives NUM_OF_SEC so the dropdown and the
+// bundle heights always agree. Snaps off-chart heights to the nearest 3" key.
+function getChartNumSections(heightInches) {
+    const h = Number(heightInches) || 0;
+    const entry = getSectionHeight(h) || getSectionHeight(Math.round(h / 3) * 3);
+    return entry ? Number(entry.num_sections) : 0;
 }
 
 // Pull the individual section heights out of a stack-chart entry.
@@ -1325,9 +1396,27 @@ function chartEntryHeights(entry) {
 // HEIGHT / NUM_OF_SEC. This reconciles the two: when the chart has a matching
 // (height, num_of_sec) entry we trust it; otherwise we fall back to the rounded
 // arithmetic. Returns { tallest, shortest, tallestQty, shortestQty, source }.
+let _resolveSectionHeightsCache = null;
+let _resolveSectionHeightsKey = null;
+// Force the next resolveSectionHeights() to recompute. Call after HEIGHT/NUM_OF_SEC
+// settle for a new selection but before recomputing bundles — otherwise the memo
+// (keyed HEIGHT|NUM_OF_SEC) can serve the previous selection's values, which made
+// the BOM lag one click behind / show arithmetic fallback (15/18) on load.
+function invalidateSectionHeightsCache() {
+    _resolveSectionHeightsCache = null;
+    _resolveSectionHeightsKey = null;
+}
 function resolveSectionHeights() {
     const doorHeight = Number(getState("HEIGHT")) || 0;
     const numOfSec = Number(getState("NUM_OF_SEC")) || 0;
+
+    // Memoize on (HEIGHT, NUM_OF_SEC): called by SHORTEST/TALLEST_SECTION (+ QTY)
+    // and indirectly by the whole section-bundle fan-out, so it runs many times
+    // per walk with identical inputs. Auto-invalidates when height/sections change.
+    const cacheKey = `${doorHeight}|${numOfSec}`;
+    if (_resolveSectionHeightsKey === cacheKey && _resolveSectionHeightsCache) {
+        return _resolveSectionHeightsCache;
+    }
 
     // Arithmetic estimate (3" granularity) — kept as the cross-check / fallback.
     const per = numOfSec > 0 ? doorHeight / numOfSec : 0;
@@ -1357,7 +1446,9 @@ function resolveSectionHeights() {
                 `arithmetic=${arithTallest}/${arithShortest}. Using chart.`
             );
         }
-        return { tallest, shortest, tallestQty, shortestQty, source: "chart" };
+        _resolveSectionHeightsCache = { tallest, shortest, tallestQty, shortestQty, source: "chart" };
+        _resolveSectionHeightsKey = cacheKey;
+        return _resolveSectionHeightsCache;
     }
 
     // No chart entry — fall back to arithmetic (clamped so an out-of-range
@@ -1379,7 +1470,9 @@ function resolveSectionHeights() {
             `(snapped ${snapped}) NUM_OF_SEC=${numOfSec}; using arithmetic fallback.`
         );
     }
-    return { tallest, shortest, tallestQty, shortestQty, source: "arithmetic" };
+    _resolveSectionHeightsCache = { tallest, shortest, tallestQty, shortestQty, source: "arithmetic" };
+    _resolveSectionHeightsKey = cacheKey;
+    return _resolveSectionHeightsCache;
 }
 
 // function getSectionBundle() {
@@ -1788,88 +1881,93 @@ function calculateSectionShipWeight(sectionHeightInInches, isBottomSection = tru
     return Number((RPWeight + endCaps + btmRetainer + lites + pckWeight).toFixed(2));
 }
 
+// Shared segments b–d for SB / SC / SR descriptions.
+// b: <ft>-<in>x<height> (feet zero-padded to 2). c: <model>-<patternNumber>[MR]
+// (MR only for Multi Rib). d: <colour abbreviation>. Returns the three joined
+// by single spaces — callers prepend their tag (SB prefix / "SC" / "SR") and
+// append the conditional segments e/f as needed.
+// Per-walk cache of the description fields that are identical across all ~186
+// bundle nodes (everything except `height`). Without this, each node re-ran ~5
+// jQuery/Sizzle DOM selectors — ~900+ DOM queries per dimension change, which
+// is what made the rw() walk take seconds. We read the DOM once and reuse it.
+// _descSegmentsToken is bumped whenever any input feeding these fields changes
+// (see invalidateDescSegmentsCache), so the cache auto-refreshes.
+let _descSegmentsCache = null;
+let _descSegmentsToken = 0;
+let _descSegmentsCacheToken = -1;
+
+function invalidateDescSegmentsCache() {
+    _descSegmentsToken++;
+}
+
+function getSharedDescFields() {
+    if (_descSegmentsCache && _descSegmentsCacheToken === _descSegmentsToken) {
+        return _descSegmentsCache;
+    }
+
+    let doorWidthFeet, doorWidthInches;
+    if ($("#custom_dimensions").is(":checked")) {
+        doorWidthFeet = $("#CUSTOM_WIDTH_FEET").val() || "";
+        doorWidthInches = $("#CUSTOM_WIDTH_INCHES").val() || "0";
+    } else {
+        const $sz = $("input[name='SIZE']:checked");
+        doorWidthFeet = $sz.attr("width") || getNode("DOOR_WIDTH_FEET")?.value || "";
+        doorWidthInches = $sz.attr("widthInches") || getNode("DOOR_WIDTH_INCHES")?.value || "0";
+    }
+    doorWidthFeet = String(doorWidthFeet).padStart(2, "0");
+
+    const doorModelDesc = getNode("DOOR_MODEL")?.getAttribute("desc");
+    // COLOR radio value is the lowercase key ("iron_ore"); its `desc` attr is the
+    // proper name ("Iron Ore") that matches the SB_COLOR_ABBR keys.
+    const color = $("input[name='COLOR']:checked").attr("desc") || "";
+    const colorShort = SB_COLOR_ABBR[color] || color;
+
+    const patternName = $("input[name='Pattern']:checked").val() || "Standard Rib";
+    const reinforce = hasThirdReinforcing() ? "-3" : "";
+    const patternSuffix = patternName === "Multi Rib" ? "MR" : "";
+    const modelPattern = `${doorModelDesc}${reinforce}${patternSuffix}`;
+
+    _descSegmentsCache = { doorWidthFeet, doorWidthInches, modelPattern, colorShort };
+    _descSegmentsCacheToken = _descSegmentsToken;
+    return _descSegmentsCache;
+}
+
+function buildDescSegmentsBCD(height) {
+    // Only `height` varies per node; everything else is shared and cached.
+    const { doorWidthFeet, doorWidthInches, modelPattern, colorShort } = getSharedDescFields();
+    const size = `${doorWidthFeet}-${doorWidthInches}x${height}`;          // b
+    return `${size} ${modelPattern} ${colorShort}`;                        // b c d
+}
+
 //function to get the section component desc
-// Mirrors Landmark's buildSCDescription format
-//   SC <ft>-<in>x<height> <model> <color> <panelStyle> <DE>
-// but sourced the Thermatite way: custom-dim-aware width, COLOR/Pattern radios,
-// and the EndCaps radio ("1" = double) instead of Landmark's .desc/FACE/"Y".
+// SC <segments b–d> [e] [f] — same segment logic as the SB description, minus
+// segment a (the SB-B/-I/etc. prefix): SC is a component nested under the bundle
+// (SB -> SC -> SR), so it carries no bundle-type prefix, just the "SC" tag.
 function buildSCDescription(height, qty) {
 
     if (qty <= 0) return "";
 
-    let doorWidthFeet, doorWidthInches;
-    if ($("#custom_dimensions").is(":checked")) {
-        doorWidthFeet = $("#CUSTOM_WIDTH_FEET").val() || "";
-        doorWidthInches = $("#CUSTOM_WIDTH_INCHES").val() || "0";
-    } else {
-        const $sz = $("input[name='SIZE']:checked");
-        doorWidthFeet = $sz.attr("width") || getNode("DOOR_WIDTH_FEET")?.value || "";
-        doorWidthInches = $sz.attr("widthInches") || getNode("DOOR_WIDTH_INCHES")?.value || "0";
-    }
-    doorWidthFeet = String(doorWidthFeet).padStart(2, "0");
-
-    const doorModelDesc = getNode("DOOR_MODEL")?.getAttribute("desc");
-    const colorRaw = $("input[name='COLOR']:checked").val() || "";
-    const color = colorRaw ? String(colorRaw).charAt(0).toUpperCase() + String(colorRaw).slice(1) : "";
-    const panelStyle = $("input[name='Pattern']:checked").val() || "Standard Rib";
-
-    const colorShortMap = {
-        "White":      "Wht",
-        "Brown":      "Brn",
-        "Silver":     "Slv",
-        "Bronze":     "Brnz",
-        "Slate Grey": "SltGry",
-        "Iron Ore":   "IronOre",
-        "Black":      "Blk",
-        "Sandstone":  "Sand",
-        "Almond":     "Alm",
-        "Cafe":       "Caf"
-    };
-    const colorShort = colorShortMap[color] || color;
-
-    const doubleEndCaps = $("input[name='EndCaps']:checked").val() === "1" ? "DE" : "";
-
-    return `SC ${doorWidthFeet}-${doorWidthInches}x${height} ${doorModelDesc} ${colorShort} ${panelStyle} ${doubleEndCaps}`;
+    return assembleDesc([
+        "SC",
+        buildDescSegmentsBCD(height),     // b c d
+        buildSectionOptionsText(),        // e (conditional)
+        buildEndCapsText(),               // f (conditional)
+    ]);
 }
 
-//function to get the desc of raw panel 
+//function to get the desc of raw panel
+// SR <segments b–d> [e] [f] — raw panel, the leaf of the SB -> SC -> SR tree.
+// Same segment logic as SC, again with no bundle-type prefix (just the "SR" tag).
 function buildRPDescription(height, qty, isBundleIndex = 0, bundleIndex = 0) {
 
     if (qty <= 0) return "";
 
-    let doorWidthFeet, doorWidthInches;
-    if ($("#custom_dimensions").is(":checked")) {
-        doorWidthFeet = $("#CUSTOM_WIDTH_FEET").val() || "";
-        doorWidthInches = $("#CUSTOM_WIDTH_INCHES").val() || "0";
-    } else {
-        const $sz = $("input[name='SIZE']:checked");
-        doorWidthFeet = $sz.attr("width") || getNode("DOOR_WIDTH_FEET")?.value || "";
-        doorWidthInches = $sz.attr("widthInches") || getNode("DOOR_WIDTH_INCHES")?.value || "0";
-    }
-    doorWidthFeet = String(doorWidthFeet).padStart(2, "0");
-
-    const doorModelDesc = getNode("DOOR_MODEL")?.getAttribute("desc");
-    const colorRaw = $("input[name='COLOR']:checked").val() || "";
-    const color = colorRaw ? String(colorRaw).charAt(0).toUpperCase() + String(colorRaw).slice(1) : "";
-    const panelStyle = $("input[name='Pattern']:checked").val() || "Standard Rib";
-
-    const colorShortMap = {
-        "White":      "Wht",
-        "Brown":      "Brn",
-        "Silver":     "Slv",
-        "Bronze":     "Brnz",
-        "Slate Grey": "SltGry",
-        "Iron Ore":   "IronOre",
-        "Black":      "Blk",
-        "Sandstone":  "Sand",
-        "Almond":     "Alm",
-        "Cafe":       "Caf"
-    };
-    const colorShort = colorShortMap[color] || color;
-
-    // Flat Landmark format: SR <ft>-<in>x<h> <model> <color> <panelStyle>.
-    // (No Btm/Int or SR-B/SR-BI prefixing — matches buildRPDescription in exmaple.js.)
-    return `SR ${doorWidthFeet}-${doorWidthInches}x${height} ${doorModelDesc} ${colorShort} ${panelStyle}`;
+    return assembleDesc([
+        "SR",
+        buildDescSegmentsBCD(height),     // b c d
+        buildSectionOptionsText(),        // e (conditional)
+        buildEndCapsText(),               // f (conditional)
+    ]);
 }
 
 //function to get the raw panel base part#
@@ -1906,17 +2004,16 @@ const SB_COLOR_ABBR = {
     "Kynar White": "K-Wht",
 };
 
-// SB-description segment c: fixed pattern -> number, keyed by pattern NAME (the
-// number is fixed per pattern, not by its position in a model's pattern list).
-// Only Multi Rib also carries the "MR" suffix (segment c -> e.g. "T150-2MR").
-// BUSINESS-LOGIC TBD: Flush (4) / Plank (5) numbers are assumed — confirm with Bill.
-const SB_PATTERN_NUMBER = {
-    "Standard Rib":   1,
-    "Multi Rib":      2,
-    "Raynor Profile": 3,
-    "Flush":          4,
-    "Plank":          5,
-};
+// Max characters for any section-bundle / component / raw-panel description.
+const SB_DESC_MAX_CHARS = 30;
+
+// Segment c, third-reinforcing flag. The "-3" in a description (e.g. "T150-3"
+// or "T150-3MR") is added ONLY when a section has third reinforcing. The
+// THIRD_REINFORCE input is truss-driven (Yes only for the HatTruss style) by
+// applyThirdReinforceConstraint in load_drive_inputs.js — read its value here.
+function hasThirdReinforcing() {
+    return $("[name='THIRD_REINFORCE']").val() === "Yes";
+}
 
 // SB-description segment e (step plate part): StepPlate radio -> text.
 // "each" (1 Each Side) = two plates -> "2xSP"; any other non-none -> "SP".
@@ -1958,32 +2055,16 @@ function buildEndCapsText() {
     return $("input[name='EndCaps']:checked").val() === "1" ? "DE" : "";
 }
 
+// Assemble description segments: drop empty ones, join with single spaces, and
+// hard-cap at SB_DESC_MAX_CHARS (30) characters.
+function assembleDesc(segments) {
+    return segments.filter(Boolean).join(" ").slice(0, SB_DESC_MAX_CHARS);
+}
+
 //function to build section bundle desc
 function buildSBDescription(prefix, height, qty, isBundleIndex = 0, bundleIndex = 0) {
 
     if (qty <= 0) return "";
-
-    let doorWidthFeet, doorWidthInches;
-    if ($("#custom_dimensions").is(":checked")) {
-        doorWidthFeet = $("#CUSTOM_WIDTH_FEET").val() || "";
-        doorWidthInches = $("#CUSTOM_WIDTH_INCHES").val() || "0";
-    } else {
-        const $sz = $("input[name='SIZE']:checked");
-        doorWidthFeet = $sz.attr("width") || getNode("DOOR_WIDTH_FEET")?.value || "";
-        doorWidthInches = $sz.attr("widthInches") || getNode("DOOR_WIDTH_INCHES")?.value || "0";
-    }
-    doorWidthFeet = String(doorWidthFeet).padStart(2, "0");
-
-    const doorModelDesc = getNode("DOOR_MODEL")?.getAttribute("desc");
-    const colorRaw = $("input[name='COLOR']:checked").val() || "";
-    const color = colorRaw ? String(colorRaw).charAt(0).toUpperCase() + String(colorRaw).slice(1) : "";
-    const colorShort = SB_COLOR_ABBR[color] || color;
-
-    // Segment c: model + pattern number, with "MR" suffix for Multi Rib only.
-    const patternName = $("input[name='Pattern']:checked").val() || "Standard Rib";
-    const patternNumber = SB_PATTERN_NUMBER[patternName] ?? "";
-    const patternSuffix = patternName === "Multi Rib" ? "MR" : "";
-    const modelPattern = `${doorModelDesc}-${patternNumber}${patternSuffix}`;
 
     // Segment a: bundle type. A bundle is a "double" when it pairs two sections.
     // SB-B / SB-BI = bottom single / double, SB-I / SB-II = intermediate.
@@ -2000,18 +2081,15 @@ function buildSBDescription(prefix, height, qty, isBundleIndex = 0, bundleIndex 
         sbPrefix = isDouble ? "SB-II" : "SB-I";
     }
 
-    // Segments a–d are always present; e (section options) and f (end caps) are
-    // conditional. Join with single spaces, dropping any empty conditional segment.
-    const segments = [
-        sbPrefix,                                            // a
-        `${doorWidthFeet}-${doorWidthInches}x${height}`,     // b
-        modelPattern,                                        // c
-        colorShort,                                          // d
-        buildSectionOptionsText(),                           // e (conditional)
-        buildEndCapsText(),                                  // f (conditional)
-    ];
-
-    return segments.filter(Boolean).join(" ");
+    // Segment a then the shared b–d block, then conditional e (section options)
+    // and f (end caps). Empty segments dropped, joined with single spaces,
+    // hard-capped at 30 chars.
+    return assembleDesc([
+        sbPrefix,                         // a
+        buildDescSegmentsBCD(height),     // b c d
+        buildSectionOptionsText(),        // e (conditional)
+        buildEndCapsText(),               // f (conditional)
+    ]);
 }
 
 // Maps the selected DOOR_MODEL to the part-number code segment used in
@@ -2041,7 +2119,15 @@ function safeState(id) {
 }
 
 function getModelPartCode() {
-    const model = $("input[name='DOOR_MODEL']:checked").val() || "";
+    // Read the model the SAME way the descriptions do — via the registered
+    // DOOR_MODEL node's `value` — instead of $(":checked").val(). On load, two
+    // radios can transiently both carry the checked state (markup default T150 +
+    // applyDefaults-set default), and :checked returns whichever is later in the
+    // DOM (U200C) while the desc reads the node (T150). Reading the node keeps
+    // part# and desc in agreement.
+    const model = getNode("DOOR_MODEL")?.getAttribute("value")
+        || $("input[name='DOOR_MODEL']:checked").val()
+        || "";
     if (MODEL_CODE_OVERRIDES[model]) return MODEL_CODE_OVERRIDES[model];
     return model.substring(1);
 }

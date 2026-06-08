@@ -1987,6 +1987,22 @@ option--disabled {
     pointer-events: none !important;
 }
 
+/* [OPERATOR-TAB-HIDDEN] hide the Operator tab (section index 4) from the nav.
+   The Operator section stays in the DOM so its inputs keep feeding price /
+   springs logic — only the tab button is hidden so users can't open it. Same
+   collapse technique as the face-only Hardware tab above (visibility+width,
+   not display:none) to avoid a space-evenly gap in #section_select. */
+#tab_4 {
+    visibility: hidden !important;
+    width: 0 !important;
+    min-width: 0 !important;
+    max-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    pointer-events: none !important;
+}
+
 /* [HARDWARE-LAYOUT] When the Hardware tab is active, hide the canvas + window-
    position picker on the left pane. The Drums & Cables and Springing Solutions
    tables get moved into #HW_LEFT_PANE_LANDING (which JS un-hides). The nav bar

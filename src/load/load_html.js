@@ -1923,15 +1923,52 @@ function loadForm() {
         showSection(Number(evt.target.value));
     });
 
+    // [PERF-DEBUG] tiny timing helper — logs how long a labelled step takes.
+    window.__perf = function(label, fn) {
+        const t0 = performance.now();
+        const r = fn();
+        const dt = performance.now() - t0;
+        console.log(`[perf] ${label}: ${dt.toFixed(1)}ms`);
+        return r;
+    };
+
     //Load the caching system.
-    rw_init("configurator");
-    loadDrivenInputEvents();
-    loadGlobalNodes();
-    loadTrussStyleLogic();
-    //addSectionBundleDrivers()
+    __perf("rw_init", () => rw_init("configurator"));
+    __perf("loadDrivenInputEvents", () => loadDrivenInputEvents());
+    __perf("loadGlobalNodes", () => loadGlobalNodes());
+    __perf("loadTrussStyleLogic", () => loadTrussStyleLogic());
+    // Registers the section-bundle output nodes (SB/SC/SR part#s + descriptions,
+    // bundle heights/qtys, end caps, etc.) that feed the BOM. Must run after
+    // rw_init so addLogic/nodeset exist.
+    __perf("addSectionBundleDrivers (registers ~186 nodes)", () => addSectionBundleDrivers());
+    console.log(`[perf] total nodes registered: ${Object.keys(nodeset || {}).length}`);
     setTimeout(() => {
-        if (typeof getNode === "function" && nodeset?.["T_DOOR_MODEL"]) rw(getNode("T_DOOR_MODEL"));
+        if (typeof getNode === "function" && nodeset?.["T_DOOR_MODEL"]) {
+            __perf("initial rw(T_DOOR_MODEL) walk", () => rw(getNode("T_DOOR_MODEL")));
+        }
     }, 0);
+    // Part#/desc nodes only depend on DOOR_MODEL, so they compute once at load —
+    // before applyDefaults (async AJAX) settles the real model — and hold a stale
+    // value (e.g. SRU200C01 while the door is T150). Refresh them after defaults
+    // land. refreshAllBundleDescs is hoisted (function declaration) so it's callable here.
+    // Order matters: NUM_OF_SEC must be derived from the loaded HEIGHT (e.g. 5 for
+    // a 10'0" door) BEFORE bundles recompute, else resolveSectionHeights misses
+    // the chart (which is keyed by section count) and falls back to arithmetic
+    // (the wrong 15/18 instead of 5×24). renderNumOfSections sets NUM_OF_SEC.
+    const _settleBundles = () => {
+        // Force the dimension nodes to reflect the checked SIZE radio first. On
+        // load, HEIGHT/SIZE_HEIGHT can be left at the 7'(84") default because the
+        // SIZE node walk didn't propagate — so the chart lookup used the wrong
+        // height. Push SIZE then rw() the dimension leaves before deriving sections.
+        if (nodeset?.["SIZE"]) nodeset["SIZE"].value = $("input[name='SIZE']:checked").val();
+        ["SIZE_HEIGHT", "SIZE_WIDTH", "DOOR_WIDTH_FEET", "DOOR_WIDTH_INCHES", "DOOR_HEIGHT_FEET", "DOOR_HEIGHT_INCHES", "WIDTH", "HEIGHT"].forEach(id => {
+            if (typeof getNode === "function" && nodeset?.[id]) rw(getNode(id));
+        });
+        if (typeof renderNumOfSections === "function") renderNumOfSections();
+        if (typeof refreshAllBundleDescs === "function") refreshAllBundleDescs();
+    };
+    setTimeout(_settleBundles, 600);
+    setTimeout(_settleBundles, 1500);
     //loadTrussSchedule();
     //loadPriceDrivers();
   async function redrawCanvas() {
@@ -2169,6 +2206,9 @@ $(document).on("change", "input[name='DOOR_MODEL']", function() {
     renderEndCaps();
     redrawCanvas();
     if (typeof getNode === "function" && nodeset?.["T_DOOR_MODEL"]) rw(getNode("T_DOOR_MODEL"));
+    // Part#s/descs depend on DOOR_MODEL but aren't always reached by the model
+    // change-walk (e.g. after applyDefaults). Refresh them explicitly.
+    refreshAllBundleDescs();
 });
 
 // ===== [ENDCAPS-PER-MODEL] availability of single/double end caps by model + total width inches.
@@ -2298,20 +2338,35 @@ function getCurrentHeightFeet() {
 }
 
 function renderNumOfSections() {
-    const $select = $("#NUM_OF_SEC");
-    if (!$select.length) return;
+    const sel = document.getElementById("NUM_OF_SEC");
+    if (!sel) return;
 
     const hFt = getCurrentHeightFeet();
-    const allowed = HEIGHT_SECTIONS[hFt] || [4];
-    const previous = parseInt($select.val());
-    const selected = allowed.includes(previous) ? previous : allowed[0];
+    // Single source of truth: the stack chart's primary row decides the section
+    // count for this height (Thermatite has exactly one per height). Fall back to
+    // the HEIGHT_SECTIONS table only if the chart has no entry.
+    let allowed;
+    if (typeof getChartNumSections === "function") {
+        const n = getChartNumSections(hFt * 12);
+        allowed = n ? [n] : (HEIGHT_SECTIONS[hFt] || [4]);
+    } else {
+        allowed = HEIGHT_SECTIONS[hFt] || [4];
+    }
+    const selected = allowed[0];
 
-    $select.empty();
-    allowed.forEach(n => {
-        const sel = n === selected ? " selected" : "";
-        $select.append(`<option value="${n}"${sel}>${n}</option>`);
-    });
-    $select.val(selected).trigger("change");
+    // Rebuild options only if the allowed set actually changed. Manipulating the
+    // <select> (empty/append/val via jQuery) can emit native change/input events
+    // that the framework's NUM_OF_SEC binding catches → a SECOND full 186-node
+    // walk (the dispatch→rw seen in the profiler). Touch the raw DOM directly and
+    // never dispatch; sync the node value in code instead.
+    const current = Array.from(sel.options).map(o => Number(o.value));
+    const sameOptions = current.length === allowed.length && current.every((v, i) => v === allowed[i]);
+    if (!sameOptions) {
+        sel.innerHTML = allowed.map(n => `<option value="${n}">${n}</option>`).join("");
+    }
+    if (sel.value !== String(selected)) sel.value = String(selected);
+
+    if (nodeset?.["NUM_OF_SEC"]) nodeset["NUM_OF_SEC"].value = selected;
 }
 
 let _numOfSecTimer = null;
@@ -2319,10 +2374,27 @@ $(document).on("change", "#CUSTOM_HEIGHT_FEET, input[name='SIZE']", function() {
     if (_numOfSecTimer) clearTimeout(_numOfSecTimer);
     _numOfSecTimer = setTimeout(() => {
         _numOfSecTimer = null;
+        // Update the dimension leaf nodes for the CURRENT selection FIRST, then
+        // rebuild section count, then recompute bundles. Previously bundles were
+        // recomputed before WIDTH/HEIGHT settled (those update via the framework's
+        // own SIZE walk, which is also async), so the BOM lagged one selection
+        // behind. Pushing the leaves here makes the recompute read current values.
+        if (nodeset?.["SIZE"]) nodeset["SIZE"].value = $("input[name='SIZE']:checked").val();
+        ["SIZE_HEIGHT", "SIZE_WIDTH", "DOOR_WIDTH_FEET", "DOOR_WIDTH_INCHES", "DOOR_HEIGHT_FEET", "DOOR_HEIGHT_INCHES", "WIDTH", "HEIGHT"].forEach(id => {
+            if (typeof getNode === "function" && nodeset?.[id]) rw(getNode(id));
+        });
+        // NUM_OF_SEC must be current BEFORE recomputing bundles. renderNumOfSections
+        // derives it from the just-updated HEIGHT and writes the node value. The
+        // bundle recompute (via resolveSectionHeights, keyed on HEIGHT|NUM_OF_SEC)
+        // would otherwise read the previous selection's section count — the cause
+        // of the BOM being one selection behind until you clicked again.
         renderNumOfSections();
-        if (typeof CANVAS_PLUGIN?.redrawFromCurrentForm === "function") {
-            CANVAS_PLUGIN.redrawFromCurrentForm();
-        }
+        if (typeof invalidateSectionHeightsCache === "function") invalidateSectionHeightsCache();
+        if (typeof invalidateDescSegmentsCache === "function") invalidateDescSegmentsCache();
+        if (typeof refreshAllBundleDescs === "function") refreshAllBundleDescs();
+        // One canvas redraw. (The RENDER node isn't registered, so the canvas
+        // only updates via an explicit redraw — keep exactly one here.)
+        redrawCanvas();
     }, 80);
 });
 
@@ -2335,38 +2407,60 @@ $(document).on("change", "#NUM_OF_SEC", function() {
 
 $(document).on("change", "#custom_dimensions", function() {
     renderNumOfSections();
+    // renderNumOfSections() no longer fires the #NUM_OF_SEC change handler (it
+    // used to via .trigger("change"), which also redrew). Redraw explicitly here
+    // so toggling custom dimensions still refreshes the canvas.
+    if (typeof CANVAS_PLUGIN?.redrawFromCurrentForm === "function") {
+        CANVAS_PLUGIN.redrawFromCurrentForm();
+    }
 });
 
 setTimeout(() => { renderColorRow(); renderPatternRow(); renderNumOfSections(); }, 0);
 setTimeout(renderNumOfSections, 200);
 setTimeout(renderNumOfSections, 1000);
 
-$(document).on("click", "input[name='SIZE']", function() {
-    setState("SIZE", $(this).val());
-    ["SIZE_HEIGHT", "SIZE_WIDTH", "DOOR_WIDTH_FEET", "DOOR_WIDTH_INCHES", "DOOR_HEIGHT_FEET", "DOOR_HEIGHT_INCHES", "WIDTH", "HEIGHT"].forEach(id => {
-        if (typeof getNode === "function" && nodeset?.[id]) rw(getNode(id));
-    });
-    redrawCanvas();
-});
+// No custom SIZE click handler (LM-style): the SIZE radio's native `change`
+// fires the framework's SIZE node → one walk that recomputes the dimension and
+// bundle nodes. renderNumOfSections runs from the #CUSTOM_HEIGHT_FEET/SIZE change
+// handler above. Adding a manual rw()-per-node pass here ran the 186-node walk a
+// second/third time — the source of the multi-second lag.
 
 let _customDimsCascadeTimer = null;
 $(document).on("change", "#CUSTOM_WIDTH_FEET, #CUSTOM_WIDTH_INCHES, #CUSTOM_HEIGHT_FEET, #CUSTOM_HEIGHT_INCHES, #custom_dimensions", function() {
     if (_customDimsCascadeTimer) clearTimeout(_customDimsCascadeTimer);
     _customDimsCascadeTimer = setTimeout(() => {
         _customDimsCascadeTimer = null;
+        console.log("%c[CUSTOM-DIMS] change", "color:#06c;font-weight:bold");
+        const tAll = performance.now();
         // Push leaf values; framework's dep chain handles the section-bundle fan-out from there.
         ["DOOR_WIDTH_FEET", "DOOR_WIDTH_INCHES", "DOOR_HEIGHT_FEET", "DOOR_HEIGHT_INCHES"].forEach(id => {
-            if (typeof getNode === "function" && nodeset?.[id]) rw(getNode(id));
+            if (typeof getNode === "function" && nodeset?.[id]) {
+                __perf(`  CUSTOM rw(${id})`, () => rw(getNode(id)));
+            }
         });
-        if (typeof getNode === "function" && nodeset?.["WIDTH"]) rw(getNode("WIDTH"));
-        if (typeof getNode === "function" && nodeset?.["HEIGHT"]) rw(getNode("HEIGHT"));
-        redrawCanvas();
+        if (typeof getNode === "function" && nodeset?.["WIDTH"]) __perf("  CUSTOM rw(WIDTH)", () => rw(getNode("WIDTH")));
+        if (typeof getNode === "function" && nodeset?.["HEIGHT"]) __perf("  CUSTOM rw(HEIGHT)", () => rw(getNode("HEIGHT")));
+        renderNumOfSections();
+        if (typeof refreshAllBundleDescs === "function") __perf("  CUSTOM recomputeBundles", () => refreshAllBundleDescs());
+        __perf("  CUSTOM redrawCanvas", () => redrawCanvas());
+        console.log(`%c[CUSTOM-DIMS] total handler: ${(performance.now() - tAll).toFixed(1)}ms`, "color:#06c;font-weight:bold");
     }, 80);
 });
-// Refresh all bundle description fields (SB, SC, RP) when inputs that affect
-// their text values change. The framework's dep chain doesn't always catch
-// radio input attribute changes (SIZE/COLOR/Pattern), so we trigger explicitly.
+// Refresh all section-bundle outputs (descs + part#s). The bundle nodes are no
+// longer in the framework dependency graph (their edges were stripped to avoid
+// REACT_WILCOX's O(n²) walk blowing up), so they don't auto-update on input
+// change — recomputeSectionBundles() runs all of them once, cheaply.
 function refreshAllBundleDescs() {
+    // Clear both memo caches so the recompute reads CURRENT HEIGHT/NUM_OF_SEC and
+    // DOM fields — not a stale (previous-selection) memo. Without this the BOM
+    // showed the prior selection (or arithmetic fallback 15/18 on load).
+    if (typeof invalidateSectionHeightsCache === "function") invalidateSectionHeightsCache();
+    if (typeof invalidateDescSegmentsCache === "function") invalidateDescSegmentsCache();
+    if (typeof recomputeSectionBundles === "function") {
+        recomputeSectionBundles();
+        return;
+    }
+    // Fallback (shouldn't run): the old per-node rw() path.
     const descIds = [
         // SB descriptions
         "SB1_DESC", "SB2_DESC", "SB3_DESC", "SB4_DESC", "SB5_DESC",
@@ -2387,31 +2481,75 @@ function refreshAllBundleDescs() {
         "BUNDLE5_RP1_DESC", "BUNDLE6_RP1_DESC",
         "BUNDLE7_RP1_DESC", "BUNDLE8_RP1_DESC",
         "BUNDLE9_RP1_DESC",
+        // Part numbers (SB/SC/RP). These only list DOOR_MODEL as a dep, so they
+        // go stale when the visible model settles after applyDefaults without a
+        // model-change walk — refresh them here too.
+        "SB1_SPNUM", "SB2_SPNUM", "SB3_SPNUM", "SB4_SPNUM", "SB5_SPNUM",
+        "SB6_SPNUM", "SB7_SPNUM", "SB8_SPNUM", "SB9_SPNUM",
+        "BUNDLE1_SC1_SPNUM", "BUNDLE1_SC2_SPNUM",
+        "BUNDLE2_SC1_SPNUM", "BUNDLE2_SC2_SPNUM",
+        "BUNDLE3_SC1_SPNUM", "BUNDLE3_SC2_SPNUM",
+        "BUNDLE4_SC1_SPNUM", "BUNDLE4_SC2_SPNUM",
+        "BUNDLE5_SC1_SPNUM", "BUNDLE6_SC1_SPNUM",
+        "BUNDLE7_SC1_SPNUM", "BUNDLE8_SC1_SPNUM",
+        "BUNDLE9_SC1_SPNUM",
+        "BUNDLE1_RP1_SPNUM", "BUNDLE1_RP2_SPNUM",
+        "BUNDLE2_RP1_SPNUM", "BUNDLE2_RP2_SPNUM",
+        "BUNDLE3_RP1_SPNUM", "BUNDLE3_RP2_SPNUM",
+        "BUNDLE4_RP1_SPNUM", "BUNDLE4_RP2_SPNUM",
+        "BUNDLE5_RP1_SPNUM", "BUNDLE6_RP1_SPNUM",
+        "BUNDLE7_RP1_SPNUM", "BUNDLE8_RP1_SPNUM",
+        "BUNDLE9_RP1_SPNUM",
     ];
+    // Drop the per-walk shared-fields cache so this refresh reads current DOM.
+    if (typeof invalidateDescSegmentsCache === "function") invalidateDescSegmentsCache();
     descIds.forEach(id => {
         if (typeof getNode === "function" && nodeset?.[id]) rw(getNode(id));
     });
 }
 
-$(document).on("change", "input[name='Pattern']", function() {
-    redrawCanvas();
-    refreshAllBundleDescs();
-});
-$(document).on("change", "input[name='COLOR']", function() {
-    redrawCanvas();
-    refreshAllBundleDescs();
-});
-$(document).on("change", "input[name='SIZE']", function() {
-    refreshAllBundleDescs();
-});
-// Section-options (segment e) and end-caps (segment f) inputs feed the SB
-// descriptions but aren't on the framework dep chain, so refresh explicitly.
+// The description shared-fields cache (getSharedDescFields) must be invalidated
+// whenever any input feeding it changes; otherwise descriptions go stale. The
+// framework walk also recomputes desc nodes on dimension change, so invalidate
+// on the same set of inputs that feed segments b–d.
 $(document).on(
     "change",
-    "input[name='StepPlate'], input[name='ExhaustPortView'], input[name='ExhaustPortSize'], input[name='EndCaps']",
+    "input[name='SIZE'], input[name='COLOR'], input[name='Pattern'], input[name='DOOR_MODEL'], " +
+    "input[name='EndCaps'], [name='THIRD_REINFORCE'], #custom_dimensions, " +
+    "#CUSTOM_WIDTH_FEET, #CUSTOM_WIDTH_INCHES, #CUSTOM_HEIGHT_FEET, #CUSTOM_HEIGHT_INCHES, #NUM_OF_SEC",
     function() {
-        refreshAllBundleDescs();
+        if (typeof invalidateDescSegmentsCache === "function") invalidateDescSegmentsCache();
     }
+);
+
+// Pattern/COLOR feed the descriptions (segments c/d). Debounce + invalidate the
+// desc cache so rapid toggles (e.g. Multi Rib → Standard Rib) coalesce to ONE
+// recompute that reads the FINAL checked value. Previously the synchronous
+// recompute could run mid-toggle and leave a stale "MR" in the BOM.
+let _patternColorTimer = null;
+function _refreshDescsDebounced() {
+    if (typeof invalidateDescSegmentsCache === "function") invalidateDescSegmentsCache();
+    redrawCanvas();
+    if (_patternColorTimer) clearTimeout(_patternColorTimer);
+    _patternColorTimer = setTimeout(() => {
+        _patternColorTimer = null;
+        refreshAllBundleDescs();
+    }, 80);
+}
+$(document).on("change", "input[name='Pattern']", _refreshDescsDebounced);
+$(document).on("change", "input[name='COLOR']", _refreshDescsDebounced);
+// SIZE deliberately does NOT call refreshAllBundleDescs(): the descriptions
+// update through the framework dep chain (SIZE → WIDTH/HEIGHT → bundle nodes →
+// desc nodes), exactly like the custom-dimension inputs, which update smoothly
+// without it. Calling it here added ~35 redundant rw() walks per size click —
+// the work custom dims never did, which is why the radios lagged and they didn't.
+// Section-options (segment e), end-caps (segment f), and the truss-driven
+// THIRD_REINFORCE flag (segment c "-3") feed the descriptions but aren't on the
+// framework dep chain, so refresh explicitly when any of them change.
+$(document).on(
+    "change",
+    "input[name='StepPlate'], input[name='ExhaustPortView'], input[name='ExhaustPortSize'], input[name='EndCaps'], [name='THIRD_REINFORCE']",
+    _refreshDescsDebounced
 );
   
 function syncHardwareVisibility() {
@@ -2568,7 +2706,14 @@ $
     onUpdate = function (walk) {
         clearInterval(interval);
         interval = 0;
-        $("#CONFIGURE_BTN").attr("disabled", !isFormValid());
+        // Restore the button label after the loading animation (it overwrites the
+        // text to "Loading. . ." on each tick and never resets it otherwise).
+        loadingCount = 0;
+        loadingText = "Loading";
+        $("button[name=nextPageBtn]").text("Configure");
+        // No validation gating for now — keep Configure enabled so it always
+        // proceeds to the BOM. Re-enable the isFormValid() check here later.
+        $("#CONFIGURE_BTN").removeAttr("disabled");
         showErrorMessageIfError();
     };
   
@@ -3049,11 +3194,14 @@ $("#NAVIGATION_SPC").on("click", function() {
         }
     });
 
-    if ($("#INPUT_JSON").val() === "") applyDefaults();
-    else {
-        loadInputValues("configurator");
-
-        updateDoorSummary();
+    console.log(`%c[LOAD] loadForm synchronous body done @ ${performance.now().toFixed(0)}ms`, "color:#a60;font-weight:bold");
+    if ($("#INPUT_JSON").val() === "") {
+        console.log("[LOAD] no saved input → applyDefaults() (async AJAX + radio-click storm)");
+        __perf("applyDefaults (sync part)", () => applyDefaults());
+    } else {
+        console.log("[LOAD] saved input found → loadInputValues()");
+        __perf("loadInputValues", () => loadInputValues("configurator"));
+        __perf("updateDoorSummary", () => updateDoorSummary());
     }
 
     // After defaults/restored values are applied, re-sync conditional visibility so refreshed
@@ -3139,8 +3287,12 @@ function applyDefaults() {
                 };
                 if (!nodeset[node.id]) return;
                 if (nodeset[node.id].type === "RADIO_PARENT") {
-                    $(`input[type=radio][name="${node.id}"]`).removeAttr("checked");
-                    $(`input[type=radio][name="${node.id}"][value="${node.value}"]`).attr("checked", "");
+                    // Set BOTH the attribute and the live property. :checked reads
+                    // the property; setting only the attribute leaves the markup
+                    // default (e.g. T150) property-checked while the node value is
+                    // the saved default (e.g. U200C) — so part#s and descs disagree.
+                    $(`input[type=radio][name="${node.id}"]`).removeAttr("checked").prop("checked", false);
+                    $(`input[type=radio][name="${node.id}"][value="${node.value}"]`).attr("checked", "").prop("checked", true);
                 }
                 const input = $("#" + node.id);
                 nodeset[node.id].value = node.value;
@@ -3150,20 +3302,24 @@ function applyDefaults() {
             });
 
             if (!!defaultValues && defaultValues.length > 0) finalvalidation();
-            $("input[type=radio][checked]").click();
+            const $checkedRadios = $("input[type=radio][checked]");
+            console.log(`%c[LOAD] applyDefaults: clicking ${$checkedRadios.length} checked radios (each fires handlers + walks)`, "color:#a60;font-weight:bold");
+            if (typeof window.__perf === "function") {
+                window.__perf("applyDefaults radio-click storm", () => $checkedRadios.click());
+            } else {
+                $checkedRadios.click();
+            }
         })
         .fail((res) => {
             console.log(res);
         });
 }
 function buttonLogic() {
-    if (!isFormValid()) {
-        this.setAttribute("disabled", "true");
-        this.value = "Error";
-    } else {
-        this.removeAttribute("disabled");
-        this.value = "Done";
-    }
+    // TODO: re-enable validation gating once SPRING_SOLUTION / WEIGHT / price
+    // drivers are wired up. For now the Configure button is always enabled so it
+    // always proceeds to the BOM (nextPage()), with no conditions to meet.
+    this.removeAttribute("disabled");
+    this.value = "Done";
 }
 function isFormValid() {
     const springSolution = nodeset["SPRING_SOLUTION"]?.value;
@@ -3180,18 +3336,36 @@ function printError() {
         Object.values(nodeset).forEach((node) => (node.value + "").includes("ERROR") && console.log(node));
 }
 function additionalSaves(json) {
-    json.push({ id: "glazingobj", value: JSON.stringify(getGlazingObj()) });
-    json.push({ id: "weight", value: getCurrentDoorWeight() });
-    json.push({ id: "WINDOWS_LAYOUT", value: getNode("WINDOW_POSITION").getAttribute("desc") });
-    json.push({ id: "WINDOWS_OUTPUT", value: getNode("WINDOWS").getAttribute("desc") });
-    json.push({ id: "COLOUR_OUTPUT", value: getNode("COLOR").getAttribute("desc") });
-    json.push({ id: "DOOR_WIDTH_OUTPUT", value: getState("WIDTH") });
-    json.push({ id: "DOOR_HEIGHT_OUTPUT", value: getState("HEIGHT") });
-    json.push({ id: "price", value: getState("PRICE_DISPLAY") });
-    json.push({ id: "GLASS_TYPE_OUTPUT", value: getState("GLASS_TYPE_OUTPUT") });
-    json.push({
-        id: "SIZE_CODE",
-        value: `${getState("DOOR_WIDTH_FEET")}'${getState("DOOR_WIDTH_INCHES")}"x${getState("DOOR_HEIGHT_FEET")}'${getState("DOOR_HEIGHT_INCHES")}"`,
-    });
-    json.push({ id: "END_CAPS_OUTPUT", value: getState("END_CAPS") });
+    // The section-bundle nodes are recomputed on demand (they're out of the
+    // framework dep graph for perf). Make sure their values are current before
+    // the BOM is serialized for the host.
+    if (typeof recomputeSectionBundles === "function") recomputeSectionBundles();
+    // Each value is pushed defensively: glazing / weight / price controllers are
+    // still WIP (some functions/nodes may be undefined), and a single throw here
+    // would abort the whole save and hang nextPage(). pushSafe swallows failures
+    // and falls back to "", so Configure always reaches the BOM. Values fill in
+    // automatically as each controller is finished.
+    const pushSafe = (id, getValue) => {
+        let value = "";
+        try {
+            const v = getValue();
+            if (v !== undefined && v !== null) value = v;
+        } catch (e) {
+            console.warn(`additionalSaves: "${id}" skipped —`, e.message);
+        }
+        json.push({ id, value });
+    };
+
+    pushSafe("glazingobj", () => JSON.stringify(getGlazingObj()));
+    pushSafe("weight", () => getCurrentDoorWeight());
+    pushSafe("WINDOWS_LAYOUT", () => getNode("WINDOW_POSITION").getAttribute("desc"));
+    pushSafe("WINDOWS_OUTPUT", () => getNode("WINDOWS").getAttribute("desc"));
+    pushSafe("COLOUR_OUTPUT", () => getNode("COLOR").getAttribute("desc"));
+    pushSafe("DOOR_WIDTH_OUTPUT", () => getState("WIDTH"));
+    pushSafe("DOOR_HEIGHT_OUTPUT", () => getState("HEIGHT"));
+    pushSafe("price", () => getState("PRICE_DISPLAY"));
+    pushSafe("GLASS_TYPE_OUTPUT", () => getState("GLASS_TYPE_OUTPUT"));
+    pushSafe("SIZE_CODE", () =>
+        `${getState("DOOR_WIDTH_FEET")}'${getState("DOOR_WIDTH_INCHES")}"x${getState("DOOR_HEIGHT_FEET")}'${getState("DOOR_HEIGHT_INCHES")}"`);
+    pushSafe("END_CAPS_OUTPUT", () => getState("END_CAPS"));
 }

@@ -202,11 +202,17 @@ function getEndCapsData() {
 }
 
 //EasyWeb uses a fixed table to calculate section heights. This chart is provided here. 
+// Constant lookup table. Built once and cached — it was previously re-allocated
+// (a 33-key nested object, hundreds of sub-objects) on EVERY call, and it's
+// called many times per section-bundle walk via resolveSectionHeights. That
+// allocation churn drove GC pressure and made each rw() walk slower/variable.
+let _stackChartCache = null;
 function getStackChart() {
-  return {
+  if (_stackChartCache) return _stackChartCache;
+  _stackChartCache = {
     '72': [
       { num_sections: 3, top_section_height: 24, btm_section_height: 24, int1_rp1_height: 24 }, //6-0
-      { num_sections: 4, top_section_height: 18, btm_section_height: 18, int1_rp1_height: 18, int1_rp2_height: 18 }, //6-0   
+      { num_sections: 4, top_section_height: 18, btm_section_height: 18, int1_rp1_height: 18, int1_rp2_height: 18 }, //6-0
     ],
 
     '75': [
@@ -331,5 +337,6 @@ function getStackChart() {
       { num_sections: 8, top_section_height: 21, btm_section_height: 21, int1_rp1_height: 21, int1_rp2_height: 21, int2_rp1_height: 21, int2_rp2_height: 21, int3_rp1_height: 21, int3_rp2_height: 21 }, //14-0 optional      
       { num_sections: 9, top_section_height: 21, btm_section_height: 21, int1_rp1_height: 18, int1_rp2_height: 18, int2_rp1_height: 18, int2_rp2_height: 18, int3_rp1_height: 18, int3_rp2_height: 18, int4_rp1_height: 18 } //14-0 optional
     ]
-  }
+  };
+  return _stackChartCache;
 }

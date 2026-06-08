@@ -78,119 +78,160 @@
    ========================================================================= */
 
 // [WIDTH-LIMITS]
+// Values from data/ThermatiteV2_Size_Limits(*).csv. All CSV max widths are
+// X'-2", so every entry caps inches at 2 (maxInches: 2) at its max foot.
+// Buckets: "2"/"3" = Complete Door (HW2/HW3); face_only_* = Door Face Only
+// (same for both HW sizes per the CSV); hw_only_* = Hardware Only (HW2/HW3).
 const MODEL_WIDTH_LIMITS = {
+  // Complete Door — HW Size 2
   "2": {
-    "T150":    { min: 4, max: 24 },
-    "T175":    { min: 4, max: 19 },
-    "T200":    { min: 4, max: 19 },
-    "T300":    { min: 4, max: 19 },
-    "T200-20": { min: 4, max: 19 },
-    "T200C":   { min: 4, max: 20 },
-    "U200C":   { min: 4, max: 20 },
-    "T150U":   { min: 4, max: 20 },
-    "T175U":   { min: 4, max: 20 },
-    "T200U":   { min: 4, max: 20 },
+    "T150":    { min: 4, max: 24, maxInches: 2 },
+    "T175":    { min: 4, max: 19, maxInches: 2 },
+    "T200":    { min: 4, max: 19, maxInches: 2 },
+    "T300":    { min: 4, max: 19, maxInches: 2 },
+    "T200-20": { min: 4, max: 19, maxInches: 2 },
+    "T200C":   { min: 4, max: 20, maxInches: 2 },
+    "U200C":   { min: 4, max: 20, maxInches: 2 },
+    "T150U":   { min: 4, max: 20, maxInches: 2 },
+    "T175U":   { min: 4, max: 20, maxInches: 2 },
+    "T200U":   { min: 4, max: 20, maxInches: 2 },
   },
+  // Complete Door — HW Size 3
   "3": {
-    "T150":    { min: 4, max: 24 },
-    "T175":    { min: 4, max: 38 },
-    "T200":    { min: 4, max: 38 },
-    "T300":    { min: 4, max: 38 },
-    "T200-20": { min: 4, max: 38 },
-    "T200C":   { min: 4, max: 32 },
-    "U200C":   { min: 4, max: 32 },
-    "T150U":   { min: 4, max: 20 },
-    "T175U":   { min: 4, max: 38 },
-    "T200U":   { min: 4, max: 38 },
+    "T150":    { min: 4, max: 24, maxInches: 2 },
+    "T175":    { min: 4, max: 38, maxInches: 2 },
+    "T200":    { min: 4, max: 38, maxInches: 2 },
+    "T300":    { min: 4, max: 38, maxInches: 2 },
+    "T200-20": { min: 4, max: 38, maxInches: 2 },
+    "T200C":   { min: 4, max: 32, maxInches: 2 },
+    "U200C":   { min: 4, max: 32, maxInches: 2 },
+    "T150U":   { min: 4, max: 20, maxInches: 2 },
+    "T175U":   { min: 4, max: 38, maxInches: 2 },
+    "T200U":   { min: 4, max: 38, maxInches: 2 },
   },
+  // Door Face Only — same limits for HW2 and HW3 (CSV has no HW Size column)
+  "face_only_2": {
+    "T150":    { min: 4, max: 24, maxInches: 2 },
+    "T175":    { min: 4, max: 38, maxInches: 2 },
+    "T200":    { min: 4, max: 38, maxInches: 2 },
+    "T300":    { min: 4, max: 38, maxInches: 2 },
+    "T200-20": { min: 4, max: 38, maxInches: 2 },
+    "T200C":   { min: 4, max: 32, maxInches: 2 },
+    "U200C":   { min: 4, max: 32, maxInches: 2 },
+    "T150U":   { min: 4, max: 20, maxInches: 2 },
+    "T175U":   { min: 4, max: 38, maxInches: 2 },
+    "T200U":   { min: 4, max: 38, maxInches: 2 },
+  },
+  // Hardware Only — HW Size 2
   "hw_only_2": {
-    "T150":    { min: 4, max: 24 },
-    "T175":    { min: 4, max: 20 },
-    "T200":    { min: 4, max: 20 },
-    "T300":    { min: 4, max: 20 },
-    "T200-20": { min: 4, max: 20 },
-    "T200C":   { min: 4, max: 20 },
-    "U200C":   { min: 4, max: 20 },
-    "T150U":   { min: 4, max: 20 },
-    "T175U":   { min: 4, max: 20 },
-    "T200U":   { min: 4, max: 20 },
+    "T150":    { min: 4, max: 24, maxInches: 2 },
+    "T175":    { min: 4, max: 20, maxInches: 2 },
+    "T200":    { min: 4, max: 20, maxInches: 2 },
+    "T300":    { min: 4, max: 20, maxInches: 2 },
+    "T200-20": { min: 4, max: 38, maxInches: 2 },
+    "T200C":   { min: 4, max: 20, maxInches: 2 },
+    "U200C":   { min: 4, max: 20, maxInches: 2 },
+    "T150U":   { min: 4, max: 20, maxInches: 2 },
+    "T175U":   { min: 4, max: 20, maxInches: 2 },
+    "T200U":   { min: 4, max: 20, maxInches: 2 },
+  },
+  // Hardware Only — HW Size 3
+  "hw_only_3": {
+    "T150":    { min: 4, max: 24, maxInches: 2 },
+    "T175":    { min: 4, max: 38, maxInches: 2 },
+    "T200":    { min: 4, max: 38, maxInches: 2 },
+    "T300":    { min: 4, max: 38, maxInches: 2 },
+    "T200-20": { min: 4, max: 38, maxInches: 2 },
+    "T200C":   { min: 4, max: 32, maxInches: 2 },
+    "U200C":   { min: 4, max: 32, maxInches: 2 },
+    "T150U":   { min: 4, max: 20, maxInches: 2 },
+    "T175U":   { min: 4, max: 38, maxInches: 2 },
+    "T200U":   { min: 4, max: 38, maxInches: 2 },
   },
 };
 
 // [HEIGHT-LIMITS]
-// Rule: 32' max for all models except T150 (16/18) and T150U (18/22).
+// Values from data/ThermatiteV2_Size_Limits(*).csv. All CSV max heights are
+// X'-0", so every entry caps inches at 0 (maxInches: 0) at its max foot.
+// Keys are doorOption_hwSize: complete_* / face_* / hw_*. Door Face Only has no
+// HW Size column in the CSV, so face_2 and face_3 share the same values.
 const MODEL_HEIGHT_LIMITS = {
+  // Complete Door — HW Size 2
   "complete_2": {
-    "T150":    { min: 4, max: 16 },
-    "T175":    { min: 4, max: 32 },
-    "T200":    { min: 4, max: 32 },
-    "T300":    { min: 4, max: 32 },
-    "T200-20": { min: 4, max: 32 },
-    "T200C":   { min: 4, max: 32 },
-    "T150U":   { min: 4, max: 32 },
-    "T175U":   { min: 4, max: 32 },
-    "T200U":   { min: 4, max: 32 },
-    "U200C":   { min: 4, max: 32 },
+    "T150":    { min: 4, max: 18, maxInches: 0 },
+    "T175":    { min: 4, max: 32, maxInches: 0 },
+    "T200":    { min: 4, max: 32, maxInches: 0 },
+    "T300":    { min: 4, max: 32, maxInches: 0 },
+    "T200-20": { min: 4, max: 32, maxInches: 0 },
+    "T200C":   { min: 4, max: 32, maxInches: 0 },
+    "T150U":   { min: 4, max: 32, maxInches: 0 },
+    "T175U":   { min: 4, max: 18, maxInches: 0 },
+    "T200U":   { min: 4, max: 32, maxInches: 0 },
+    "U200C":   { min: 4, max: 32, maxInches: 0 },
   },
+  // Complete Door — HW Size 3
   "complete_3": {
-    "T150":    { min: 4, max: 18 },
-    "T175":    { min: 4, max: 32 },
-    "T200":    { min: 4, max: 32 },
-    "T300":    { min: 4, max: 32 },
-    "T200-20": { min: 4, max: 32 },
-    "T200C":   { min: 4, max: 32 },
-    "T150U":   { min: 4, max: 32 },
-    "T175U":   { min: 4, max: 32 },
-    "T200U":   { min: 4, max: 32 },
-    "U200C":   { min: 4, max: 32 },
+    "T150":    { min: 4, max: 18, maxInches: 0 },
+    "T175":    { min: 4, max: 32, maxInches: 0 },
+    "T200":    { min: 4, max: 32, maxInches: 0 },
+    "T300":    { min: 4, max: 32, maxInches: 0 },
+    "T200-20": { min: 4, max: 32, maxInches: 0 },
+    "T200C":   { min: 4, max: 32, maxInches: 0 },
+    "T150U":   { min: 4, max: 32, maxInches: 0 },
+    "T175U":   { min: 4, max: 32, maxInches: 0 },
+    "T200U":   { min: 4, max: 32, maxInches: 0 },
+    "U200C":   { min: 4, max: 32, maxInches: 0 },
   },
+  // Door Face Only — same limits for HW2 and HW3 (CSV has no HW Size column)
   "face_2": {
-    "T150":    { min: 4, max: 16 },
-    "T175":    { min: 4, max: 32 },
-    "T200":    { min: 4, max: 32 },
-    "T300":    { min: 4, max: 32 },
-    "T200-20": { min: 4, max: 32 },
-    "T200C":   { min: 4, max: 32 },
-    "T150U":   { min: 4, max: 18 },
-    "T175U":   { min: 4, max: 32 },
-    "T200U":   { min: 4, max: 32 },
-    "U200C":   { min: 4, max: 32 },
+    "T150":    { min: 4, max: 18, maxInches: 0 },
+    "T175":    { min: 4, max: 32, maxInches: 0 },
+    "T200":    { min: 4, max: 32, maxInches: 0 },
+    "T300":    { min: 4, max: 32, maxInches: 0 },
+    "T200-20": { min: 4, max: 32, maxInches: 0 },
+    "T200C":   { min: 4, max: 32, maxInches: 0 },
+    "T150U":   { min: 4, max: 18, maxInches: 0 },
+    "T175U":   { min: 4, max: 32, maxInches: 0 },
+    "T200U":   { min: 4, max: 32, maxInches: 0 },
+    "U200C":   { min: 4, max: 32, maxInches: 0 },
   },
   "face_3": {
-    "T150":    { min: 4, max: 18 },
-    "T175":    { min: 4, max: 32 },
-    "T200":    { min: 4, max: 32 },
-    "T300":    { min: 4, max: 32 },
-    "T200-20": { min: 4, max: 32 },
-    "T200C":   { min: 4, max: 32 },
-    "T150U":   { min: 4, max: 22 },
-    "T175U":   { min: 4, max: 32 },
-    "T200U":   { min: 4, max: 32 },
-    "U200C":   { min: 4, max: 32 },
+    "T150":    { min: 4, max: 18, maxInches: 0 },
+    "T175":    { min: 4, max: 32, maxInches: 0 },
+    "T200":    { min: 4, max: 32, maxInches: 0 },
+    "T300":    { min: 4, max: 32, maxInches: 0 },
+    "T200-20": { min: 4, max: 32, maxInches: 0 },
+    "T200C":   { min: 4, max: 32, maxInches: 0 },
+    "T150U":   { min: 4, max: 18, maxInches: 0 },
+    "T175U":   { min: 4, max: 32, maxInches: 0 },
+    "T200U":   { min: 4, max: 32, maxInches: 0 },
+    "U200C":   { min: 4, max: 32, maxInches: 0 },
   },
+  // Hardware Only — HW Size 2
   "hw_2": {
-    "T150":    { min: 4, max: 16 },
-    "T175":    { min: 4, max: 32 },
-    "T200":    { min: 4, max: 32 },
-    "T300":    { min: 4, max: 32 },
-    "T200-20": { min: 4, max: 32 },
-    "T200C":   { min: 4, max: 32 },
-    "T150U":   { min: 4, max: 18 },
-    "T175U":   { min: 4, max: 32 },
-    "T200U":   { min: 4, max: 32 },
-    "U200C":   { min: 4, max: 32 },
+    "T150":    { min: 4, max: 16, maxInches: 0 },
+    "T175":    { min: 4, max: 32, maxInches: 0 },
+    "T200":    { min: 4, max: 32, maxInches: 0 },
+    "T300":    { min: 4, max: 32, maxInches: 0 },
+    "T200-20": { min: 4, max: 32, maxInches: 0 },
+    "T200C":   { min: 4, max: 32, maxInches: 0 },
+    "T150U":   { min: 4, max: 16, maxInches: 0 },
+    "T175U":   { min: 4, max: 32, maxInches: 0 },
+    "T200U":   { min: 4, max: 32, maxInches: 0 },
+    "U200C":   { min: 4, max: 32, maxInches: 0 },
   },
+  // Hardware Only — HW Size 3
   "hw_3": {
-    "T150":    { min: 4, max: 18 },
-    "T175":    { min: 4, max: 32 },
-    "T200":    { min: 4, max: 32 },
-    "T300":    { min: 4, max: 32 },
-    "T200-20": { min: 4, max: 32 },
-    "T200C":   { min: 4, max: 32 },
-    "T150U":   { min: 4, max: 22 },
-    "T175U":   { min: 4, max: 32 },
-    "T200U":   { min: 4, max: 32 },
-    "U200C":   { min: 4, max: 32 },
+    "T150":    { min: 4, max: 16, maxInches: 0 },
+    "T175":    { min: 4, max: 32, maxInches: 0 },
+    "T200":    { min: 4, max: 32, maxInches: 0 },
+    "T300":    { min: 4, max: 32, maxInches: 0 },
+    "T200-20": { min: 4, max: 32, maxInches: 0 },
+    "T200C":   { min: 4, max: 32, maxInches: 0 },
+    "T150U":   { min: 4, max: 32, maxInches: 0 },
+    "T175U":   { min: 4, max: 32, maxInches: 0 },
+    "T200U":   { min: 4, max: 32, maxInches: 0 },
+    "U200C":   { min: 4, max: 32, maxInches: 0 },
   },
 };
 
@@ -205,19 +246,16 @@ function getSelections() {
 
 // [WIDTH-CONSTRAINT]
 function applyWidthConstraint(model, hwSize, doorOptions) {
+  // doorOptions: "1" = Door Face Only, "2" = Hardware Only, else Complete Door.
+  // Face Only width limits are identical for HW2/HW3 (one CSV, no HW column),
+  // so both map to the single face_only_2 bucket.
   let effectiveKey;
-  if (doorOptions === "1" && hwSize === "2") {
+  if (doorOptions === "1") {
     effectiveKey = "face_only_2";
-  } else if (doorOptions === "1" && hwSize === "3") {
-    effectiveKey = "face_only_3";
-  } else if (doorOptions === "1") {
-    effectiveKey = "3";
-  } else if (doorOptions === "2" && hwSize === "2") {
-    effectiveKey = "hw_only_2";
-  } else if (doorOptions === "2" && hwSize === "3") {
-    effectiveKey = "hw_only_3";
+  } else if (doorOptions === "2") {
+    effectiveKey = hwSize === "3" ? "hw_only_3" : "hw_only_2";
   } else {
-    effectiveKey = hwSize;
+    effectiveKey = hwSize === "3" ? "3" : "2";
   }
   const hwLimits = MODEL_WIDTH_LIMITS[effectiveKey] ?? MODEL_WIDTH_LIMITS["2"];
   const limits = hwLimits[model] ?? { min: 4, max: 22 };
@@ -705,6 +743,39 @@ function loadDrivenInputEvents() {
 
   $(document).on("change", "input[name='EndCaps']", apply12GaHingesConstraint);
   apply12GaHingesConstraint();
+
+  // [THIRD-REINFORCE-LOGIC] Third Reinforce is driven by the selected Truss
+  // Style, not the user: it is "Yes" only when the truss style is exactly
+  // HatTruss (dropdown value "0.049 Hat Truss"), "No" for every other style.
+  // The "-3" in section/component/raw-panel descriptions keys off this (see
+  // hasThirdReinforcing() in section_bundles.js).
+  const THIRD_REINFORCE_TRUSS_VALUE = "0.049 Hat Truss";
+  function applyThirdReinforceConstraint() {
+    const $sel = $("[name='THIRD_REINFORCE']");
+    if (!$sel.length) return;
+    // Truss-driven only: the user must not be able to change it. Disable the
+    // select so it's read-only (the value is still submitted/readable).
+    $sel.prop("disabled", true);
+    const trussStyle = $("#TRUSS_STYLE").val();
+    const value = trussStyle === THIRD_REINFORCE_TRUSS_VALUE ? "Yes" : "No";
+    if ($sel.val() !== value) {
+      $sel.val(value).trigger("change");
+    }
+  }
+  // Re-run on direct TRUSS_STYLE change and on the axes that re-render the
+  // TRUSS_STYLE options (which can change the selection). The 120ms delay lets
+  // truss_style_logic.js's debounced (80ms) re-render settle first.
+  $(document).on(
+    "change",
+    "#TRUSS_STYLE, input[name='DOOR_MODEL'], input[name='WindLoad'], input[name='SIZE'], #NUM_OF_SEC, #CUSTOM_WIDTH_FEET, #CUSTOM_WIDTH_INCHES, #CUSTOM_HEIGHT_FEET, #CUSTOM_HEIGHT_INCHES, #custom_dimensions",
+    function () {
+      setTimeout(applyThirdReinforceConstraint, 120);
+    }
+  );
+  // Initial passes — repeated because the framework may render the
+  // THIRD_REINFORCE select after our init runs; each pass also (re)disables it.
+  setTimeout(applyThirdReinforceConstraint, 200);
+  setTimeout(applyThirdReinforceConstraint, 1000);
 
   // [ROLLER-STYLE-LOGIC]
   // HW Size 2: Steel, Nylon, Nylon w/ sealed bearing
