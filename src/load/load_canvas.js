@@ -387,15 +387,13 @@ const CANVAS_PLUGIN = {
     //const windowLinearGradientFill = ctx.createLinearGradient();
 
     switch (glazing.material) {
-      case "clear":
+      case "lites":
+      case "polytite_fullview":
+      case "alumatite_fullview":
+        // Glazed styles draw as clear glass on the preview.
         ctx.fillStyle = "#ADD8E6";
         break;
-      case "black_satin":
-        ctx.fillStyle = "#D3D3D3";
-        break;
-      case "tinted_grey":
-        ctx.fillStyle = "#B0C4DE";
-        break;
+      case "none":
       default:
         ctx.fillStyle = "white";
     }
@@ -954,7 +952,7 @@ const CANVAS_PLUGIN = {
       background: { pattern, color },
       glazing: {
         width: 0, height: 0, numLites: 0,
-        material: "clear", spacing: "center",
+        material: "none", spacing: "center",
         distanceFromEdge: 5, frameColor: "black", liteType: ""
       },
       misc: { labels: true }

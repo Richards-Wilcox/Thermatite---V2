@@ -36,11 +36,11 @@ function loadJDENodes(){
     this.value = getNode("WINDOWS").getAttribute("desc")
   }, ["WINDOWS"])
   addLogic("GL_GLAZING_TYPE", function(){
-    this.value = getState("WINDOWS") === 'slim_40' ? getNode("GLAZING_TYPE").getAttribute("desc") : 'None'
-  }, ['WINDOWS', "GLAZING_TYPE"])
+    this.value = getState("GLAZING_TYPE") !== 'none' ? getNode("GLAZING_TYPE").getAttribute("desc") : 'None'
+  }, ["GLAZING_TYPE"])
   addLogic("GL_NUMBER_OF_LITES", function(){
-    this.value = getState("WINDOWS") === 'none' ? 0 : getState("WINDOWS_LAYOUT") ==='both' ? 8:4
-  }, ['WINDOWS', 'WINDOWS_LAYOUT'])
+    this.value = getState("GLAZING_TYPE") === 'none' ? 0 : getState("WINDOWS_LAYOUT") ==='both' ? 8:4
+  }, ['GLAZING_TYPE', 'WINDOWS_LAYOUT'])
   addLogic("GL_HARDWARE_SIZE", function(){
     this.value = getState("HARDWARE_SZ") ?? 2
   }, ["HARDWARE_SZ"])

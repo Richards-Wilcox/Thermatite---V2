@@ -80,15 +80,9 @@ function addSectionBundleDrivers() {
         "NUM_OF_SEC"
     ];
 
-    addLogic("YLINE_DESC", function () {
-        const doorType = "DF"
-        let color = getState("COLOR").desc;
-        let doorModel = getNode("DOOR_MODEL").getAttribute("desc")
-        let panelStyle = getNode("FACE").getAttribute("desc");
-        let num_of_sec = getState("NUM_OF_SEC");
-
-        this.value = `${doorType} ${getState("DOOR_WIDTH_FEET")}-0x${getState("DOOR_HEIGHT_FEET")}-0(${num_of_sec}) ${doorModel} ${color} ${panelStyle}`
-    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "DOOR_MODEL", "COLOR", "customSwitch", "FACE"])
+    addLogic("Y_LINE_DESC", function () {
+        this.value = buildDoorFaceDescription();
+    }, ["WIDTH", DIMENSION_DEPS, "HEIGHT", "DOOR_MODEL", "COLOR", "customSwitch", "FACE", "Pattern", "StepPlate", "ExhaustPortView", "ExhaustPortSize", "EndCaps"])
 
 
     addLogic("T_DOOR_MODEL", function () {
@@ -1106,6 +1100,18 @@ function addSectionBundleDrivers() {
         this.value = ((Number(width) / 12) + 0.5)
     }, ["WIDTH"])
 
+    // Mirror the currently selected Bottom Seal (radio name="BottomSeal") as
+    // display text. Values: none / pvc_4_35c / santoprene_3_60c (load_html.js).
+    addLogic("BTM_SEAL", function () {
+        const seal = getState("BottomSeal");
+        const labels = {
+            none: "",
+            pvc_4_35c: '4" PVC Bottom Seal (-35C)',
+            santoprene_3_60c: '3" Santoprene Bottom Seal (-60C)',
+        };
+        this.value = labels[seal] || "";
+    }, ["BottomSeal"])
+
     addLogic("BTM_RETAINER_SCREW_QTY", function () {
         let width_feet = getState("DOOR_WIDTH_FEET");
 
@@ -1155,6 +1161,35 @@ function addSectionBundleDrivers() {
         const BUNDLE1_SC2_HEIGHT = getState("BUNDLE1_SC2_HEIGHT");
         this.value = getEndCapsPartNum(BUNDLE1_SC2_HEIGHT, door_model, end_caps);
 
+    }, ["BUNDLE1_SC2_HEIGHT", "DOOR_MODEL", "EndCaps"])
+
+    //Thermatite End Caps — LH (Bundle 1)
+    addLogic("BUNDLE1_SC1_END_CAPS_LH_SPNUM", function () {
+        const end_caps = getState("EndCaps");
+        const door_model = getState("DOOR_MODEL");
+        const height = getState("BUNDLE1_SC1_HEIGHT");
+        this.value = getThermatiteEndCap(door_model, end_caps, "LH", height).spnum;
+    }, ["BUNDLE1_SC1_HEIGHT", "DOOR_MODEL", "EndCaps"])
+
+    addLogic("BUNDLE1_SC1_END_CAPS_LH_DESC", function () {
+        const end_caps = getState("EndCaps");
+        const door_model = getState("DOOR_MODEL");
+        const height = getState("BUNDLE1_SC1_HEIGHT");
+        this.value = getThermatiteEndCap(door_model, end_caps, "LH", height).desc;
+    }, ["BUNDLE1_SC1_HEIGHT", "DOOR_MODEL", "EndCaps"])
+
+    addLogic("BUNDLE1_SC2_END_CAPS_LH_SPNUM", function () {
+        const end_caps = getState("EndCaps");
+        const door_model = getState("DOOR_MODEL");
+        const height = getState("BUNDLE1_SC2_HEIGHT");
+        this.value = getThermatiteEndCap(door_model, end_caps, "LH", height).spnum;
+    }, ["BUNDLE1_SC2_HEIGHT", "DOOR_MODEL", "EndCaps"])
+
+    addLogic("BUNDLE1_SC2_END_CAPS_LH_DESC", function () {
+        const end_caps = getState("EndCaps");
+        const door_model = getState("DOOR_MODEL");
+        const height = getState("BUNDLE1_SC2_HEIGHT");
+        this.value = getThermatiteEndCap(door_model, end_caps, "LH", height).desc;
     }, ["BUNDLE1_SC2_HEIGHT", "DOOR_MODEL", "EndCaps"])
 
     //Bundle 2
@@ -1357,6 +1392,46 @@ function getEndCapsPartNum(section_height, door_model, end_caps) {
     //const capKey = end_caps === "N" ? "N" : "Y";
     // console.log("end caps part$", partNumbers[door_model]?.[end_caps]?.[section_height]);
     return partNumbers[door_model]?.[end_caps]?.[section_height] || null;
+}
+
+// Thermatite end caps. Galvanized is the only finish; single vs double comes
+// from the EndCaps radio ("0" = single, "1" = double — see ENDCAPS_0/_1 in
+// load_html.js). Each cap is handed (LH/RH). Only the 21" and 24" panels exist.
+// Part numbers group by base model — the U-variants and T200-20 reuse their
+// base model's number — but the DESC must print the ORIGINAL model string
+// (e.g. "T200-20", "U200C").
+function getThermatiteEndCap(model, end_caps, hand, height) {
+    // "0" = single, "1" = double
+    const partNumbers = {
+        T150:  { "0": { LH: { 21: '426-0901', 24: '426-0903' }, RH: { 21: '426-0902', 24: '426-0904' } },
+                 "1": { LH: { 21: '426-0905', 24: '426-0907' }, RH: { 21: '426-0906', 24: '426-0908' } } },
+        T175:  { "0": { LH: { 21: '426-0911', 24: '426-0913' }, RH: { 21: '426-0912', 24: '426-0914' } },
+                 "1": { LH: { 21: '426-0915', 24: '426-0917' }, RH: { 21: '426-0916', 24: '426-0918' } } },
+        T200:  { "0": { LH: { 21: '426-0921', 24: '426-0923' }, RH: { 21: '426-0922', 24: '426-0924' } },
+                 "1": { LH: { 21: '426-0925', 24: '426-0927' }, RH: { 21: '426-0926', 24: '426-0928' } } },
+        T300:  { "0": { LH: { 21: '426-0931', 24: '426-0933' }, RH: { 21: '426-0932', 24: '426-0934' } },
+                 "1": { LH: { 21: '426-0935', 24: '426-0937' }, RH: { 21: '426-0936', 24: '426-0938' } } },
+        T200C: { "0": { LH: { 21: '426-0842', 24: '426-0844' }, RH: { 21: '426-0843', 24: '426-0845' } },
+                 "1": { LH: { 21: '426-0852', 24: '426-0854' }, RH: { 21: '426-0853', 24: '426-0855' } } },
+    };
+
+    // U-variants and T200-20 share their base model's part numbers.
+    const baseModelByModel = {
+        T150: 'T150', T150U: 'T150',
+        T175: 'T175', T175U: 'T175',
+        T200: 'T200', 'T200-20': 'T200', T200U: 'T200',
+        T300: 'T300',
+        T200C: 'T200C', U200C: 'T200C',
+    };
+
+    const baseModel = baseModelByModel[model];
+    const spnum = partNumbers[baseModel]?.[end_caps]?.[hand]?.[height] || null;
+
+    if (!spnum) return { spnum: 'None', desc: '' };
+
+    const dbl = end_caps === '1' ? 'Dbl ' : '';
+    const desc = `${height}" Galv ${dbl}End Cap ${hand} ${model}`;
+    return { spnum, desc };
 }
 
 function getSectionHeight(height, num_of_sec) {
@@ -1956,8 +2031,10 @@ function buildSCDescription(height, qty) {
 }
 
 //function to get the desc of raw panel
-// SR <segments b–d> [e] [f] — raw panel, the leaf of the SB -> SC -> SR tree.
-// Same segment logic as SC, again with no bundle-type prefix (just the "SR" tag).
+// SR <segments b–d> <g> — raw panel, the leaf of the SB -> SC -> SR tree.
+// Reuses the shared b–d block (size / model-pattern / colour) and adds segment g
+// (the RP run length). Unlike SB/SC, the raw panel carries NO section-options (e)
+// or end-caps (f) segments.
 function buildRPDescription(height, qty, isBundleIndex = 0, bundleIndex = 0) {
 
     if (qty <= 0) return "";
@@ -1965,9 +2042,22 @@ function buildRPDescription(height, qty, isBundleIndex = 0, bundleIndex = 0) {
     return assembleDesc([
         "SR",
         buildDescSegmentsBCD(height),     // b c d
-        buildSectionOptionsText(),        // e (conditional)
-        buildEndCapsText(),               // f (conditional)
+        buildRPRunLength(),               // g
     ]);
+}
+
+// SR-description segment g: raw panel (RP) run length in inches = finished
+// section width less 0.375". WIDTH holds the whole-inch width (feet*12 + inches);
+// the fractional inch lives separately in DOOR_WIDTH_FRACTION (a decimal, 1/8 ->
+// 0.125) so it doesn't perturb the ~15 other WIDTH consumers. g therefore is
+// WIDTH + fraction - 0.375. Printed at exact precision, no forced decimals, no
+// unit: 10'-2 1/8" -> 122 + 0.125 - 0.375 = "121.75"; whole-inch 20'-2" -> 242 +
+// 0 - 0.375 = "241.625".
+function buildRPRunLength() {
+    const width = Number(safeState("WIDTH")) || 0;
+    if (width <= 0) return "";
+    const fraction = Number(safeState("DOOR_WIDTH_FRACTION")) || 0;
+    return String(width + fraction - 0.375);
 }
 
 //function to get the raw panel base part#
@@ -2053,6 +2143,83 @@ function buildSectionOptionsText() {
 // EndCaps radio value "1" = double.
 function buildEndCapsText() {
     return $("input[name='EndCaps']:checked").val() === "1" ? "DE" : "";
+}
+
+// ---------------------------------------------------------------------------
+// Door Face (Y-line) description helpers
+// ---------------------------------------------------------------------------
+
+// Door-face segment a: door-type tag. "GF" (glazed face) when any glazing /
+// lites / full-view section is present, otherwise "DF" (door face). Glazing is
+// not implemented yet, so hasGlazing() is a stub returning false (always "DF").
+// Flip it to read the real glazing input(s) when glazing ships.
+function hasGlazing() {
+    // "GF" (glazed face) when any glazing option is selected — Lites or a
+    // full-view section. GLAZING_TYPE is the visible picker (none / lites /
+    // polytite_fullview / alumatite_fullview); anything but "none" counts as
+    // glazed. Read the checked radio directly (DOM is the source of truth here,
+    // matching how the other segment helpers read StepPlate/EndCaps/etc.).
+    const glazing = $("input[name='GLAZING_TYPE']:checked").val() || "none";
+    return glazing !== "none";
+}
+
+function buildDoorTypeText() {
+    return hasGlazing() ? "GF" : "DF";
+}
+
+// Door-face segment b: door SIZE = width(ft)-width(in)[.frac] x height(ft)-height(in).
+//   - Width feet padded to a leading zero when < 10 (08, 09, 10, 20...).
+//   - Width inches carries a fractional decimal ONLY when fraction <> 0: the
+//     inch + fraction is rounded to 2 decimals incl. the period (10-2 1/8" ->
+//     "2.13"). Whole-inch widths show just the integer ("2"). Fraction isn't
+//     offered yet but DOOR_WIDTH_FRACTION already feeds it (see the SR run length).
+//   - Height feet/inches are shown as feet-inches (NOT total inches like the SB
+//     section size), e.g. "12-0".
+// Unlike the SB/SC/SR section size, this is the whole-DOOR size.
+function buildDoorFaceSize() {
+    // Read width/height straight from the DOM, the same way the working SB size
+    // (getSharedDescFields) does: CUSTOM_* selects when custom is on, otherwise the
+    // checked SIZE radio's own width/widthInches/height/heightInches attrs. Don't
+    // route through getCurrentDimensions() — it can read 0 before it's ready, which
+    // produced the blank size segment.
+    let widthFeet, widthInches, fraction, heightFeet, heightInches;
+    if ($("#custom_dimensions").is(":checked")) {
+        widthFeet    = $("#CUSTOM_WIDTH_FEET").val() || "";
+        widthInches  = Number($("#CUSTOM_WIDTH_INCHES").val()) || 0;
+        fraction     = Number($("#CUSTOM_WIDTH_FRACTION").val()) || 0;
+        heightFeet   = $("#CUSTOM_HEIGHT_FEET").val() || "";
+        heightInches = Number($("#CUSTOM_HEIGHT_INCHES").val()) || 0;
+    } else {
+        const $sz = $("input[name='SIZE']:checked");
+        widthFeet    = $sz.attr("width")        || getNode("DOOR_WIDTH_FEET")?.value    || "";
+        widthInches  = Number($sz.attr("widthInches"))  || 0;
+        fraction     = 0;
+        heightFeet   = $sz.attr("height")       || getNode("DOOR_HEIGHT_FEET")?.value   || "";
+        heightInches = Number($sz.attr("heightInches")) || 0;
+    }
+    widthFeet = String(widthFeet).padStart(2, "0");
+
+    // Width inches: append the fractional decimal (2 dp) only when fraction <> 0.
+    const widthInchText = fraction !== 0
+        ? (widthInches + fraction).toFixed(2)   // 2 + 0.125 -> "2.13"
+        : String(widthInches);
+
+    return `${widthFeet}-${widthInchText}x${heightFeet}-${heightInches}`;
+}
+
+// Door Face (Y-line) description: a b c d [e] [f]. a/b are door-specific;
+// c (model+pattern), d (colour) reuse the shared SB fields; e (section options)
+// and f (end caps) reuse the shared SB helpers and are conditional.
+function buildDoorFaceDescription() {
+    const { modelPattern, colorShort } = getSharedDescFields();
+    return assembleDesc([
+        buildDoorTypeText(),         // a
+        buildDoorFaceSize(),         // b
+        modelPattern,                // c
+        colorShort,                  // d
+        buildSectionOptionsText(),   // e (conditional)
+        buildEndCapsText(),          // f (conditional)
+    ]);
 }
 
 // Assemble description segments: drop empty ones, join with single spaces, and

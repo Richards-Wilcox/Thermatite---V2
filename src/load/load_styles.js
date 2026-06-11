@@ -1791,8 +1791,7 @@ option--disabled {
 }
 
 /* Remove position container from flow when hidden so it doesn't push canvas down */
-.postion-container[style*="visibility: hidden"],
-.postion-container[style*="visibility:hidden"] {
+.postion-container.hidden {
     display: none !important;
 }
 
@@ -1977,22 +1976,6 @@ option--disabled {
    #section_select uses justify-content: space-evenly, which would leave wide gaps when
    a tab is removed — collapse the missing tab visually rather than hiding it via display:none. */
 .face-only #tab_2 {
-    visibility: hidden !important;
-    width: 0 !important;
-    min-width: 0 !important;
-    max-width: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    overflow: hidden !important;
-    pointer-events: none !important;
-}
-
-/* [OPERATOR-TAB-HIDDEN] hide the Operator tab (section index 4) from the nav.
-   The Operator section stays in the DOM so its inputs keep feeding price /
-   springs logic — only the tab button is hidden so users can't open it. Same
-   collapse technique as the face-only Hardware tab above (visibility+width,
-   not display:none) to avoid a space-evenly gap in #section_select. */
-#tab_4 {
     visibility: hidden !important;
     width: 0 !important;
     min-width: 0 !important;

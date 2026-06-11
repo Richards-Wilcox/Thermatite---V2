@@ -753,18 +753,21 @@ function loadDrivenInputEvents() {
   function applyThirdReinforceConstraint() {
     const $sel = $("[name='THIRD_REINFORCE']");
     if (!$sel.length) return;
-    // Truss-driven only: the user must not be able to change it. Disable the
-    // select so it's read-only (the value is still submitted/readable).
-    $sel.prop("disabled", true);
-    const trussStyle = $("#TRUSS_STYLE").val();
-    const value = trussStyle === THIRD_REINFORCE_TRUSS_VALUE ? "Yes" : "No";
-    if ($sel.val() !== value) {
-      $sel.val(value).trigger("change");
-    }
+    // TESTING: force-enable so Yes/No can be selected manually (the JDE framework
+    // renders this select disabled). To restore truss-driven/read-only behaviour,
+    // swap removeAttr/prop back to $sel.prop("disabled", true) and re-enable the
+    // auto-set block below.
+    $sel.removeAttr("disabled").prop("disabled", false);
+    // Auto-set disabled for testing so manual selections aren't overwritten.
+    // const trussStyle = $("#TRUSS_STYLE").val();
+    // const value = trussStyle === THIRD_REINFORCE_TRUSS_VALUE ? "Yes" : "No";
+    // if ($sel.val() !== value) {
+    //   $sel.val(value).trigger("change");
+    // }
   }
   // Re-run on direct TRUSS_STYLE change and on the axes that re-render the
-  // TRUSS_STYLE options (which can change the selection). The 120ms delay lets
-  // truss_style_logic.js's debounced (80ms) re-render settle first.
+  // TRUSS_STYLE options. The 120ms delay lets truss_style_logic.js's debounced
+  // (80ms) re-render settle first.
   $(document).on(
     "change",
     "#TRUSS_STYLE, input[name='DOOR_MODEL'], input[name='WindLoad'], input[name='SIZE'], #NUM_OF_SEC, #CUSTOM_WIDTH_FEET, #CUSTOM_WIDTH_INCHES, #CUSTOM_HEIGHT_FEET, #CUSTOM_HEIGHT_INCHES, #custom_dimensions",
@@ -772,8 +775,8 @@ function loadDrivenInputEvents() {
       setTimeout(applyThirdReinforceConstraint, 120);
     }
   );
-  // Initial passes — repeated because the framework may render the
-  // THIRD_REINFORCE select after our init runs; each pass also (re)disables it.
+  // Initial passes — repeated because the framework may render (and disable) the
+  // THIRD_REINFORCE select after our init runs; each pass re-enables it.
   setTimeout(applyThirdReinforceConstraint, 200);
   setTimeout(applyThirdReinforceConstraint, 1000);
 

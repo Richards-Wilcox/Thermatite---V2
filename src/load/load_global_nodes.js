@@ -67,6 +67,18 @@ function loadGlobalNodes() {
     }
   }, ["SIZE"])
 
+  // Fractional inch of door width, as a decimal (1/8 -> 0.125). Custom dimensions
+  // only; standard SIZE presets are whole-inch (fraction = 0). Consumed by the RP
+  // run-length (segment g) in section_bundles.js; WIDTH itself stays whole-inch so
+  // the ~15 other WIDTH consumers (truss schedule's === checks, etc.) are untouched.
+  addLogic("DOOR_WIDTH_FRACTION", function () {
+    if ($("#custom_dimensions").is(":checked")) {
+      this.value = parseFloat($("#CUSTOM_WIDTH_FRACTION").val()) || 0;
+    } else {
+      this.value = 0;
+    }
+  }, ["SIZE"])
+
   addLogic("DOOR_HEIGHT_INCHES", function () {
     if ($("#custom_dimensions").is(":checked")) {
       this.value = parseInt($("#CUSTOM_HEIGHT_INCHES").val()) || 0;

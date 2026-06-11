@@ -38,16 +38,16 @@ function getGlazingObj(){
 	 pattern:"None",
     },
 	 glazing:{
-	type:getState("WINDOWS"),
-	   width:40, 
+	// Glazing presence is driven by GLAZING_TYPE now (WINDOWS is a frozen "none").
+	type:getState("GLAZING_TYPE"),
+	   width:40,
 	   height:6 + 15/16,
 	   frameColor: '#1B1B1B',
 	   distanceFromEdge: getState("END_CAPS") === 'single' ? 23.71875 - 20 : 27.71875 - 20,
-	   //material:getNode("GLAZING_TYPE").getAttribute("canvas_value"),
 	   material:getNode("GLAZING_TYPE").getAttribute("value"),
-	   spacing:getState("WINDOW_POSITION"), 
-	   numLites:getState("WINDOW_POSITION") === "both" ? (getState("WINDOWS") !== 'none' ? 2 : 0) : getState("WINDOWS") !== 'none' ? 1:0,
-	   
+	   spacing:getState("WINDOW_POSITION"),
+	   numLites:getState("WINDOW_POSITION") === "both" ? (getState("GLAZING_TYPE") !== 'none' ? 2 : 0) : getState("GLAZING_TYPE") !== 'none' ? 1:0,
+
 	 },
 	 misc:{
 	 labels:true,

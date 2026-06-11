@@ -11,7 +11,7 @@ function getSpringingWeight(){
 
    //Windows
   const weightPerLite = 2.9
-  const liteWeightTotal = weightPerLite * (getState("WINDOWS") === 'none' ? 0 : getState("WINDOW_POSITION") === 'both' ? 8 : 4)
+  const liteWeightTotal = weightPerLite * (getState("GLAZING_TYPE") === 'none' ? 0 : getState("WINDOW_POSITION") === 'both' ? 8 : 4)
  
   const ondoorHDWRWeight = getOndoorHDWRWeight()
   const bottomSealWeight = 0.258 * getState("DOOR_WIDTH_FEET")
