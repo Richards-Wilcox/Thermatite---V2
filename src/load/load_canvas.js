@@ -110,7 +110,7 @@ const CANVAS_PLUGIN = {
 
   loadCanvasHTML: () => {
     $("#CANVAS_PLUGIN").html(
-      `<canvas id="CONFIG_CANVAS" width=1400 height=1000 style="height:65vh; padding-bottom: 30px; border:none;background: transparent;"></canvas>`
+      `<canvas id="CONFIG_CANVAS" width=1400 height=1000 style="height:65vh; border:none;background: transparent;"></canvas>`
     );
   },
   //958177
@@ -136,7 +136,11 @@ const CANVAS_PLUGIN = {
 
     // Fit the door to the canvas while preserving real-world proportions.
     // Reserve margin for dimension labels/lines drawn outside the door rect.
-    const marginX = 120; // room for vertical dim line + text on the right
+    // On the Glazing page, widen the right margin so the per-section pencil
+    // icons (drawn past the height dim line, see GLAZING_PENCIL_OFFSET_X)
+    // always have room and never clip off the canvas.
+    const inGlazingTab = typeof isGlazingSectionVisible === "function" && isGlazingSectionVisible();
+    const marginX = inGlazingTab ? 170 : 120; // room for vertical dim line + text (+ pencils) on the right
     const marginY = 120; // room for horizontal dim line + text on the bottom
     const availableWidth  = canvasWidth  - marginX * 2;
     const availableHeight = canvasHeight - marginY * 2;
@@ -168,15 +172,38 @@ const CANVAS_PLUGIN = {
     const scale = dimensions.scale ?? 1
     const inchConversion = (doorWidthInches > doorHeightInches ? 800 / doorWidthInches : 800 / doorHeightInches) * scale
 
-    const sectionHeight = height / numSections;
+    // Real per-section heights (inches, bottom-to-top from getSectionBundle) when
+    // available, converted to pixels and reversed to top-to-bottom canvas order.
+    // Falls back to equal division if the caller didn't supply them (or the count
+    // doesn't match numSections), so this never breaks older callers.
+    const realHeightsInches = Array.isArray(dimensions.sectionHeights) ? dimensions.sectionHeights : [];
+    const useRealHeights = realHeightsInches.length === numSections;
+    const sectionHeightsPx = useRealHeights
+      ? realHeightsInches.slice().reverse().map(h => (Number(h) || 0) * heightRatio)
+      : Array(numSections).fill(height / numSections);
+    // Cumulative top offset (in px, relative to the door's top y) for each section.
+    const sectionOffsetsPx = [];
+    let _cum = 0;
+    for (let k = 0; k < sectionHeightsPx.length; k++) {
+      sectionOffsetsPx.push(_cum);
+      _cum += sectionHeightsPx[k];
+    }
 
+    // Per-section clickable glazing box rects (canvas coords), rebuilt fresh
+    // every render — only populated on the Glazing page.
+    CANVAS_PLUGIN._glazingBoxRects = [];
+    // Per-slot clickable rects (one per window box, not per section) so users
+    // can click an individual box on the canvas to toggle its position.
+    CANVAS_PLUGIN._glazingSlotRects = [];
+    const inGlazing = typeof isGlazingSectionVisible === "function" && isGlazingSectionVisible();
 
     for(let i =0;i<dimensions.numSections;i++){
  	 //Background
     const background = layerObj.background;
 
     const bgColor = background.color;
-    const sY = y + sectionHeight * i;
+    const sectionHeight = sectionHeightsPx[i];
+    const sY = y + sectionOffsetsPx[i];
 
     // All patterns render procedurally — flat coloured fill, then crisp rib
     // lines drawn on top. Replaces the prior image-texture approach which
@@ -202,6 +229,10 @@ const CANVAS_PLUGIN = {
 
     ctx.strokeStyle = "black";
     ctx.strokeRect(x, sY, width, sectionHeight);
+
+    if (inGlazing && typeof drawGlazingBoxes === "function") {
+      drawGlazingBoxes(ctx, i, x, sY, width, sectionHeight);
+    }
 
 
     // Testing highlights
@@ -295,12 +326,12 @@ const CANVAS_PLUGIN = {
 	//For now only enabling gradients for black only
     if (bgColor === "#000" || bgColor === "#FFF" || bgColor === "#3f3f3f") {
 	 // Top Highlight Line
-	 const gradientLines = ctx.createLinearGradient(0, y + sectionHeight * i, 0, y + sectionHeight * i + highlightHeight);
+	 const gradientLines = ctx.createLinearGradient(0, sY, 0, sY + highlightHeight);
 	 gradientLines.addColorStop(0, shadeColors[bgColor][0]);
 	 gradientLines.addColorStop(1, shadeColors[bgColor][1]);
 
 	 ctx.fillStyle = gradientLines;
-	 ctx.fillRect(x, y + sectionHeight * i, width, highlightHeight);
+	 ctx.fillRect(x, sY, width, highlightHeight);
 
 	 // Bottom Highlight
 	 //30 og
@@ -317,7 +348,7 @@ const CANVAS_PLUGIN = {
 	   gradientRightSide.addColorStop(1, shadeColors[bgColor][5]);
 
 	   ctx.fillStyle = gradientRightSide;
-	   ctx.fillRect(x + width - highlightWidth, y + sectionHeight * i, highlightWidth,sectionHeight);
+	   ctx.fillRect(x + width - highlightWidth, sY, highlightWidth,sectionHeight);
 
 	   // Panel side shading left
 	   const gradientLeftSide = ctx.createLinearGradient(x, sectionHeight, x + highlightWidth, sectionHeight);
@@ -327,7 +358,7 @@ const CANVAS_PLUGIN = {
 	   gradientLeftSide.addColorStop(1, shadeColors[bgColor][2]);
 
 	   ctx.fillStyle = gradientLeftSide;
-	   ctx.fillRect(x, y + sectionHeight * i, highlightWidth, sectionHeight);
+	   ctx.fillRect(x, sY, highlightWidth, sectionHeight);
 
 	   /*// Window shading test
 	   const windowsGradient = ctx.createLinearGradient(0, sectionHeight, 100, 0);
@@ -341,7 +372,7 @@ const CANVAS_PLUGIN = {
 	   */
 
 	   // Panel full gradients
-	   const panelTop = y + sectionHeight * i;
+	   const panelTop = sY;
 	   const panelBottom = panelTop + sectionHeight;
 
 	//   console.log("Panel top = Index:" + i + "   :" + panelTop);
@@ -408,7 +439,7 @@ const CANVAS_PLUGIN = {
         case "left":
           ctx.roundRect(
             x + distanceFromEdgeCanvas,
-            y + (sectionHeight/2) + sectionHeight * i  - glazingHeightCanvas / 2,
+            sY + sectionHeight / 2 - glazingHeightCanvas / 2,
             glazingWidthCanvas,
             glazingHeightCanvas,
             corners
@@ -420,7 +451,7 @@ const CANVAS_PLUGIN = {
         case "right":
           ctx.roundRect(
             width + x - glazingWidthCanvas - distanceFromEdgeCanvas,
-            y + (sectionHeight/2) + sectionHeight * i  - glazingHeightCanvas / 2,
+            sY + sectionHeight / 2 - glazingHeightCanvas / 2,
             glazingWidthCanvas,
             glazingHeightCanvas,
             corners
@@ -431,7 +462,7 @@ const CANVAS_PLUGIN = {
         case "center":
           ctx.roundRect(
             canvasWidth / 2 - glazingWidthCanvas / 2,
-            y + (sectionHeight/2) + sectionHeight * i  - glazingHeightCanvas / 2,
+            sY + sectionHeight / 2 - glazingHeightCanvas / 2,
             glazingWidthCanvas,
             glazingHeightCanvas,
             corners
@@ -451,7 +482,7 @@ const CANVAS_PLUGIN = {
         ctx.beginPath();
         ctx.roundRect(
           start + (spaceBetween + glazingWidthCanvas) * j,
-          y + (sectionHeight/2) + sectionHeight * i  - glazingHeightCanvas / 2,
+          sY + sectionHeight / 2 - glazingHeightCanvas / 2,
           glazingWidthCanvas,
           glazingHeightCanvas,
           corners
@@ -1009,3 +1040,522 @@ $(document).on("focus", "#CUSTOM_WIDTH_FEET", function() {
   if (!$(this).attr("min")) $(this).attr("min", WIDTH_FEET_MIN);
   if (!$(this).attr("max")) $(this).attr("max", WIDTH_FEET_MAX);
 });
+
+// ===== [GLAZING-BOXES] Per-section glazing. Each section has its own full set
+// of glazing settings (type, material, frame color, lites count, spacing,
+// size) edited via one popover opened from a pencil icon next to the section.
+// The section's "lites" count (1-3) decides how many of its up-to-3 window
+// boxes are drawn/glazed; Position (left/center/right/both) only supplies the
+// starting default when a section is first set up. All glazed boxes render
+// with the same neutral "glass" fill — color doesn't encode type. Only active
+// on the Glazing page. GLAZING_TYPE_0 (hidden) is kept in sync as "has any
+// glazing at all" for code elsewhere (hasGlazing() in section_bundles.js, the
+// Position-bar CSS gate) that still reads GLAZING_TYPE as a single
+// none/not-none flag.
+
+const GLAZING_BOXES_PER_SECTION = 3;
+const GLAZING_GLASS_FILL = ["#dfe9ef", "#aebfc9"];
+
+const GLAZING_TYPE_CHOICES = [
+  { value: "",                    label: "None",      desc: "None" },
+  { value: "lites",               label: "Lites",     desc: "Lites" },
+  { value: "polytite_fullview",   label: "Polytite",  desc: "Polytite Fullview" },
+  { value: "alumatite_fullview",  label: "Alumatite", desc: "Alumatite Fullview" },
+];
+const GLAZING_MATERIAL_CHOICES = [
+  { value: "",              label: "None" },
+  { value: "glass",         label: "Glass" },
+  { value: "acrylic",       label: "Acrylic" },
+  { value: "polycarbonate", label: "Polycarbonate" },
+];
+const GLAZING_FRAME_COLOR_CHOICES = [
+  { value: "black", label: "Black" },
+  { value: "brown", label: "Brown" },
+  { value: "white", label: "White" },
+];
+const GLAZING_LITES_CHOICES = [1, 2, 3];
+const GLAZING_SPACING_CHOICES = [
+  { value: "evenly_spaced",             label: "Evenly Spaced" },
+  { value: "evenly_spaced_fixed_ends",  label: "Evenly Spaced Fixed Ends" },
+];
+const GLAZING_SIZE_CHOICES = [
+  { value: "",    label: "None" },
+  { value: "AA",  label: "AA - (26\" x 13\")" },
+  { value: "B",   label: "B - (24\" x 6\")" },
+  { value: "CPL", label: "CPL - (24\" x 8\")" },
+  { value: "D",   label: "D - (34\" x 16\")" },
+  { value: "E",   label: "E - (24\" x 12\")" },
+];
+
+// slots: which of the 3 fixed grid slots (0=left, 1=center, 2=right) are lit.
+// Kept alongside lites (the count shown/edited in the popover) so Position
+// (Left/Center/Right) can place a single lite in the actually-correct slot;
+// changing Lites manually in the popover falls back to GLAZING_LITES_SLOTS
+// (see drawGlazingBoxes) since a manual count has no left/right intent.
+function glazingDefaultSectionSettings() {
+  return {
+    type: "",
+    material: "",
+    frameColor: "black",
+    lites: 2,
+    slots: null,
+    spacing: "evenly_spaced",
+    size: "",
+  };
+}
+
+// True when the Glazing page is on screen (#GLAZING_OPTIONS is unique to it).
+function isGlazingSectionVisible() {
+  const el = document.getElementById("GLAZING_OPTIONS");
+  return !!(el && el.offsetParent !== null && el.getClientRects().length > 0);
+}
+
+// In-memory only: { sectionIndex: { type, material, frameColor, lites, slots, spacing, size } }.
+CANVAS_PLUGIN._glazingSections = CANVAS_PLUGIN._glazingSections || {};
+
+function getGlazingSectionSettings(sectionIndex) {
+  return CANVAS_PLUGIN._glazingSections[sectionIndex] || glazingDefaultSectionSettings();
+}
+
+// WINDOW_POSITION -> which box slot(s) (0=left, 1=center, 2=right) light up,
+// used to seed every section's defaults when a Position radio is picked.
+const GLAZING_POSITION_BOXES = {
+  left:   [0],
+  center: [1],
+  right:  [2],
+  both:   [0, 2],
+};
+
+// Other code (weight_controller.js, glazing_code.js, global_data_controller.js,
+// load_jde_nodes.js, canvas_controller.js) still reads a single GLAZING_TYPE
+// node via getState/getNode(...).getAttribute("value"/"desc"), expecting one
+// selected type. Since sections can still differ from each other, we pick the
+// most common non-empty type as the "representative" value/desc for that
+// node, and only flip checked to reflect none-vs-any. Keeps every existing
+// consumer working without per-file changes.
+function syncGlazingTypeFlag() {
+  const counts = {};
+  Object.values(CANVAS_PLUGIN._glazingSections).forEach(s => {
+    if (s.type) counts[s.type] = (counts[s.type] || 0) + 1;
+  });
+  const values = Object.keys(counts);
+  const dominantValue = values.sort((a, b) => counts[b] - counts[a])[0] || "";
+  const hasAny = !!dominantValue;
+  const dominantType = GLAZING_TYPE_CHOICES.find(t => t.value === dominantValue) || GLAZING_TYPE_CHOICES[0];
+
+  const el = document.getElementById("GLAZING_TYPE_0");
+  if (!el) return;
+  const newValue = hasAny ? dominantType.value : "none";
+  const newDesc = hasAny ? dominantType.desc : "None";
+  const shouldBeChecked = !hasAny;
+  const changed = el.getAttribute("value") !== newValue || el.checked !== shouldBeChecked;
+
+  el.setAttribute("value", newValue);
+  el.setAttribute("desc", newDesc);
+  if (!changed) return;
+  $(el).prop("checked", shouldBeChecked).trigger("change");
+}
+
+// Reset every section to Lites (with Position's default box pattern) when a
+// Position radio is picked, replacing (not merging with) any prior manual picks.
+function applyGlazingPositionToBoxes() {
+  const position = $("input[name='WINDOW_POSITION']:checked").val();
+  const boxIndexes = GLAZING_POSITION_BOXES[position];
+  if (!boxIndexes) return;
+
+  const numSections = parseInt($("#NUM_OF_SEC").val()) || 0;
+  const newState = {};
+  for (let s = 0; s < numSections; s++) {
+    newState[s] = Object.assign(glazingDefaultSectionSettings(), {
+      type: "lites",
+      lites: boxIndexes.length,
+      slots: boxIndexes.slice(),
+    });
+  }
+  CANVAS_PLUGIN._glazingSections = newState;
+  syncGlazingTypeFlag();
+}
+
+$(document).on("change", "input[name='WINDOW_POSITION']", function() {
+  applyGlazingPositionToBoxes();
+  renderGlazingSectionPanel(CANVAS_PLUGIN._activeGlazingSection || 0);
+  if (typeof redrawCanvas === "function") {
+    redrawCanvas();
+  } else if (typeof CANVAS_PLUGIN?.redrawFromCurrentForm === "function") {
+    CANVAS_PLUGIN.redrawFromCurrentForm();
+  }
+});
+
+const GLAZING_PENCIL_RADIUS = 34;
+// Distance right of the door's right edge — clears the height dimension
+// line (~+30) and its text (extends to ~+110).
+const GLAZING_PENCIL_OFFSET_X = 155;
+
+// Lites count -> which of the 3 fixed slots (0=left, 1=center, 2=right) are
+// glazed. 1 lite centers, 2 lites go symmetric left+right, 3 fills the grid —
+// matches common real garage-door glazing layouts.
+const GLAZING_LITES_SLOTS = {
+  1: [1],
+  2: [0, 2],
+  3: [0, 1, 2],
+};
+
+// Draws the fixed 3-slot box grid for one section (canvas coords) — slot
+// positions never move, only which slots are glazed changes with the
+// section's Lites count, so "1 lite" reads as a single centered window rather
+// than one box stretched across the whole section. One pencil icon, outside
+// the door to the right, centered on the section, opens the settings
+// popover. Records the section's pencil rect (for click hit-testing) into
+// CANVAS_PLUGIN._glazingBoxRects.
+function drawGlazingBoxes(ctx, sectionIndex, x, sY, width, sectionHeight) {
+  const settings = getGlazingSectionSettings(sectionIndex);
+  const litesCount = Math.min(Math.max(parseInt(settings.lites) || 0, 1), GLAZING_BOXES_PER_SECTION);
+  // Position (Left/Center/Right) sets exact slots; a manual Lites-count edit
+  // in the popover clears slots and falls back to the generic count rule.
+  const litSlots = Array.isArray(settings.slots) ? settings.slots : (GLAZING_LITES_SLOTS[litesCount] || GLAZING_LITES_SLOTS[2]);
+
+  const n = GLAZING_BOXES_PER_SECTION;
+  // Slim horizontal slat, not a square window — most of the section height is
+  // padding, leaving a short, wide bar centered in the section.
+  const padY = sectionHeight * 0.42;
+  // One uniform gap used both between boxes AND from the door's left/right
+  // edges, so spacing is equal all around (n boxes -> n+1 gaps across width).
+  const gap = width * 0.03;
+  const boxW = (width - gap * (n + 1)) / n;
+  const boxH = sectionHeight - padY * 2;
+  const boxY = sY + padY;
+
+  const glazed = !!settings.type;
+
+  for (let b = 0; b < n; b++) {
+    const boxX = x + gap + b * (boxW + gap);
+    const boxLit = glazed && litSlots.includes(b);
+
+    ctx.save();
+    if (boxLit) {
+      const grad = ctx.createLinearGradient(boxX, boxY, boxX + boxW, boxY + boxH);
+      grad.addColorStop(0, GLAZING_GLASS_FILL[0]);
+      grad.addColorStop(1, GLAZING_GLASS_FILL[1]);
+      ctx.fillStyle = grad;
+      ctx.fillRect(boxX, boxY, boxW, boxH);
+      ctx.strokeStyle = GLAZING_FRAME_COLOR_CHOICES.find(c => c.value === settings.frameColor)
+        ? settings.frameColor
+        : "#333";
+      ctx.lineWidth = 2;
+      ctx.setLineDash([]);
+      ctx.strokeRect(boxX, boxY, boxW, boxH);
+    } else {
+      ctx.strokeStyle = "rgba(0,0,0,0.55)";
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([6, 4]);
+      ctx.strokeRect(boxX, boxY, boxW, boxH);
+      ctx.setLineDash([]);
+    }
+    ctx.restore();
+
+    CANVAS_PLUGIN._glazingSlotRects.push({
+      sectionIndex, slot: b, x: boxX, y: boxY, w: boxW, h: boxH,
+    });
+  }
+
+  // Pencil sits outside the door on the right, past the height dimension
+  // line/label (drawn at roughly x + width + 30, text extending to ~x + width
+  // + 110) so it never overlaps them, at this section's vertical center.
+  const pencilCx = x + width + GLAZING_PENCIL_OFFSET_X;
+  const pencilCy = sY + sectionHeight / 2;
+  const isActiveSection = (CANVAS_PLUGIN._activeGlazingSection || 0) === sectionIndex;
+  drawPencilIcon(ctx, pencilCx, pencilCy, GLAZING_PENCIL_RADIUS, isActiveSection);
+
+  CANVAS_PLUGIN._glazingBoxRects.push({
+    key: sectionIndex, x, y: boxY, w: width, h: boxH,
+    pencilCx, pencilCy, pencilR: GLAZING_PENCIL_RADIUS,
+  });
+}
+
+// Round pencil button centered at (cx, cy) — white fill with a dark glyph and
+// thin border when idle, reading as a neutral icon button against the door
+// art. When active (this section's options are showing on the right) it
+// flips to a solid black fill with a white glyph, matching the site's
+// black-fill "selected" convention (.rw-button.btn-checked,
+// .rw-sliding-button.selected) plus a black ring so it's unmistakable which
+// pencil is currently selected. Pure canvas shapes, no glyph/SVG (glyph
+// rendering was unreliable across fonts in an earlier attempt).
+function drawPencilIcon(ctx, cx, cy, r, active) {
+  ctx.save();
+
+  const fillColor = active ? "#000" : "#fff";
+  const glyphColor = active ? "#fff" : "#333";
+
+  // Drop shadow so the button lifts off the grey page background.
+  ctx.shadowColor = "rgba(0,0,0,0.35)";
+  ctx.shadowBlur = 4;
+  ctx.shadowOffsetY = 1;
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.fillStyle = fillColor;
+  ctx.fill();
+  ctx.shadowColor = "transparent";
+  ctx.lineWidth = 1.5;
+  ctx.strokeStyle = active ? "#000" : "#333";
+  ctx.stroke();
+
+  if (active) {
+    ctx.beginPath();
+    ctx.arc(cx, cy, r + 4, 0, Math.PI * 2);
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = "#000";
+    ctx.stroke();
+  }
+
+  // Pencil glyph: real pencil silhouette (flat eraser-end body, pale wood
+  // band, dark pointed tip), outlined like the reference icon rather than a
+  // plain filled bar+triangle. Tilted tip-down-left, same as a pencil about
+  // to write. 3π/4 (not π/4) so local +x (the tip end) points down-LEFT, not
+  // down-right.
+  ctx.translate(cx, cy);
+  ctx.rotate(3 * Math.PI / 4);
+  const len = r * 1.5;
+  const bodyW = r * 0.5;
+  const half = bodyW / 2;
+  const backX = -len / 2;          // flat back (eraser) end
+  const woodStartX = len / 2 - bodyW * 1.5; // where the pale wood band begins
+  const tipX = len / 2;            // point
+
+  const strokeColor = glyphColor;
+  ctx.lineJoin = "round";
+  ctx.lineCap = "round";
+  ctx.lineWidth = Math.max(1.5, r * 0.09);
+
+  // Body: flat-ended rectangle from the back to where the wood band starts.
+  ctx.fillStyle = strokeColor;
+  ctx.beginPath();
+  ctx.rect(backX, -half, woodStartX - backX, bodyW);
+  ctx.fill();
+  ctx.stroke();
+
+  // Wood band: pale trapezoid tapering toward the tip.
+  ctx.fillStyle = active ? "#ccc" : "#eee";
+  ctx.beginPath();
+  ctx.moveTo(woodStartX, -half);
+  ctx.lineTo(tipX - bodyW * 0.35, -half * 0.35);
+  ctx.lineTo(tipX - bodyW * 0.35, half * 0.35);
+  ctx.lineTo(woodStartX, half);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+
+  // Tip: dark triangle at the point.
+  ctx.fillStyle = strokeColor;
+  ctx.beginPath();
+  ctx.moveTo(tipX - bodyW * 0.35, -half * 0.35);
+  ctx.lineTo(tipX, 0);
+  ctx.lineTo(tipX - bodyW * 0.35, half * 0.35);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+// Makes sectionIndex the active section shown in the right-pane panel and
+// redraws immediately (both a pencil click and a box click land here) so the
+// active pencil highlight and the panel update in the same click, not on the
+// next unrelated redraw.
+function activateGlazingSection(sectionIndex) {
+  renderGlazingSectionPanel(sectionIndex);
+  if (typeof redrawCanvas === "function") {
+    redrawCanvas();
+  } else if (typeof CANVAS_PLUGIN?.redrawFromCurrentForm === "function") {
+    CANVAS_PLUGIN.redrawFromCurrentForm();
+  }
+}
+
+// Clicking an individual window box toggles that slot's position on/off
+// directly on the canvas (in addition to the Lites/Spacing controls in the
+// right panel) and makes its section the active one being edited, same as
+// clicking the pencil — clicking a box counts as "now editing this section."
+function toggleGlazingSlot(sectionIndex, slot) {
+  const settings = getGlazingSectionSettings(sectionIndex);
+  const litesCount = Math.min(Math.max(parseInt(settings.lites) || 0, 1), GLAZING_BOXES_PER_SECTION);
+  const currentSlots = Array.isArray(settings.slots) ? settings.slots.slice() : (GLAZING_LITES_SLOTS[litesCount] || GLAZING_LITES_SLOTS[2]).slice();
+
+  const glazed = !!settings.type;
+  if (!glazed) {
+    // First click on an unglazed section: turn glazing on and light only the clicked slot.
+    settings.type = "lites";
+    settings.slots = [slot];
+  } else if (currentSlots.includes(slot)) {
+    // Clicking a lit box turns it off; if that was the last lit box, drop back to unglazed.
+    const next = currentSlots.filter(s => s !== slot);
+    settings.slots = next;
+    if (next.length === 0) settings.type = "";
+  } else {
+    settings.slots = currentSlots.concat(slot).sort();
+  }
+  settings.lites = Math.max((settings.slots || []).length, 1);
+
+  CANVAS_PLUGIN._glazingSections[sectionIndex] = settings;
+  syncGlazingTypeFlag();
+  activateGlazingSection(sectionIndex);
+}
+
+// Hit-test a canvas-coordinate click against the recorded pencil-icon rects
+// first (clicking a pencil just makes that section active), then against the
+// individual window-box rects (clicking a box also toggles that slot).
+function handleGlazingCanvasClick(evt) {
+  if (!isGlazingSectionVisible()) return;
+  const pencilRects = CANVAS_PLUGIN._glazingBoxRects || [];
+  const slotRects = CANVAS_PLUGIN._glazingSlotRects || [];
+  if (!pencilRects.length && !slotRects.length) return;
+
+  const canvas = document.getElementById("CONFIG_CANVAS");
+  if (!canvas) return;
+  const cRect = canvas.getBoundingClientRect();
+  const sx = canvas.width / cRect.width;
+  const sy = canvas.height / cRect.height;
+  const clickX = (evt.clientX - cRect.left) * sx;
+  const clickY = (evt.clientY - cRect.top) * sy;
+
+  const pencilHit = pencilRects.find(r => {
+    const dx = clickX - r.pencilCx, dy = clickY - r.pencilCy;
+    return Math.sqrt(dx * dx + dy * dy) <= r.pencilR + 20; // generous tap-target pad
+  });
+  if (pencilHit) {
+    activateGlazingSection(pencilHit.key);
+    return;
+  }
+
+  const slotHit = slotRects.find(r =>
+    clickX >= r.x && clickX <= r.x + r.w && clickY >= r.y && clickY <= r.y + r.h
+  );
+  if (slotHit) {
+    toggleGlazingSlot(slotHit.sectionIndex, slotHit.slot);
+  }
+}
+
+$(document).on("click", "#CONFIG_CANVAS", handleGlazingCanvasClick);
+
+// Builds one labeled row of choice-buttons for the section panel, styled and
+// structured like the rest of the right pane instead of the old small popover
+// chips — the panel now lives in the right pane where there's no floating-box
+// width limit. 2-3 choices (Frame Color, Lites, Spacing) use the compact
+// sliding-toggle style from Glass Material (Clear/Tempered); 4+ choices
+// (Glazing Type, Material, Size) use the Door Model / Dimensions button grid
+// — a 3-column grid reads awkwardly for only 2-3 options. Either way the
+// page's generic delegated handlers (load_html.js: [JS-RADIO-STYLE] for
+// .rw-button, [JS-SLIDING-BUTTON] for .rw-sliding-button) take care of
+// toggling the selected look and forwarding padding-clicks to the radio, so
+// this only needs to build real radio+label markup and react to "change".
+function buildGlazingPopoverRow($panel, sectionIndex, label, field, choices, valueOf, labelOf) {
+  $panel.append($('<div style="text-align: left;" class="config-option-title-style"></div>').text(label));
+  const groupName = "GLZ_SEC" + sectionIndex + "_" + field;
+  const current = getGlazingSectionSettings(sectionIndex)[field];
+  const useSlider = choices.length <= 3;
+
+  const $row = useSlider
+    ? $('<div class="combined-button-container"></div>').append($('<div class="combined-button-container-inner"></div>'))
+    : $('<div class="dimension-layout"></div>');
+  const $items = useSlider ? $row.find(".combined-button-container-inner") : $row;
+
+  choices.forEach((choice, i) => {
+    const value = valueOf(choice);
+    const text = labelOf(choice);
+    const inputId = groupName + "_" + i;
+    const isChecked = value === current;
+
+    const btnClass = useSlider ? "rw-sliding-button" : "rw-button";
+    const selectedClass = useSlider ? "selected" : "btn-checked";
+    const $btn = $('<div tabindex="0"></div>').addClass(btnClass).toggleClass(selectedClass, isChecked);
+    const $label = $('<label></label>').attr("for", inputId).text(text);
+    const $input = $('<input type="radio" style="display:none;">').attr({
+      id: inputId, name: groupName, value: value,
+    });
+    if (isChecked) $input.prop("checked", true);
+
+    $input.on("change", function() {
+      const settings = getGlazingSectionSettings(sectionIndex);
+      settings[field] = value;
+      // A manual Lites-count change overrides whatever exact slots Position
+      // had set — fall back to the generic count-based slot rule instead.
+      if (field === "lites") settings.slots = null;
+      CANVAS_PLUGIN._glazingSections[sectionIndex] = settings;
+      syncGlazingTypeFlag();
+      if (typeof redrawCanvas === "function") {
+        redrawCanvas();
+      } else if (typeof CANVAS_PLUGIN?.redrawFromCurrentForm === "function") {
+        CANVAS_PLUGIN.redrawFromCurrentForm();
+      }
+    });
+
+    $btn.append($label, $input);
+    $items.append($btn);
+  });
+  $panel.append($row);
+}
+
+// Which section's options are currently shown in the right-pane panel.
+// Defaults to section 0 so the panel isn't empty before any pencil is clicked.
+CANVAS_PLUGIN._activeGlazingSection = CANVAS_PLUGIN._activeGlazingSection || 0;
+
+// Renders the "Section N Options" block into #GLAZING_SECTION_PANEL for the
+// given section index, replacing whatever section was shown before. Edits
+// apply immediately (see buildGlazingPopoverRow) — there is no Done/cancel
+// step since this is an inline panel, not a popover.
+function renderGlazingSectionPanel(sectionIndex) {
+  const $panel = $("#GLAZING_SECTION_PANEL");
+  if (!$panel.length) return;
+  CANVAS_PLUGIN._activeGlazingSection = sectionIndex;
+
+  $panel.empty();
+  $panel.append($('<div class="glazing-active-section-banner"></div>').text("Section " + (sectionIndex + 1) + " Options"));
+
+  buildGlazingPopoverRow($panel, sectionIndex, "Glazing Type", "type", GLAZING_TYPE_CHOICES, c => c.value, c => c.label);
+  buildGlazingPopoverRow($panel, sectionIndex, "Material", "material", GLAZING_MATERIAL_CHOICES, c => c.value, c => c.label);
+  buildGlazingPopoverRow($panel, sectionIndex, "Frame Color", "frameColor", GLAZING_FRAME_COLOR_CHOICES, c => c.value, c => c.label);
+  buildGlazingPopoverRow($panel, sectionIndex, "Lites", "lites", GLAZING_LITES_CHOICES, c => c, c => String(c));
+  buildGlazingPopoverRow($panel, sectionIndex, "Spacing", "spacing", GLAZING_SPACING_CHOICES, c => c.value, c => c.label);
+  buildGlazingPopoverRow($panel, sectionIndex, "Size", "size", GLAZING_SIZE_CHOICES, c => c.value, c => c.label);
+}
+
+// Pointer cursor over a pencil icon or a window box, default elsewhere —
+// visual affordance that both are clickable while on the Glazing page.
+$(document).on("mousemove", "#CONFIG_CANVAS", function(evt) {
+  const canvas = this;
+  if (!isGlazingSectionVisible()) { canvas.style.cursor = ""; return; }
+  const pencilRects = CANVAS_PLUGIN._glazingBoxRects || [];
+  const slotRects = CANVAS_PLUGIN._glazingSlotRects || [];
+  const cRect = canvas.getBoundingClientRect();
+  const sx = canvas.width / cRect.width;
+  const sy = canvas.height / cRect.height;
+  const x = (evt.clientX - cRect.left) * sx;
+  const y = (evt.clientY - cRect.top) * sy;
+  const overPencil = pencilRects.some(r => {
+    const dx = x - r.pencilCx, dy = y - r.pencilCy;
+    return Math.sqrt(dx * dx + dy * dy) <= r.pencilR + 20;
+  });
+  const overSlot = slotRects.some(r => x >= r.x && x <= r.x + r.w && y >= r.y && y <= r.y + r.h);
+  canvas.style.cursor = (overPencil || overSlot) ? "pointer" : "";
+});
+
+// Redraw when entering/leaving the Glazing page so the box grid shows/hides.
+// First-ever entry seeds the grid from the current Position radio; later
+// visits leave manual picks alone (only an explicit Position change resets).
+let _glazingWasVisible = false;
+let _glazingBoxesSeeded = false;
+setInterval(function() {
+  const vis = isGlazingSectionVisible();
+  if (vis !== _glazingWasVisible) {
+    _glazingWasVisible = vis;
+    if (vis && !_glazingBoxesSeeded) {
+      _glazingBoxesSeeded = true;
+      applyGlazingPositionToBoxes();
+    }
+    if (vis) renderGlazingSectionPanel(CANVAS_PLUGIN._activeGlazingSection || 0);
+    if (typeof redrawCanvas === "function") {
+      redrawCanvas();
+    } else if (typeof CANVAS_PLUGIN?.redrawFromCurrentForm === "function") {
+      CANVAS_PLUGIN.redrawFromCurrentForm();
+    }
+  }
+}, 300);
+

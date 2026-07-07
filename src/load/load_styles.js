@@ -668,12 +668,17 @@ div.radio-layout{
 		width: 100%;
 		justify-content: center;
 		flex-wrap: wrap;
-		gap: 8px;
+		gap: 6px;
 
 		.rw-button {
-			padding: 8px 12px;
-			flex: 1 1 70px;
-			max-width: 120px;
+			height: auto;
+			padding: 4px 10px;
+			flex: 1 1 60px;
+			max-width: 90px;
+		}
+
+		.rw-button label {
+			line-height: 1.4;
 		}
 	}
 }
@@ -1778,20 +1783,41 @@ option--disabled {
     box-sizing: border-box;
 }
 
-/* Glazing colour button row */
-#GLAZING_OPTIONS > div[style*="display:flex"] {
-    gap: 6px !important;
+/* Settings form for one door section's glazing — type, material, frame
+   color, lites count, spacing, and size — rendered inline into
+   #GLAZING_SECTION_PANEL in the right pane using the same .rw-button /
+   .dimension-layout markup as Door Model, Dimensions, etc. (see
+   buildGlazingPopoverRow in load_canvas.js), so no dedicated button styling
+   is needed here — it inherits the site-wide .rw-button/.btn-checked look.
+   Which section it shows is set by clicking that section's pencil icon on
+   the canvas. */
+#GLAZING_SECTION_PANEL .dimension-layout {
+    margin-bottom: 4px;
 }
 
-#GLAZING_OPTIONS > div[style*="display:flex"] .rw-button {
-    flex: 0 0 calc(33.333% - 6px);
-    max-width: calc(33.333% - 6px);
-    min-width: 0;
-    box-sizing: border-box;
+/* Banner naming the section currently being edited (set by clicking a
+   section or its pencil on the canvas) — solid black bar, not just another
+   label, so it's obvious at a glance which section the controls below
+   belong to. Matches the site's black "selected" convention. */
+.glazing-active-section-banner {
+    background: #000;
+    color: #fff;
+    font-weight: 700;
+    font-size: 15px;
+    text-align: center;
+    padding: 8px 10px;
+    border-radius: 8px;
+    margin-top: 10px;
+    margin-bottom: 4px;
 }
 
 /* Remove position container from flow when hidden so it doesn't push canvas down */
 .postion-container.hidden {
+    display: none !important;
+}
+
+/* Hide the position bar when glazing is None (GLAZING_TYPE_0 checked). */
+#configurator:has(#GLAZING_TYPE_0:checked) .postion-container {
     display: none !important;
 }
 

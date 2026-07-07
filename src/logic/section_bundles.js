@@ -1,23 +1,8 @@
-// IDs of every section-bundle output node, recorded at registration so they can
-// be recomputed on demand (at Configure) instead of living in the framework's
-// dependency graph. REACT_WILCOX's getWalk() is O(n²) in the walk size, so having
-// ~186 of these as live dependents of HEIGHT/WIDTH/NUM_OF_SEC/COLOR made every
-// input change build an enormous walk (the multi-second freeze). Registering
-// them with NO edges keeps them out of input walks entirely; recomputeSectionBundles()
-// fills their values when the BOM actually needs them.
+
 let _sectionBundleNodeIds = [];
 
-// Recompute every section-bundle node's value once, in registration order
-// (upstream → downstream, which is how they're declared). Call before reading
-// the BOM (Configure / serialization) and after dimension/colour/model changes
-// if a live preview is desired.
 function recomputeSectionBundles() {
-    // Two passes: nodes are recomputed in registration order, but a few outputs
-    // are declared before the upstream nodes they read (e.g. SB1_DESC before
-    // SHORTEST_SECTION). Most logic recomputes from primitives (HEIGHT/NUM_OF_SEC
-    // via resolveSectionHeights), so one pass usually suffices; a second pass
-    // guarantees any node-to-node reads settle. It's a plain loop (~186×2),
-    // nothing like the framework's O(n²) walk.
+
     for (let pass = 0; pass < 2; pass++) {
         for (const id of _sectionBundleNodeIds) {
             const node = nodeset?.[id];
@@ -27,16 +12,29 @@ function recomputeSectionBundles() {
         }
     }
 
-    // Push node values to their DOM elements. These nodes are out of the framework
-    // walk, so rw()'s end-of-walk DOM sync (REACT_WILCOX ~line 286) never runs for
-    // them — without this the BOM inputs/labels show stale values even though the
-    // node state is correct.
     for (const id of _sectionBundleNodeIds) {
         const node = nodeset?.[id];
-        const el = node && node.element;
+        if (!node) continue;
+        // Prefer the LIVE element by id: the platform can re-create field DOM on
+        // page/section navigation (e.g. Back), leaving node.element detached — so
+        // writing to node.element would update an orphan while the visible field
+        // keeps its stale value. Fall back to node.element if no id match.
+        const el = document.getElementById(id) || node.element;
         if (!el) continue;
         const tag = el.tagName;
-        if (tag === "SELECT" || tag === "INPUT" || tag === "OPTION") {
+        if (tag === "SELECT") {
+            // A <select> ignores el.value = "" when it has no empty option, so a
+            // blanked node would otherwise leave the previously-selected part#
+            // (which then lands on the BOM). Force "no selection" in that case.
+            const v = node.value;
+            if (v === "" || v === undefined || v === null) {
+                el.selectedIndex = -1;
+            } else {
+                el.value = v;
+                // If the value matched no option, also clear (don't leave stale).
+                if (el.value !== String(v)) el.selectedIndex = -1;
+            }
+        } else if (tag === "INPUT" || tag === "OPTION") {
             el.value = node.value;
         } else if (node.type === "LABEL" && !node.text) {
             el.innerText = node.value;
@@ -47,17 +45,7 @@ function recomputeSectionBundles() {
 }
 
 function addSectionBundleDrivers() {
-
-    // Shadow addLogic locally: register the node's logic but DROP its edges so it
-    // never enters an input-driven walk. Record the id for recomputeSectionBundles().
-    // Declared as a hoisted function (not const) so the 186 call sites below bind
-    // to THIS one, with no temporal-dead-zone issues.
     _sectionBundleNodeIds = [];
-    // Mirror the framework's addLogic EXACTLY (REACT_WILCOX:188) except we DON'T
-    // register the edges — so these nodes never enter an input-driven walk. Like
-    // the original, skip ids with no existing node (don't create detached nodes;
-    // that broke the post-walk DOM loop / layout). recomputeSectionBundles() runs
-    // their logic on demand.
     function addLogic(id, logic, _edges) {
         if (!nodeset[id]) return;
         nodeset[id].logic = logic;
@@ -90,47 +78,47 @@ function addSectionBundleDrivers() {
     }, ["DOOR_MODEL"])
 
     //each section heights
-    addLogic("BTM_SECTION", function () {
+    addLogic("BTM_SECTION_1", function () {
         const sections = getSectionBundle();
         this.value = Number(getState("NUM_OF_SEC")) >= 1 ? (sections[0] ?? "") : "";
     }, SECTION_DEPS)
 
-    addLogic("INT1_SECTION", function () {
+    addLogic("INT1_SECTION_2", function () {
         const sections = getSectionBundle();
         this.value = Number(getState("NUM_OF_SEC")) >= 2 ? (sections[1] ?? "") : "";
     }, SECTION_DEPS)
 
-    addLogic("INT2_SECTION", function () {
+    addLogic("INT2_SECTION_3", function () {
         const sections = getSectionBundle();
         this.value = Number(getState("NUM_OF_SEC")) >= 3 ? (sections[2] ?? "") : "";
     }, SECTION_DEPS)
 
-    addLogic("INT3_SECTION", function () {
+    addLogic("INT3_SECTION_4", function () {
         const sections = getSectionBundle();
         this.value = Number(getState("NUM_OF_SEC")) >= 4 ? (sections[3] ?? "") : "";
     }, SECTION_DEPS)
 
-    addLogic("INT4_SECTION", function () {
+    addLogic("INT4_SECTION_5", function () {
         const sections = getSectionBundle();
         this.value = Number(getState("NUM_OF_SEC")) >= 5 ? (sections[4] ?? "") : "";
     }, SECTION_DEPS)
 
-    addLogic("INT5_SECTION", function () {
+    addLogic("INT5_SECTION_6", function () {
         const sections = getSectionBundle();
         this.value = Number(getState("NUM_OF_SEC")) >= 6 ? (sections[5] ?? "") : "";
     }, SECTION_DEPS)
 
-    addLogic("INT6_SECTION", function () {
+    addLogic("INT6_SECTION_7", function () {
         const sections = getSectionBundle();
         this.value = Number(getState("NUM_OF_SEC")) >= 7 ? (sections[6] ?? "") : "";
     }, SECTION_DEPS)
 
-    addLogic("INT7_SECTION", function () {
+    addLogic("INT7_SECTION_8", function () {
         const sections = getSectionBundle();
         this.value = Number(getState("NUM_OF_SEC")) >= 8 ? (sections[7] ?? "") : "";
     }, SECTION_DEPS)
 
-    addLogic("INT8_SECTION", function () {
+    addLogic("INT8_SECTION_9", function () {
         const sections = getSectionBundle();
         this.value = Number(getState("NUM_OF_SEC")) >= 9 ? (sections[8] ?? "") : "";
     }, SECTION_DEPS)
@@ -513,6 +501,14 @@ function addSectionBundleDrivers() {
 
     }, ["WIDTH", "BUNDLE1_SC2_HEIGHT", "BUNDLE1_SC2_QTY", "DOOR_MODEL", "COLOR", "Pattern"])
 
+    addLogic("BUNDLE1_SC1_RP_BT_DESC", function () {
+        this.value = "";
+    }, ["WIDTH", "BUNDLE1_SC1_HEIGHT", "BUNDLE1_SC1_QTY", "DOOR_MODEL", "COLOR", "Pattern"])
+
+    addLogic("BUNDLE1_SC2_RP_BT_DESC", function () {
+        this.value = "";
+    }, ["WIDTH", "BUNDLE1_SC2_HEIGHT", "BUNDLE1_SC2_QTY", "DOOR_MODEL", "COLOR", "Pattern"])
+
     //SC2
     addLogic("BUNDLE2_SC1_SPNUM", function () {
         let doorModelId = getModelPartCode();
@@ -699,9 +695,8 @@ function addSectionBundleDrivers() {
     //Raw panel Part# and Desc for Each bundle
     // set bundle 1 rp1 part#
     addLogic("BUNDLE1_RP1_SPNUM", function () {
-        const height = getState("BUNDLE1_SC1_HEIGHT");
-        this.value = buildRPSPNum(height);
-    }, ["DOOR_MODEL"])
+        this.value = buildRPSPNum(getState("BUNDLE1_SC1_HEIGHT"), "01");
+    }, ["DOOR_MODEL", "BUNDLE1_SC1_HEIGHT", DIMENSION_DEPS])
 
     // set bundle1 rp1 desc
     addLogic("BUNDLE1_RP1_DESC", function () {
@@ -714,9 +709,8 @@ function addSectionBundleDrivers() {
 
     // set bundle 1 rp2 part#
     addLogic("BUNDLE1_RP2_SPNUM", function () {
-        const height = getState("BUNDLE1_SC2_HEIGHT");
-        this.value = buildRPSPNum(height);
-    }, ["DOOR_MODEL"])
+        this.value = buildRPSPNum(getState("BUNDLE1_SC2_HEIGHT"), "01");
+    }, ["DOOR_MODEL", "BUNDLE1_SC2_HEIGHT", DIMENSION_DEPS])
 
     // set bundle 1 rp2 desc
     addLogic("BUNDLE1_RP2_DESC", function () {
@@ -728,9 +722,8 @@ function addSectionBundleDrivers() {
 
     // bundle2 rp1 part#
     addLogic("BUNDLE2_RP1_SPNUM", function () {
-        const height = getState("BUNDLE2_SC1_HEIGHT");
-        this.value = buildRPSPNum(height);
-    }, ["DOOR_MODEL"])
+        this.value = buildRPSPNum(getState("BUNDLE2_SC1_HEIGHT"), "02");
+    }, ["DOOR_MODEL", "BUNDLE2_SC1_HEIGHT", DIMENSION_DEPS])
 
     // bundle 2 rp1 desc
     addLogic("BUNDLE2_RP1_DESC", function () {
@@ -742,9 +735,8 @@ function addSectionBundleDrivers() {
 
     // bundle 2 rp2 part#
     addLogic("BUNDLE2_RP2_SPNUM", function () {
-        const height = getState("BUNDLE2_SC2_HEIGHT");
-        this.value = buildRPSPNum(height);
-    }, ["DOOR_MODEL"])
+        this.value = buildRPSPNum(getState("BUNDLE2_SC2_HEIGHT"), "02");
+    }, ["DOOR_MODEL", "BUNDLE2_SC2_HEIGHT", DIMENSION_DEPS])
 
     // bundle 2 rp2 desc
     addLogic("BUNDLE2_RP2_DESC", function () {
@@ -757,9 +749,7 @@ function addSectionBundleDrivers() {
 
     //bundle 3 rp1 part#
     addLogic("BUNDLE3_RP1_SPNUM", function () {
-        const height = getState("BUNDLE3_SC1_HEIGHT");
-        this.value = buildRPSPNum(height);
-
+        this.value = buildRPSPNum(getState("BUNDLE3_SC1_HEIGHT"), "03");
     }, ["DOOR_MODEL", "BUNDLE3_SC1_HEIGHT", DIMENSION_DEPS])
 
     //bundle 3 rp1 desc
@@ -771,10 +761,9 @@ function addSectionBundleDrivers() {
 
     }, ["WIDTH", "BUNDLE3_SC1_HEIGHT", "BUNDLE3_SC1_QTY", "DOOR_MODEL", "COLOR", "Pattern"])
 
-    //bundle3 rp2 
+    //bundle3 rp2
     addLogic("BUNDLE3_RP2_SPNUM", function () {
-        const height = getState("BUNDLE3_SC2_HEIGHT");
-        this.value = buildRPSPNum(height);
+        this.value = buildRPSPNum(getState("BUNDLE3_SC2_HEIGHT"), "03");
     }, ["DOOR_MODEL", "BUNDLE3_SC2_HEIGHT", DIMENSION_DEPS])
 
     //bundle 3 rp2 desc
@@ -787,10 +776,9 @@ function addSectionBundleDrivers() {
     }, ["WIDTH", "BUNDLE3_SC2_HEIGHT", "BUNDLE3_SC2_QTY", "DOOR_MODEL", "COLOR", "Pattern"])
 
     //BUNDLE 4
-    //BUNDLE4 RP1    
+    //BUNDLE4 RP1
     addLogic("BUNDLE4_RP1_SPNUM", function () {
-        const height = getState("BUNDLE4_SC1_HEIGHT");
-        this.value = buildRPSPNum(height);
+        this.value = buildRPSPNum(getState("BUNDLE4_SC1_HEIGHT"), "04");
     }, ["DOOR_MODEL", "BUNDLE4_SC1_HEIGHT", DIMENSION_DEPS])
 
     //BUNDLE4 RP1 DESC
@@ -804,9 +792,7 @@ function addSectionBundleDrivers() {
 
     //bundle4 RP2 PART#
     addLogic("BUNDLE4_RP2_SPNUM", function () {
-        const height = getState("BUNDLE4_SC2_HEIGHT");
-        this.value = buildRPSPNum(height);
-
+        this.value = buildRPSPNum(getState("BUNDLE4_SC2_HEIGHT"), "04");
     }, ["DOOR_MODEL", "BUNDLE4_SC2_HEIGHT", DIMENSION_DEPS])
 
     //BUNDLE4 RP2 DESC
@@ -819,10 +805,9 @@ function addSectionBundleDrivers() {
     }, ["WIDTH", "BUNDLE4_SC2_HEIGHT", "BUNDLE4_SC2_QTY", "DOOR_MODEL", "COLOR", "Pattern"])
 
     //BUNDLE 5
-    //BUNDLE5 RP1    
+    //BUNDLE5 RP1
     addLogic("BUNDLE5_RP1_SPNUM", function () {
-        const height = getState("BUNDLE5_SC1_HEIGHT");
-        this.value = buildRPSPNum(height);
+        this.value = buildRPSPNum(getState("BUNDLE5_SC1_HEIGHT"), "05");
     }, ["DOOR_MODEL", "BUNDLE5_SC1_HEIGHT", DIMENSION_DEPS])
 
     //BUNDLE5 RP1 DESC
@@ -835,12 +820,9 @@ function addSectionBundleDrivers() {
     }, ["WIDTH", "BUNDLE5_SC1_HEIGHT", "BUNDLE5_SC1_QTY", "DOOR_MODEL", "COLOR", "Pattern"])
 
     //BUNDLE 6
-    //BUNDLE6 RP1    
+    //BUNDLE6 RP1
     addLogic("BUNDLE6_RP1_SPNUM", function () {
-
-        const height = getState("BUNDLE6_SC1_HEIGHT");
-        this.value = buildRPSPNum(height);
-
+        this.value = buildRPSPNum(getState("BUNDLE6_SC1_HEIGHT"), "06");
     }, ["DOOR_MODEL", "BUNDLE6_SC1_HEIGHT", DIMENSION_DEPS])
 
     //BUNDLE6 RP1 DESC
@@ -853,11 +835,9 @@ function addSectionBundleDrivers() {
     }, ["WIDTH", "BUNDLE6_SC1_HEIGHT", "BUNDLE6_SC1_QTY", "DOOR_MODEL", "COLOR", "Pattern"])
 
     //BUNDLE 7
-    //BUNDLE7 RP1    
+    //BUNDLE7 RP1
     addLogic("BUNDLE7_RP1_SPNUM", function () {
-        const height = getState("BUNDLE7_SC1_HEIGHT");
-        this.value = buildRPSPNum(height);
-
+        this.value = buildRPSPNum(getState("BUNDLE7_SC1_HEIGHT"), "07");
     }, ["DOOR_MODEL", "BUNDLE7_SC1_HEIGHT", DIMENSION_DEPS])
 
     //BUNDLE7 RP1 DESC
@@ -870,11 +850,9 @@ function addSectionBundleDrivers() {
     }, ["WIDTH", "BUNDLE7_SC1_HEIGHT", "BUNDLE7_SC1_QTY", "DOOR_MODEL", "COLOR", "Pattern"])
 
     //BUNDLE 8
-    //BUNDLE8 RP1    
+    //BUNDLE8 RP1
     addLogic("BUNDLE8_RP1_SPNUM", function () {
-        const height = getState("BUNDLE8_SC1_HEIGHT");
-        this.value = buildRPSPNum(height);
-
+        this.value = buildRPSPNum(getState("BUNDLE8_SC1_HEIGHT"), "08");
     }, ["DOOR_MODEL", "BUNDLE8_SC1_HEIGHT", DIMENSION_DEPS])
 
     //BUNDLE8 RP1 DESC
@@ -887,11 +865,9 @@ function addSectionBundleDrivers() {
     }, ["WIDTH", "BUNDLE8_SC1_HEIGHT", "BUNDLE8_SC1_QTY", "DOOR_MODEL", "COLOR", "Pattern"])
 
     //BUNDLE 9
-    //BUNDLE9 RP1    
+    //BUNDLE9 RP1
     addLogic("BUNDLE9_RP1_SPNUM", function () {
-        const height = getState("BUNDLE9_SC1_HEIGHT");
-        this.value = buildRPSPNum(height);
-
+        this.value = buildRPSPNum(getState("BUNDLE9_SC1_HEIGHT"), "09");
     }, ["DOOR_MODEL", "BUNDLE9_SC1_HEIGHT", DIMENSION_DEPS])
 
     //BUNDLE9 RP1 DESC
@@ -906,88 +882,116 @@ function addSectionBundleDrivers() {
     // RP BASE Part# for each section
     //Bundle 1
     addLogic("BUNDLE1_SC1_RP_BASE_SPNUM", function () {
-        const height = getState("BUNDLE1_SC1_HEIGHT");
-        this.value = buildRPBaseSpNum(height);
-    }, ["DOOR_MODEL", "BUNDLE1_SC1_HEIGHT"])
+        this.value = buildRPBasePartNum(getState("BUNDLE1_SC1_HEIGHT"));
+    }, ["DOOR_MODEL", "COLOR", "BUNDLE1_SC1_HEIGHT", DIMENSION_DEPS])
+
+    addLogic("BUNDLE1_SC1_RP_BASE_DESC", function () {
+        this.value = buildRPBaseDesc(getState("BUNDLE1_SC1_HEIGHT"));
+    }, ["BUNDLE1_SC1_HEIGHT"])
 
     addLogic("BUNDLE1_SC2_RP_BASE_SPNUM", function () {
-        const height = getState("BUNDLE1_SC2_HEIGHT");
-        this.value = buildRPBaseSpNum(height);
-    }, ["DOOR_MODEL", "BUNDLE1_SC2_HEIGHT"])
+        this.value = buildRPBasePartNum(getState("BUNDLE1_SC2_HEIGHT"));
+    }, ["DOOR_MODEL", "COLOR", "BUNDLE1_SC2_HEIGHT", DIMENSION_DEPS])
+
+    addLogic("BUNDLE1_SC2_RP_BASE_DESC", function () {
+        this.value = buildRPBaseDesc(getState("BUNDLE1_SC2_HEIGHT"));
+    }, ["BUNDLE1_SC2_HEIGHT"])
 
     //Bundle 2
     addLogic("BUNDLE2_SC1_RP_BASE_SPNUM", function () {
-        const height = getState("BUNDLE2_SC1_HEIGHT");
-        this.value = buildRPBaseSpNum(height);
+        this.value = buildRPBasePartNum(getState("BUNDLE2_SC1_HEIGHT"));
+    }, ["DOOR_MODEL", "COLOR", "BUNDLE2_SC1_HEIGHT", DIMENSION_DEPS])
 
-    }, ["DOOR_MODEL", "BUNDLE2_SC1_HEIGHT"])
+    addLogic("BUNDLE2_SC1_RP_BASE_DESC", function () {
+        this.value = buildRPBaseDesc(getState("BUNDLE2_SC1_HEIGHT"));
+    }, ["BUNDLE2_SC1_HEIGHT"])
 
     addLogic("BUNDLE2_SC2_RP_BASE_SPNUM", function () {
-        const height = getState("BUNDLE2_SC2_HEIGHT");
-        this.value = buildRPBaseSpNum(height);
+        this.value = buildRPBasePartNum(getState("BUNDLE2_SC2_HEIGHT"));
+    }, ["DOOR_MODEL", "COLOR", "BUNDLE2_SC2_HEIGHT", DIMENSION_DEPS])
 
-    }, ["DOOR_MODEL", "BUNDLE2_SC2_HEIGHT"])
+    addLogic("BUNDLE2_SC2_RP_BASE_DESC", function () {
+        this.value = buildRPBaseDesc(getState("BUNDLE2_SC2_HEIGHT"));
+    }, ["BUNDLE2_SC2_HEIGHT"])
 
     //Bundle 4
     addLogic("BUNDLE3_SC1_RP_BASE_SPNUM", function () {
-        const height = getState("BUNDLE3_SC1_HEIGHT");
-        this.value = buildRPBaseSpNum(height);
+        this.value = buildRPBasePartNum(getState("BUNDLE3_SC1_HEIGHT"));
+    }, ["DOOR_MODEL", "COLOR", "BUNDLE3_SC1_HEIGHT", DIMENSION_DEPS])
 
-    }, ["DOOR_MODEL", "BUNDLE3_SC1_HEIGHT", DIMENSION_DEPS])
+    addLogic("BUNDLE3_SC1_RP_BASE_DESC", function () {
+        this.value = buildRPBaseDesc(getState("BUNDLE3_SC1_HEIGHT"));
+    }, ["BUNDLE3_SC1_HEIGHT"])
 
     addLogic("BUNDLE3_SC2_RP_BASE_SPNUM", function () {
-        const height = getState("BUNDLE3_SC2_HEIGHT");
-        this.value = buildRPBaseSpNum(height);
+        this.value = buildRPBasePartNum(getState("BUNDLE3_SC2_HEIGHT"));
+    }, ["DOOR_MODEL", "COLOR", "BUNDLE3_SC2_HEIGHT", DIMENSION_DEPS])
 
-    }, ["DOOR_MODEL", "BUNDLE3_SC2_HEIGHT", DIMENSION_DEPS])
+    addLogic("BUNDLE3_SC2_RP_BASE_DESC", function () {
+        this.value = buildRPBaseDesc(getState("BUNDLE3_SC2_HEIGHT"));
+    }, ["BUNDLE3_SC2_HEIGHT"])
 
     //Bundle 4
     addLogic("BUNDLE4_SC1_RP_BASE_SPNUM", function () {
-        const height = getState("BUNDLE4_SC1_HEIGHT");
-        this.value = buildRPBaseSpNum(height);
+        this.value = buildRPBasePartNum(getState("BUNDLE4_SC1_HEIGHT"));
+    }, ["DOOR_MODEL", "COLOR", "BUNDLE4_SC1_HEIGHT", DIMENSION_DEPS])
 
-    }, ["DOOR_MODEL", "BUNDLE4_SC1_HEIGHT", DIMENSION_DEPS])
+    addLogic("BUNDLE4_SC1_RP_BASE_DESC", function () {
+        this.value = buildRPBaseDesc(getState("BUNDLE4_SC1_HEIGHT"));
+    }, ["BUNDLE4_SC1_HEIGHT"])
 
     addLogic("BUNDLE4_SC2_RP_BASE_SPNUM", function () {
-        const height = getState("BUNDLE4_SC2_HEIGHT");
+        this.value = buildRPBasePartNum(getState("BUNDLE4_SC2_HEIGHT"));
+    }, ["DOOR_MODEL", "COLOR", "BUNDLE4_SC2_HEIGHT", DIMENSION_DEPS])
 
-        this.value = buildRPBaseSpNum(height);
-
-    }, ["DOOR_MODEL", "BUNDLE4_SC2_HEIGHT", DIMENSION_DEPS])
+    addLogic("BUNDLE4_SC2_RP_BASE_DESC", function () {
+        this.value = buildRPBaseDesc(getState("BUNDLE4_SC2_HEIGHT"));
+    }, ["BUNDLE4_SC2_HEIGHT"])
 
     //Bundle5
     addLogic("BUNDLE5_SC1_RP_BASE_SPNUM", function () {
-        const height = getState("BUNDLE5_SC1_HEIGHT");
-        this.value = buildRPBaseSpNum(height);
-    }, ["DOOR_MODEL", "BUNDLE5_SC1_HEIGHT", DIMENSION_DEPS])
+        this.value = buildRPBasePartNum(getState("BUNDLE5_SC1_HEIGHT"));
+    }, ["DOOR_MODEL", "COLOR", "BUNDLE5_SC1_HEIGHT", DIMENSION_DEPS])
+
+    addLogic("BUNDLE5_SC1_RP_BASE_DESC", function () {
+        this.value = buildRPBaseDesc(getState("BUNDLE5_SC1_HEIGHT"));
+    }, ["BUNDLE5_SC1_HEIGHT"])
 
     //Bundle6
     addLogic("BUNDLE6_SC1_RP_BASE_SPNUM", function () {
-        const height = getState("BUNDLE6_SC1_HEIGHT");
-        this.value = buildRPBaseSpNum(height);
+        this.value = buildRPBasePartNum(getState("BUNDLE6_SC1_HEIGHT"));
+    }, ["DOOR_MODEL", "COLOR", "BUNDLE6_SC1_HEIGHT", DIMENSION_DEPS])
 
-    }, ["DOOR_MODEL", "BUNDLE6_SC1_HEIGHT", DIMENSION_DEPS])
+    addLogic("BUNDLE6_SC1_RP_BASE_DESC", function () {
+        this.value = buildRPBaseDesc(getState("BUNDLE6_SC1_HEIGHT"));
+    }, ["BUNDLE6_SC1_HEIGHT"])
 
     //Bundle7
     addLogic("BUNDLE7_SC1_RP_BASE_SPNUM", function () {
-        const height = getState("BUNDLE7_SC1_HEIGHT");
-        this.value = buildRPBaseSpNum(height);
+        this.value = buildRPBasePartNum(getState("BUNDLE7_SC1_HEIGHT"));
+    }, ["DOOR_MODEL", "COLOR", "BUNDLE7_SC1_HEIGHT", DIMENSION_DEPS])
 
-    }, ["DOOR_MODEL", "BUNDLE7_SC1_HEIGHT", DIMENSION_DEPS])
+    addLogic("BUNDLE7_SC1_RP_BASE_DESC", function () {
+        this.value = buildRPBaseDesc(getState("BUNDLE7_SC1_HEIGHT"));
+    }, ["BUNDLE7_SC1_HEIGHT"])
 
     //Bundle8
     addLogic("BUNDLE8_SC1_RP_BASE_SPNUM", function () {
-        const height = getState("BUNDLE8_SC1_HEIGHT");
-        this.value = buildRPBaseSpNum(height);
+        this.value = buildRPBasePartNum(getState("BUNDLE8_SC1_HEIGHT"));
+    }, ["DOOR_MODEL", "COLOR", "BUNDLE8_SC1_HEIGHT", DIMENSION_DEPS])
 
-    }, ["DOOR_MODEL", "BUNDLE8_SC1_HEIGHT", DIMENSION_DEPS])
+    addLogic("BUNDLE8_SC1_RP_BASE_DESC", function () {
+        this.value = buildRPBaseDesc(getState("BUNDLE8_SC1_HEIGHT"));
+    }, ["BUNDLE8_SC1_HEIGHT"])
 
     //Bundle9
     addLogic("BUNDLE9_SC1_RP_BASE_SPNUM", function () {
-        const height = getState("BUNDLE9_SC1_HEIGHT");
-        this.value = buildRPBaseSpNum(height);
+        this.value = buildRPBasePartNum(getState("BUNDLE9_SC1_HEIGHT"));
+    }, ["DOOR_MODEL", "COLOR", "BUNDLE9_SC1_HEIGHT", DIMENSION_DEPS])
 
-    }, ["DOOR_MODEL", "BUNDLE9_SC1_HEIGHT", DIMENSION_DEPS])
+    addLogic("BUNDLE9_SC1_RP_BASE_DESC", function () {
+        this.value = buildRPBaseDesc(getState("BUNDLE9_SC1_HEIGHT"));
+    }, ["BUNDLE9_SC1_HEIGHT"])
 
 
     addLogic("RP_BASE_QTY", function () {
@@ -998,77 +1002,107 @@ function addSectionBundleDrivers() {
     //Bundle 1
     addLogic("BUNDLE1_SC1_RP_TOP_SHEET_SPNUM", function () {
         let height = getState("BUNDLE1_SC1_HEIGHT");
-        this.value = buildRPTopSpNum(height)
+        this.value = "";
     }, ["BUNDLE1_SC1_HEIGHT", "COLOR"])
 
     addLogic("BUNDLE1_SC2_RP_TOP_SHEET_SPNUM", function () {
         let height = getState("BUNDLE1_SC2_HEIGHT");
-        this.value = buildRPTopSpNum(height)
+        this.value = "";
     }, ["BUNDLE1_SC2_HEIGHT", "COLOR"])
 
     //Bundle 2
     addLogic("BUNDLE2_SC1_RP_TOP_SHEET_SPNUM", function () {
         let height = getState("BUNDLE2_SC1_HEIGHT");
-        this.value = buildRPTopSpNum(height)
+        this.value = "";
     }, ["BUNDLE2_SC1_HEIGHT", "COLOR"])
 
     addLogic("BUNDLE2_SC2_RP_TOP_SHEET_SPNUM", function () {
         let height = getState("BUNDLE2_SC2_HEIGHT");
-        this.value = buildRPTopSpNum(height)
+        this.value = "";
     }, ["BUNDLE2_SC2_HEIGHT", "COLOR"])
 
     //Bundle 3
     addLogic("BUNDLE3_SC1_RP_TOP_SHEET_SPNUM", function () {
         let height = getState("BUNDLE3_SC1_HEIGHT");
-        this.value = buildRPTopSpNum(height)
+        this.value = "";
     }, ["BUNDLE3_SC1_HEIGHT", "COLOR", DIMENSION_DEPS])
 
     addLogic("BUNDLE3_SC2_RP_TOP_SHEET_SPNUM", function () {
         let height = getState("BUNDLE3_SC2_HEIGHT");
-        this.value = buildRPTopSpNum(height)
+        this.value = "";
     }, ["BUNDLE3_SC2_HEIGHT", "COLOR", DIMENSION_DEPS])
 
     //Bundle 4
     addLogic("BUNDLE4_SC1_RP_TOP_SHEET_SPNUM", function () {
         let height = getState("BUNDLE4_SC1_HEIGHT");
-        this.value = buildRPTopSpNum(height)
+        this.value = "";
     }, ["BUNDLE4_SC1_HEIGHT", "COLOR", DIMENSION_DEPS])
 
     addLogic("BUNDLE4_SC2_RP_TOP_SHEET_SPNUM", function () {
         let height = getState("BUNDLE4_SC2_HEIGHT");
-        this.value = buildRPTopSpNum(height)
+        this.value = "";
     }, ["BUNDLE4_SC2_HEIGHT", "COLOR", DIMENSION_DEPS])
 
     //Bundle 5
     addLogic("BUNDLE5_SC1_RP_TOP_SHEET_SPNUM", function () {
         let height = getState("BUNDLE5_SC1_HEIGHT");
-        this.value = buildRPTopSpNum(height)
+        this.value = "";
     }, ["BUNDLE5_SC1_HEIGHT", "COLOR", DIMENSION_DEPS])
 
     //Bundle 6
     addLogic("BUNDLE6_SC1_RP_TOP_SHEET_SPNUM", function () {
         let height = getState("BUNDLE6_SC1_HEIGHT");
-        this.value = buildRPTopSpNum(height)
+        this.value = "";
     }, ["BUNDLE6_SC1_HEIGHT", "COLOR", DIMENSION_DEPS])
 
     //Bundle 7
     addLogic("BUNDLE7_SC1_RP_TOP_SHEET_SPNUM", function () {
         let height = getState("BUNDLE7_SC1_HEIGHT");
-        this.value = buildRPTopSpNum(height)
+        this.value = "";
     }, ["BUNDLE7_SC1_HEIGHT", "COLOR", DIMENSION_DEPS])
 
     //Bundle 8
     addLogic("BUNDLE8_SC1_RP_TOP_SHEET_SPNUM", function () {
         let height = getState("BUNDLE8_SC1_HEIGHT");
-        this.value = buildRPTopSpNum(height)
+        this.value = "";
     }, ["BUNDLE8_SC1_HEIGHT", "COLOR", DIMENSION_DEPS])
 
     //Bundle 9
     addLogic("BUNDLE9_SC1_RP_TOP_SHEET_SPNUM", function () {
         let height = getState("BUNDLE9_SC1_HEIGHT");
-        this.value = buildRPTopSpNum(height)
+        this.value = "";
     }, ["BUNDLE9_SC1_HEIGHT", "COLOR", DIMENSION_DEPS])
 
+
+    // Bottom Retainer part# -> two output boxes (the dropdown's option VALUE is
+    // the part#; the platform shows the matching description):
+    //   TM_BOTTOM_RETAINER          -> PRIMARY part# for the selected model
+    //                                  (all families: T150/T175 + T200/T300)
+    //   TM_BOTTOM_RETAINER_T200_T300 -> SECOND retainer part#, only the wide
+    //                                  T200 bands (>294") populate it; "" otherwise
+    // See buildBottomRetainerParts.
+    addLogic("TM_BOTTOM_RETAINER", function () {
+        // Default to the "None" option (value="None") when there is no retainer
+        // part — not blank — so the BOM carries an explicit None for the line.
+        this.value = buildBottomRetainerParts().primary || "None";
+    }, ["WIDTH", "DOOR_MODEL", "BottomRetainer"])
+
+    addLogic("TM_BOTTOM_RETAINER_T200_T300", function () {
+        // Default to the "None" option (value="None") when there is no 2nd
+        // retainer — not blank — so the BOM carries an explicit None for the line.
+        this.value = buildBottomRetainerParts().secondary || "None";
+    }, ["WIDTH", "DOOR_MODEL", "BottomRetainer"])
+
+    // Bottom Retainer qty. Placeholder: 1 when a primary retainer part exists,
+    // blank otherwise. Exact per-model/per-band rules pending from Bill — see
+    // buildBottomRetainerQty.
+    addLogic("TM_BOTTOM_RETAINER_QTY", function () {
+        this.value = buildBottomRetainerQty();
+    }, ["WIDTH", "DOOR_MODEL", "BottomRetainer"])
+
+    /* [BOTTOM_RETAINER — OLD] Original WIDTH-range part# lookup (328-790-XXX),
+       superseded by BOTTOM_RETAINER_SPNUM (model + retainer driven). Restore if
+       the new per-model logic ever needs to roll back.
 
     addLogic("BOTTOM_RETAINER", function () {
         let width = getState("WIDTH");
@@ -1094,23 +1128,60 @@ function addSectionBundleDrivers() {
         }
         this.value = value;
     }, ["WIDTH"])
+    */
 
     addLogic("BTM_SEAL_QTY", function () {
+        // Bottom seal qty = DWft + 0.5 (UoM FT). DWft = WIDTH/12 (custom-dim
+        // aware). Round to 2 decimals so wide doors don't show 31.66666… etc.
+        // Blank when the seal itself produces no BOM line (None, or a suppressed
+        // 4" PVC) — mirror the BTM_SEAL/BTM_SEAL_SPNUM blanking so the qty box
+        // can't carry an orphan value with no part#.
+        const seal = $("input[name='BottomSeal']:checked").val() || "none";
+        const model = $("input[name='DOOR_MODEL']:checked").val() || "";
+        const retainer = $("input[name='BottomRetainer']:checked").val() || "";
+        if (seal === "none" || isNoSealOutput(seal, model, retainer)) { this.value = ""; return; }
         let width = getState("WIDTH");
-        this.value = ((Number(width) / 12) + 0.5)
-    }, ["WIDTH"])
+        this.value = Math.round(((Number(width) / 12) + 0.5) * 100) / 100;
+    }, ["WIDTH", "BottomSeal", "DOOR_MODEL", "BottomRetainer"])
 
-    // Mirror the currently selected Bottom Seal (radio name="BottomSeal") as
-    // display text. Values: none / pvc_4_35c / santoprene_3_60c (load_html.js).
+    // Bottom Seal -> two text fields: BTM_SEAL = Name/desc, BTM_SEAL_SPNUM = item
+    // number. Both blank for None. Read the radio directly.
     addLogic("BTM_SEAL", function () {
-        const seal = getState("BottomSeal");
-        const labels = {
+        const seal = $("input[name='BottomSeal']:checked").val() || "none";
+        const model = $("input[name='DOOR_MODEL']:checked").val() || "";
+        const retainer = $("input[name='BottomRetainer']:checked").val() || "";
+        // 4" PVC with no BOM output (see isNoSealOutput) — blank desc + part#.
+        if (isNoSealOutput(seal, model, retainer)) { this.value = ""; return; }
+        const names = {
             none: "",
             pvc_4_35c: '4" PVC Bottom Seal (-35C)',
             santoprene_3_60c: '3" Santoprene Bottom Seal (-60C)',
+            dual_durometer: 'T150 Btm Retainer & Seal 24\'6"',
         };
-        this.value = labels[seal] || "";
-    }, ["BottomSeal"])
+        this.value = names[seal] ?? "";
+    }, ["BottomSeal", "DOOR_MODEL", "BottomRetainer"])
+
+    addLogic("BTM_SEAL_SPNUM", function () {
+        const seal = $("input[name='BottomSeal']:checked").val() || "none";
+        const model = $("input[name='DOOR_MODEL']:checked").val() || "";
+        const retainer = $("input[name='BottomRetainer']:checked").val() || "";
+        // 4" PVC with no BOM output — blank.
+        if (isNoSealOutput(seal, model, retainer)) { this.value = ""; return; }
+        const spnums = {
+            none: "",
+            pvc_4_35c: "152-318",
+            santoprene_3_60c: "152-319",
+            dual_durometer: "328-266",
+        };
+        // 3" Santoprene ships as ZZBTM-3IN (per Bill's output spec) for all
+        // currently-specified models, not the default 152-319.
+        const santoZZModels = ["T150", "T150U", "T175", "T175U", "T200", "T200-20", "T200U", "T300", "T200C", "U200C"];
+        if (seal === "santoprene_3_60c" && santoZZModels.includes(model)) {
+            this.value = "ZZBTM-3IN";
+            return;
+        }
+        this.value = spnums[seal] ?? "";
+    }, ["BottomSeal", "DOOR_MODEL", "BottomRetainer"])
 
     addLogic("BTM_RETAINER_SCREW_QTY", function () {
         let width_feet = getState("DOOR_WIDTH_FEET");
@@ -1163,35 +1234,6 @@ function addSectionBundleDrivers() {
 
     }, ["BUNDLE1_SC2_HEIGHT", "DOOR_MODEL", "EndCaps"])
 
-    //Thermatite End Caps — LH (Bundle 1)
-    addLogic("BUNDLE1_SC1_END_CAPS_LH_SPNUM", function () {
-        const end_caps = getState("EndCaps");
-        const door_model = getState("DOOR_MODEL");
-        const height = getState("BUNDLE1_SC1_HEIGHT");
-        this.value = getThermatiteEndCap(door_model, end_caps, "LH", height).spnum;
-    }, ["BUNDLE1_SC1_HEIGHT", "DOOR_MODEL", "EndCaps"])
-
-    addLogic("BUNDLE1_SC1_END_CAPS_LH_DESC", function () {
-        const end_caps = getState("EndCaps");
-        const door_model = getState("DOOR_MODEL");
-        const height = getState("BUNDLE1_SC1_HEIGHT");
-        this.value = getThermatiteEndCap(door_model, end_caps, "LH", height).desc;
-    }, ["BUNDLE1_SC1_HEIGHT", "DOOR_MODEL", "EndCaps"])
-
-    addLogic("BUNDLE1_SC2_END_CAPS_LH_SPNUM", function () {
-        const end_caps = getState("EndCaps");
-        const door_model = getState("DOOR_MODEL");
-        const height = getState("BUNDLE1_SC2_HEIGHT");
-        this.value = getThermatiteEndCap(door_model, end_caps, "LH", height).spnum;
-    }, ["BUNDLE1_SC2_HEIGHT", "DOOR_MODEL", "EndCaps"])
-
-    addLogic("BUNDLE1_SC2_END_CAPS_LH_DESC", function () {
-        const end_caps = getState("EndCaps");
-        const door_model = getState("DOOR_MODEL");
-        const height = getState("BUNDLE1_SC2_HEIGHT");
-        this.value = getThermatiteEndCap(door_model, end_caps, "LH", height).desc;
-    }, ["BUNDLE1_SC2_HEIGHT", "DOOR_MODEL", "EndCaps"])
-
     //Bundle 2
     addLogic("BUNDLE2_SC1_END_CAPS_SPNUM", function () {
         const end_caps = getState("EndCaps");
@@ -1210,6 +1252,50 @@ function addSectionBundleDrivers() {
         this.value = getEndCapsPartNum(bundle2_sc2_height, door_model, end_caps);
 
     }, ["BUNDLE2_SC2_HEIGHT", "DOOR_MODEL", "EndCaps"])
+
+    // Thermatite End Caps — flat by section height (21" / 24"), not by bundle.
+    // The part# / desc only depend on model + single/double + hand + height, so
+    // every bundle reuses the same value. Blank when the door has no section of
+    // that height (getSectionBundle is the resolved list of section heights).
+    addLogic("LH_21_END_CAPS_SPNUM", function () {
+        const has21 = getSectionBundle().includes(21);
+        this.value = has21 ? getThermatiteEndCap(getState("DOOR_MODEL"), getState("EndCaps"), "LH", 21).spnum : 'None';
+    }, ["SHORTEST_SECTION", "TALLEST_SECTION", "DOOR_MODEL", "EndCaps"])
+
+    addLogic("LH_21_END_CAPS_DESC", function () {
+        const has21 = getSectionBundle().includes(21);
+        this.value = has21 ? getThermatiteEndCap(getState("DOOR_MODEL"), getState("EndCaps"), "LH", 21).desc : '';
+    }, ["SHORTEST_SECTION", "TALLEST_SECTION", "DOOR_MODEL", "EndCaps"])
+
+    addLogic("RH_21_END_CAPS_SPNUM", function () {
+        const has21 = getSectionBundle().includes(21);
+        this.value = has21 ? getThermatiteEndCap(getState("DOOR_MODEL"), getState("EndCaps"), "RH", 21).spnum : 'None';
+    }, ["SHORTEST_SECTION", "TALLEST_SECTION", "DOOR_MODEL", "EndCaps"])
+
+    addLogic("RH_21_END_CAPS_DESC", function () {
+        const has21 = getSectionBundle().includes(21);
+        this.value = has21 ? getThermatiteEndCap(getState("DOOR_MODEL"), getState("EndCaps"), "RH", 21).desc : '';
+    }, ["SHORTEST_SECTION", "TALLEST_SECTION", "DOOR_MODEL", "EndCaps"])
+
+    addLogic("LH_24_END_CAPS_SPNUM", function () {
+        const has24 = getSectionBundle().includes(24);
+        this.value = has24 ? getThermatiteEndCap(getState("DOOR_MODEL"), getState("EndCaps"), "LH", 24).spnum : 'None';
+    }, ["SHORTEST_SECTION", "TALLEST_SECTION", "DOOR_MODEL", "EndCaps"])
+
+    addLogic("LH_24_END_CAPS_DESC", function () {
+        const has24 = getSectionBundle().includes(24);
+        this.value = has24 ? getThermatiteEndCap(getState("DOOR_MODEL"), getState("EndCaps"), "LH", 24).desc : '';
+    }, ["SHORTEST_SECTION", "TALLEST_SECTION", "DOOR_MODEL", "EndCaps"])
+
+    addLogic("RH_24_END_CAPS_SPNUM", function () {
+        const has24 = getSectionBundle().includes(24);
+        this.value = has24 ? getThermatiteEndCap(getState("DOOR_MODEL"), getState("EndCaps"), "RH", 24).spnum : 'None';
+    }, ["SHORTEST_SECTION", "TALLEST_SECTION", "DOOR_MODEL", "EndCaps"])
+
+    addLogic("RH_24_END_CAPS_DESC", function () {
+        const has24 = getSectionBundle().includes(24);
+        this.value = has24 ? getThermatiteEndCap(getState("DOOR_MODEL"), getState("EndCaps"), "RH", 24).desc : '';
+    }, ["SHORTEST_SECTION", "TALLEST_SECTION", "DOOR_MODEL", "EndCaps"])
 
     //Bundle 3
     addLogic("BUNDLE3_SC1_END_CAPS_SPNUM", function () {
@@ -1354,6 +1440,80 @@ function addSectionBundleDrivers() {
         this.value = getState("BUNDLE_9_HEIGHT") < 32 ? getState("PKG_QTY") : 0
     }, ["BUNDLE_9_HEIGHT"])
 
+    // End cap fastener quantity per section component (part# is the fixed
+    // ENDCAPS_FASTENERS dropdown selection, not driven here).
+    //   T200C (SE or DE) -> 2 ; other models SE -> 4 ; other models DE -> 8.
+    addLogic("ENDCAPS_FASTENERS_QTY", function () {
+        const numSec = Number(getState("NUM_OF_SEC")) || 0;
+        if (numSec <= 0) { this.value = 0; return; }
+        this.value = getEndCapFastenerQtyPerSC(getState("DOOR_MODEL"), getState("EndCaps"));
+    }, ["NUM_OF_SEC", "DOOR_MODEL", "EndCaps"])
+
+    // Bottom retainer fasteners. Part# is model-dependent (T200C = 215-203,
+    // all other models = 215-306). Qty = Round(DWft + 1) for every model, where
+    // DWft = WIDTH/12 (custom-dim aware, same convention as BTM_SEAL_QTY).
+    addLogic("BOTTOM_FASTENERS", function () {
+        this.value = getState("DOOR_MODEL") === "T200C" ? "215-203" : "215-306";
+    }, ["DOOR_MODEL"])
+
+    addLogic("BOTTOM_FASTENERS_QTY", function () {
+        const dwft = Number(getState("WIDTH")) / 12;
+        this.value = Math.round(dwft + 1);
+    }, ["WIDTH"])
+
+    // Top coil 21" — part# by model then colour code (1=white, 2=brown, 4=silver).
+    // T200C uses a letter colour code -> 127-032<letter> (see TOP_COIL_T200C_LETTER).
+    addLogic("TOP_COIL_21_INCH", function () {
+        const parts = {
+            T150: { "1": "126-829",  "2": "126-846B", "4": "126-885" },
+            T175: { "1": "126-821",  "2": "126-844",  "4": "126-883" },
+            T200: { "1": "126-838W" },
+            "T200-20": { "1": "126-865" },
+            T300: { "1": "126-886" },
+        };
+        const model = topCoilModelKey(getState("DOOR_MODEL"));
+        const colorKey = $("input[name='COLOR']:checked").val() || "";
+        if (model === "T200C" || model === "U200C") {
+            const letter = TOP_COIL_T200C_LETTER[colorKey];
+            this.value = letter ? `127-032${letter}` : "None";
+            return;
+        }
+        this.value = parts[model]?.[RP_BASE_COLOR_CODE[colorKey]] || "None";
+    }, ["COLOR", "DOOR_MODEL"])
+
+    // Top coil 24" — part# by model then colour code (1=white, 2=brown, 4=silver).
+    // T200C uses a letter colour code -> 127-033<letter> (see TOP_COIL_T200C_LETTER).
+    addLogic("TOP_COIL_24_INCH", function () {
+        const parts = {
+            T150: { "1": "126-828", "2": "126-845B", "4": "126-884" },
+            T175: { "1": "126-820", "2": "126-843",  "4": "126-882" },
+            T200: { "1": "126-837W" },
+            "T200-20": { "1": "126-864" },
+            T300: { "1": "126-887" },
+        };
+        const model = topCoilModelKey(getState("DOOR_MODEL"));
+        const colorKey = $("input[name='COLOR']:checked").val() || "";
+        if (model === "T200C" || model === "U200C") {
+            const letter = TOP_COIL_T200C_LETTER[colorKey];
+            this.value = letter ? `127-033${letter}` : "None";
+            return;
+        }
+        this.value = parts[model]?.[RP_BASE_COLOR_CODE[colorKey]] || "None";
+    }, ["COLOR", "DOOR_MODEL"])
+
+    // Top coil qty = model multiplier * door width (ft). 0 when there's no part#.
+    addLogic("TOP_COIL_21_INCH_QTY", function () {
+        const mult = TOP_COIL_QTY_MULT["21"][topCoilModelKey(getState("DOOR_MODEL"))];
+        const hasPart = getState("TOP_COIL_21_INCH") && getState("TOP_COIL_21_INCH") !== "None";
+        this.value = (mult && hasPart) ? Math.round(mult * (Number(getState("WIDTH")) / 12) * 100) / 100 : 0;
+    }, ["TOP_COIL_21_INCH", "DOOR_MODEL", "WIDTH"])
+
+    addLogic("TOP_COIL_24_INCH_QTY", function () {
+        const mult = TOP_COIL_QTY_MULT["24"][topCoilModelKey(getState("DOOR_MODEL"))];
+        const hasPart = getState("TOP_COIL_24_INCH") && getState("TOP_COIL_24_INCH") !== "None";
+        this.value = (mult && hasPart) ? Math.round(mult * (Number(getState("WIDTH")) / 12) * 100) / 100 : 0;
+    }, ["TOP_COIL_24_INCH", "DOOR_MODEL", "WIDTH"])
+
 }
 
 function getEndCapsPartNum(section_height, door_model, end_caps) {
@@ -1361,24 +1521,20 @@ function getEndCapsPartNum(section_height, door_model, end_caps) {
     const partNumbers = {
         A: { // L138
             N: { // Single
-                18: '426-0800',
                 21: '426-0801',
                 24: '426-0802'
             },
             Y: { // Double
-                18: '426-0805',
                 21: '426-0806',
                 24: '426-0807'
             }
         },
         D: { // L200 (any non-"A" model)
             N: {
-                18: '426-0810',
                 21: '426-0811',
                 24: '426-0812'
             },
             Y: {
-                18: '426-0815',
                 21: '426-0816',
                 24: '426-0817'
             }
@@ -1434,30 +1590,54 @@ function getThermatiteEndCap(model, end_caps, hand, height) {
     return { spnum, desc };
 }
 
+// End cap fastener (part# 215-308R) quantity PER section component.
+// Per Bill:
+//   T200C, single OR double end caps -> 2 / SC
+//   all other models, single end caps -> 4 / SC
+//   all other models, double end caps -> 8 / SC
+// end_caps is the EndCaps radio value: "0" = single (SE), "1" = double (DE).
+function getEndCapFastenerQtyPerSC(door_model, end_caps) {
+    const isDouble = String(end_caps) === "1";
+    if (door_model === "T200C") return 2;
+    return isDouble ? 8 : 4;
+}
+
+// U-variants share their base model's top-coil parts: T150U->T150, T175U->T175,
+// T200U->T200. (U200C is NOT normalized here — it has its own white entry.)
+function topCoilModelKey(model) {
+    const base = { T150U: "T150", T175U: "T175", T200U: "T200" };
+    return base[model] || model;
+}
+
 function getSectionHeight(height, num_of_sec) {
-    // Thermatite has exactly ONE section configuration per height: the PRIMARY
-    // (first) chart row. The additional "// optional" rows in getStackChart() are
-    // Landmark-only alternates and must be ignored — selecting by num_of_sec could
-    // otherwise pick an optional row (or miss entirely and fall back to wrong
-    // arithmetic). Always return the first entry for the height. num_of_sec is
-    // accepted for signature compatibility but no longer used for selection.
+    // Thermatite has exactly ONE section configuration per height: the single
+    // chart row. (The Landmark-only "// optional" alternate rows have been
+    // removed from getStackChart().) Always return that entry. num_of_sec is
+    // accepted for signature compatibility but not used for selection.
     const configArray = getStackChart()[String(height)];
     if (!configArray || !configArray.length) return undefined;
     return configArray[0];
 }
 
-// The single valid section count for a given door height (inches) per the
-// Thermatite stack chart's primary row. Drives NUM_OF_SEC so the dropdown and the
-// bundle heights always agree. Snaps off-chart heights to the nearest 3" key.
+// The single valid section count for a given door height (inches). Drives
+// NUM_OF_SEC so the dropdown and the bundle heights always agree.
+//
+// Rule (per Bill): one section is added every 2 ft of height. Each band runs
+// from X'1" up to (X+2)'0" inclusive, so the boundary sits ON the even-foot
+// mark (that height keeps the lower count; one inch more bumps it). Base case
+// is 4'0" (48") -> 2 sections; every full 24" above 48" adds one section.
+//   48"        -> 2      |  49"-72"  (4'1"-6'0")  -> 3
+//   73"-96"    -> 4      |  97"-120" (8'1"-10'0") -> 5   ... etc.
+//   265"-288"  (22'1"-24'0") -> 12  ...  361"-384" (30'1"-32'0") -> 16
 function getChartNumSections(heightInches) {
     const h = Number(heightInches) || 0;
-    const entry = getSectionHeight(h) || getSectionHeight(Math.round(h / 3) * 3);
-    return entry ? Number(entry.num_sections) : 0;
+    if (h <= 48) return h > 0 ? 2 : 0;
+    return 2 + Math.ceil((h - 48) / 24);
 }
 
 // Pull the individual section heights out of a stack-chart entry.
 // Entry keys are top_section_height / btm_section_height / int*_height,
-// all in inches and always one of 18 / 21 / 24.
+// all in inches and always one of 21 / 24.
 function chartEntryHeights(entry) {
     if (!entry) return [];
     return Object.keys(entry)
@@ -1476,10 +1656,20 @@ let _resolveSectionHeightsKey = null;
 // Force the next resolveSectionHeights() to recompute. Call after HEIGHT/NUM_OF_SEC
 // settle for a new selection but before recomputing bundles — otherwise the memo
 // (keyed HEIGHT|NUM_OF_SEC) can serve the previous selection's values, which made
-// the BOM lag one click behind / show arithmetic fallback (15/18) on load.
+// the BOM lag one click behind / show a stale arithmetic fallback on load.
 function invalidateSectionHeightsCache() {
     _resolveSectionHeightsCache = null;
     _resolveSectionHeightsKey = null;
+    // Clear the two downstream bundle caches too. They self-key on the section
+    // qtys/heights, but on a fast dimension change those node values are written
+    // during the framework's stale (HEIGHT, NUM_OF_SEC) walk, so the keys match
+    // and the stale bundle/end-cap result keeps being served. Resetting here —
+    // the single "section data changed" signal — forces a clean rebuild once the
+    // SHORTEST/TALLEST_SECTION nodes are re-walked with the settled selection.
+    _sectionBundleCache = null;
+    _sectionBundleCacheKey = null;
+    _bundleByHeightCache = null;
+    _bundleByHeightCacheKey = null;
 }
 function resolveSectionHeights() {
     const doorHeight = Number(getState("HEIGHT")) || 0;
@@ -1494,9 +1684,11 @@ function resolveSectionHeights() {
     }
 
     // Arithmetic estimate (3" granularity) — kept as the cross-check / fallback.
+    // Thermatite only ever uses 21" or 24" sections, so clamp the floor to 21:
+    // the raw arithmetic can otherwise land on 15/18, which aren't valid heights.
     const per = numOfSec > 0 ? doorHeight / numOfSec : 0;
-    const arithTallest = Math.ceil(per / 3) * 3;
-    const arithShortest = Math.floor(per / 3) * 3;
+    const arithTallest = per > 0 ? Math.max(Math.ceil(per / 3) * 3, 21) : 0;
+    const arithShortest = per > 0 ? Math.max(Math.floor(per / 3) * 3, 21) : 0;
 
     // Chart lookup. Chart keys step every 3"; snap non-charted heights (e.g. 122)
     // to the nearest 3" key so a 10'2" door still authenticates against the chart.
@@ -1530,9 +1722,18 @@ function resolveSectionHeights() {
     // NUM_OF_SEC can't produce a section taller than the chart ever allows).
     const tallest = Math.min(arithTallest, 24);
     const shortest = arithShortest;
-    const diff = per - shortest;
-    const shortestQty = Math.round((1 - diff / 3) * numOfSec) || 0;
-    const tallestQty = Math.max(numOfSec - shortestQty, 0);
+    // All sections the same clamped height: put the full count in tallestQty
+    // (matches the chart path) instead of the split formula, which overshoots
+    // numOfSec when per <= shortest (diff negative).
+    let shortestQty, tallestQty;
+    if (tallest === shortest || per <= shortest) {
+        shortestQty = 0;
+        tallestQty = numOfSec;
+    } else {
+        const diff = per - shortest;
+        shortestQty = Math.round((1 - diff / 3) * numOfSec) || 0;
+        tallestQty = Math.max(numOfSec - shortestQty, 0);
+    }
 
     // Only warn for a genuinely off-chart HEIGHT. When the height IS charted but
     // the (height, num_of_sec) combo isn't, it's almost always the transient
@@ -1600,123 +1801,6 @@ function getSectionBundle() {
     return _sectionBundleCache;
 }
 
-// function bundleByHeight() {
-
-//     const width = Number(getState("WIDTH"));
-
-//     const shortest = Number(getState("SHORTEST_SECTION"));
-//     const sQty = Number(getState("SHORTEST_SECTIONS_QTY"));
-
-//     const tallest = Number(getState("TALLEST_SECTION"));
-//     const tQty = Number(getState("TALLEST_SECTION_QTY"));
-
-//     const result = [];
-
-
-//     //  (width >= 199)
-//     if (width >= 199) {
-
-//         const allSections = [];
-
-//         // expand tallest
-//         for (let i = 0; i < tQty; i++) {
-//             allSections.push(tallest);
-//         }
-
-//         // expand shortest
-//         for (let i = 0; i < sQty; i++) {
-//             allSections.push(shortest);
-//         }
-
-//         return allSections
-//             .sort((a, b) => b - a) // tallest → shortest
-//             .map(h => ({
-//                 sections: [h],
-//                 weight: calculateSectionShipWeight(h, false)
-//             }));
-//     }
-
-
-//     // (width < 199)
-//     if (tQty === 1) {
-//         // single tallest will go last (handled later)
-//     }
-
-//     else if (tQty > 1 && tQty % 2 === 1) {
-
-//         // 1️⃣ first tallest single
-//         result.push({
-//             sections: [tallest],
-//             weight: calculateSectionShipWeight(tallest, false)
-//         });
-
-//         // 2️⃣ remaining pairs
-//         let remaining = tQty - 1;
-
-//         while (remaining >= 2) {
-//             result.push({
-//                 sections: [tallest, tallest],
-//                 weight:
-//                     calculateSectionShipWeight(tallest, false) +
-//                     calculateSectionShipWeight(tallest, true)
-//             });
-//             remaining -= 2;
-//             console.log("1", result);
-//         }
-//     }
-
-//     else if (tQty > 1 && tQty % 2 === 0) {
-
-//         let remaining = tQty;
-
-//         while (remaining >= 2) {
-//             result.push({
-//                 sections: [tallest, tallest],
-//                 weight:
-//                     calculateSectionShipWeight(tallest, false) +
-//                     calculateSectionShipWeight(tallest, true)
-//             });
-//             remaining -= 2;
-//         }
-//     }
-
-//     // =========================
-//     // STEP 2: SHORTEST RULES
-//     // =========================
-
-//     let sRemaining = sQty;
-
-//     while (sRemaining >= 2) {
-//         result.push({
-//             sections: [shortest, shortest],
-//             weight:
-//                 calculateSectionShipWeight(shortest, false) +
-//                 calculateSectionShipWeight(shortest, true)
-//         });
-//         sRemaining -= 2;
-//     }
-
-//     if (sRemaining === 1) {
-//         result.push({
-//             sections: [shortest],
-//             weight: calculateSectionShipWeight(shortest, false)
-//         });
-//     }
-
-//     // =========================
-//     // STEP 3: SINGLE TALLEST LAST (ONLY IF 1)
-//     // =========================
-
-//     if (tQty === 1) {
-//         result.push({
-//             sections: [tallest],
-//             weight: calculateSectionShipWeight(tallest, false)
-//         });
-//     }
-
-//     console.log("result", result);
-//     return result;
-// }
 
 // Maximum bundle weight in pounds. Pairs whose combined ship weight would
 // meet or exceed this cap must ship as singles instead.
@@ -1726,6 +1810,7 @@ function bundleByHeight() {
 
     // Thermatite bundling rules (based on Landmark v2):
     // - Width >= 199: All sections ship alone (no bundling)
+    // - Height > 12'2" (146"): All sections ship alone (no double bundling)
     // - If tallest section qty is odd (or all sections have same height with odd count),
     //   the bottom section always ships alone. Remaining sections pair up.
     // - If tallest section qty is even, pair up adjacent same-height sections from the start.
@@ -1742,8 +1827,11 @@ function bundleByHeight() {
 
     if (!sections.length) return result;
 
-    // WIDTH RULE: ship every section alone if width >= 199
-    if (width >= 199) {
+    // HEIGHT RULE: doors taller than 12'2" (146") ship every section alone —
+    // no double bundling past that height. (12'2" itself can still pair.)
+    // WIDTH RULE: ship every section alone if width >= 199.
+    const doorHeight = Number(getState("HEIGHT"));
+    if (width >= 199 || doorHeight > 146) {
         sections.forEach((h, i) => {
             result.push({
                 sections: [h],
@@ -2040,19 +2128,11 @@ function buildRPDescription(height, qty, isBundleIndex = 0, bundleIndex = 0) {
     if (qty <= 0) return "";
 
     return assembleDesc([
-        "SR",
         buildDescSegmentsBCD(height),     // b c d
         buildRPRunLength(),               // g
     ]);
 }
 
-// SR-description segment g: raw panel (RP) run length in inches = finished
-// section width less 0.375". WIDTH holds the whole-inch width (feet*12 + inches);
-// the fractional inch lives separately in DOOR_WIDTH_FRACTION (a decimal, 1/8 ->
-// 0.125) so it doesn't perturb the ~15 other WIDTH consumers. g therefore is
-// WIDTH + fraction - 0.375. Printed at exact precision, no forced decimals, no
-// unit: 10'-2 1/8" -> 122 + 0.125 - 0.375 = "121.75"; whole-inch 20'-2" -> 242 +
-// 0 - 0.375 = "241.625".
 function buildRPRunLength() {
     const width = Number(safeState("WIDTH")) || 0;
     if (width <= 0) return "";
@@ -2060,16 +2140,135 @@ function buildRPRunLength() {
     return String(width + fraction - 0.375);
 }
 
+// Raw-panel "BT" description for the SC_RP_BT_DESC boxes.
+// Format: <model> <widthFt-In> X <sectionHeight> <colourAbbr>
+//   model        : full DOOR_MODEL value, with the leading "T" (e.g. "T150")
+//   widthFt-In   : door width feet-inches, feet zero-padded to 2 (e.g. "16-2")
+//   X            : literal separator
+//   sectionHeight: section height in inches (24 or 21)
+//   colourAbbr   : colour abbreviation (e.g. "Wht")
+// e.g. T150 / 16'2" / 24" section / White -> "T150 16-2 X 24 Wht"
+function buildRPBtDescription(height, qty) {
+
+    if (qty <= 0) return "";
+
+    const model = getNode("DOOR_MODEL")?.getAttribute("value")
+        || $("input[name='DOOR_MODEL']:checked").val()
+        || "";
+
+    const { doorWidthFeet, doorWidthInches, colorShort } = getSharedDescFields();
+    const size = `${doorWidthFeet}-${doorWidthInches}`;
+
+    return assembleDesc([
+        model,                  // T150
+        size,                   // 16-2
+        "X",                    // X
+        String(height),         // 24
+        colorShort,             // Wht
+    ]);
+}
+
+// Section-height (inches) -> single-digit code. Thermatite only uses 21 and 24.
+const RP_BASE_HEIGHT_CODE = { 21: "1", 24: "4" };
+
+// Colour key -> single-digit code. Only white/brown/silver defined so far;
+// remaining colours TBD (they fall through to "" until codes are provided).
+const RP_BASE_COLOR_CODE = { white: "1", brown: "2", silver: "4" };
+
+// T200C / U200C top-coil colour letter -> part# is 127-032<letter> (21") /
+// 127-033<letter> (24"). U200C shares the map and also allows white (W).
+const TOP_COIL_T200C_LETTER = {
+    white: "W", brown: "B", bronze: "Z", slate_grey: "C", iron_ore: "V",
+    black: "K", sandstone: "T", almond: "A", cafe: "F",
+};
+
+// Top-coil qty multiplier per model (qty = multiplier * door width in ft).
+// U200C shares T200C's multipliers (same part# series); confirm if it differs.
+const TOP_COIL_QTY_MULT = {
+    "21": { T150: 1.1542, T175: 1.52205, T200: 1.19150, "T200-20": 2.79247, T300: 1.7303, T200C: 1.16027, U200C: 1.16027 },
+    "24": { T150: 1.3116, T175: 1.7261,  T200: 1.3478,  "T200-20": 3.16188, T300: 1.93448, T200C: 1.31254, U200C: 1.31254 },
+};
+
 //function to get the raw panel base part#
+// Format: {modelCode}{colorCode}-{heightCode}{doorHeightFtIn}
+//   modelCode      : DOOR_MODEL with leading "T" stripped (T150 -> 150)
+//   colorCode      : selected colour code (white -> 1)
+//   heightCode     : section height code (24 -> 4, 21 -> 1)
+//   doorHeightFtIn : feet concatenated with inches (no inch padding), whole
+//                    string left-padded to 3 digits.
+//                    8'2" -> "82"  -> "082"; 10'2" -> "102"; 10'10" -> "1010"
+// e.g. T150 / white / 24" section / 8'2" door  ->  "1501-4082"
 function buildRPBaseSpNum(height) {
-    const doorModelId = $("input[name='DOOR_MODEL']:checked").val() || "";
-    return `${doorModelId}-${height}`;
+    const modelCode = getModelPartCode();
+
+    const colorKey = $("input[name='COLOR']:checked").val() || "";
+    const colorCode = RP_BASE_COLOR_CODE[colorKey] ?? "";
+
+    const heightCode = RP_BASE_HEIGHT_CODE[height] ?? "";
+
+    // Door height (ft + in). Standard SIZE presets don't populate the
+    // DOOR_HEIGHT_FEET/INCHES state nodes (those fill from the custom inputs),
+    // so read the SIZE radio's attrs in non-custom mode — same source the
+    // working door-face description uses (see buildDoorFaceSize).
+    let feet, inches;
+    if ($("#custom_dimensions").is(":checked")) {
+        feet = parseInt($("#CUSTOM_HEIGHT_FEET").val()) || 0;
+        inches = parseInt($("#CUSTOM_HEIGHT_INCHES").val()) || 0;
+    } else {
+        const $sz = $("input[name='SIZE']:checked");
+        feet = parseInt($sz.attr("height") || getNode("DOOR_HEIGHT_FEET")?.value) || 0;
+        inches = parseInt($sz.attr("heightInches")) || 0;
+    }
+    const doorHeightFtIn = `${feet}${inches}`.padStart(3, "0");
+
+    return `${modelCode}${colorCode}-${heightCode}-${doorHeightFtIn}`;
+}
+
+// RP part# for the BUNDLE_RP1/RP2 boxes.
+// Format: {modelCode}{colorCode}-{heightCode}-{doorWidthFt3}
+//   heightCode    : section height code (24 -> 4, 21 -> 1)
+//   doorWidthFt3  : width feet+inches, no inch padding, padded to 3 (10'2" -> "102")
+// e.g. T150 / white / 24" section / 10'2" wide -> "1501-4-102"
+function buildRPPartNum(height) {
+    const modelCode = getModelPartCode();
+    const colorKey = $("input[name='COLOR']:checked").val() || "";
+    const colorCode = RP_BASE_COLOR_CODE[colorKey] ?? "";
+    const heightCode = RP_BASE_HEIGHT_CODE[height] ?? "";
+
+    let feet, inches;
+    if ($("#custom_dimensions").is(":checked")) {
+        feet = parseInt($("#CUSTOM_WIDTH_FEET").val()) || 0;
+        inches = parseInt($("#CUSTOM_WIDTH_INCHES").val()) || 0;
+    } else {
+        const $sz = $("input[name='SIZE']:checked");
+        feet = parseInt($sz.attr("width") || getNode("DOOR_WIDTH_FEET")?.value) || 0;
+        inches = parseInt($sz.attr("widthInches")) || 0;
+    }
+    const doorWidthFtIn = `${feet}${inches}`.padStart(3, "0");
+
+    return `${modelCode}${colorCode}-${heightCode}-${doorWidthFtIn}`;
+}
+
+// RP base part# for the BUNDLE_RP_BASE_SPNUM boxes: {model}-{sectionHeight}.
+// e.g. T150 / 24" section -> "T150-24". Blank when the section is unused.
+function buildRPBasePartNum(height) {
+    if (!(height > 0)) return "";
+    const model = $("input[name='DOOR_MODEL']:checked").val()
+        || getNode("DOOR_MODEL")?.getAttribute("value") || "";
+    return `${model}-${height}`;
+}
+
+// RP base description: {sectionHeight}" Classic Base. Blank when unused.
+function buildRPBaseDesc(height) {
+    return height > 0 ? `${height}" Classic Base` : "";
 }
 
 //function to get the raw panel top sheet part#
 function buildRPTopSpNum(height) {
-    const color = getState("COLOR").value;
-    return `LND-${height}${color}`;
+    const modelCode = getModelPartCode();
+    const colorKey = $("input[name='COLOR']:checked").val() || "";
+    const colorCode = RP_BASE_COLOR_CODE[colorKey] ?? "";
+    return `${modelCode}-${height}-${colorCode}`;
 }
 
 // SB-description segment d: door colour -> abbreviation.
@@ -2097,10 +2296,6 @@ const SB_COLOR_ABBR = {
 // Max characters for any section-bundle / component / raw-panel description.
 const SB_DESC_MAX_CHARS = 30;
 
-// Segment c, third-reinforcing flag. The "-3" in a description (e.g. "T150-3"
-// or "T150-3MR") is added ONLY when a section has third reinforcing. The
-// THIRD_REINFORCE input is truss-driven (Yes only for the HatTruss style) by
-// applyThirdReinforceConstraint in load_drive_inputs.js — read its value here.
 function hasThirdReinforcing() {
     return $("[name='THIRD_REINFORCE']").val() === "Yes";
 }
@@ -2113,10 +2308,6 @@ function buildStepPlateText() {
     return sp === "each" ? "2xSP" : "SP";
 }
 
-// SB-description segment e (exhaust port part): ExhaustPortView + ExhaustPortSize.
-// "each" (1 Each Side) -> "2x{size}EP"; any other non-none -> "{size}EP".
-// Sizes 3/4/5/6 are supported; 5" is programmed in but not yet offered in the UI.
-// Size "0" (or any unrecognised size) yields no text.
 function buildExhaustPortText() {
     const view = $("input[name='ExhaustPortView']:checked").val() || "none";
     if (view === "none") return "";
@@ -2127,10 +2318,6 @@ function buildExhaustPortText() {
     return view === "each" ? `2x${size}EP` : `${size}EP`;
 }
 
-// SB-description segment e: section options (step plate / exhaust port).
-// Both present -> step-plate text + "+" + exhaust-port text (no surrounding
-// spaces), e.g. "2xSP+2x4EP". Glazing/lites (e.g. "5xE") are deferred until
-// glazing is implemented.
 function buildSectionOptionsText() {
     const stepPlate = buildStepPlateText();
     const exhaustPort = buildExhaustPortText();
@@ -2139,8 +2326,6 @@ function buildSectionOptionsText() {
     return stepPlate || exhaustPort;
 }
 
-// SB-description segment f: double end caps -> "DE", single -> nothing.
-// EndCaps radio value "1" = double.
 function buildEndCapsText() {
     return $("input[name='EndCaps']:checked").val() === "1" ? "DE" : "";
 }
@@ -2149,39 +2334,18 @@ function buildEndCapsText() {
 // Door Face (Y-line) description helpers
 // ---------------------------------------------------------------------------
 
-// Door-face segment a: door-type tag. "GF" (glazed face) when any glazing /
-// lites / full-view section is present, otherwise "DF" (door face). Glazing is
-// not implemented yet, so hasGlazing() is a stub returning false (always "DF").
-// Flip it to read the real glazing input(s) when glazing ships.
 function hasGlazing() {
-    // "GF" (glazed face) when any glazing option is selected — Lites or a
-    // full-view section. GLAZING_TYPE is the visible picker (none / lites /
-    // polytite_fullview / alumatite_fullview); anything but "none" counts as
-    // glazed. Read the checked radio directly (DOM is the source of truth here,
-    // matching how the other segment helpers read StepPlate/EndCaps/etc.).
-    const glazing = $("input[name='GLAZING_TYPE']:checked").val() || "none";
-    return glazing !== "none";
+    // GLAZING_TYPE_0 is the only radio left in this group (per-section glazing
+    // is picked on the canvas now); checked means "no glazing anywhere".
+    return !$("#GLAZING_TYPE_0").is(":checked");
 }
 
 function buildDoorTypeText() {
     return hasGlazing() ? "GF" : "DF";
 }
 
-// Door-face segment b: door SIZE = width(ft)-width(in)[.frac] x height(ft)-height(in).
-//   - Width feet padded to a leading zero when < 10 (08, 09, 10, 20...).
-//   - Width inches carries a fractional decimal ONLY when fraction <> 0: the
-//     inch + fraction is rounded to 2 decimals incl. the period (10-2 1/8" ->
-//     "2.13"). Whole-inch widths show just the integer ("2"). Fraction isn't
-//     offered yet but DOOR_WIDTH_FRACTION already feeds it (see the SR run length).
-//   - Height feet/inches are shown as feet-inches (NOT total inches like the SB
-//     section size), e.g. "12-0".
-// Unlike the SB/SC/SR section size, this is the whole-DOOR size.
 function buildDoorFaceSize() {
-    // Read width/height straight from the DOM, the same way the working SB size
-    // (getSharedDescFields) does: CUSTOM_* selects when custom is on, otherwise the
-    // checked SIZE radio's own width/widthInches/height/heightInches attrs. Don't
-    // route through getCurrentDimensions() — it can read 0 before it's ready, which
-    // produced the blank size segment.
+
     let widthFeet, widthInches, fraction, heightFeet, heightInches;
     if ($("#custom_dimensions").is(":checked")) {
         widthFeet    = $("#CUSTOM_WIDTH_FEET").val() || "";
@@ -2207,9 +2371,6 @@ function buildDoorFaceSize() {
     return `${widthFeet}-${widthInchText}x${heightFeet}-${heightInches}`;
 }
 
-// Door Face (Y-line) description: a b c d [e] [f]. a/b are door-specific;
-// c (model+pattern), d (colour) reuse the shared SB fields; e (section options)
-// and f (end caps) reuse the shared SB helpers and are conditional.
 function buildDoorFaceDescription() {
     const { modelPattern, colorShort } = getSharedDescFields();
     return assembleDesc([
@@ -2233,10 +2394,6 @@ function buildSBDescription(prefix, height, qty, isBundleIndex = 0, bundleIndex 
 
     if (qty <= 0) return "";
 
-    // Segment a: bundle type. A bundle is a "double" when it pairs two sections.
-    // SB-B / SB-BI = bottom single / double, SB-I / SB-II = intermediate.
-    // SB-T / SB-TI (top) and SB-G / SB-GG / SB-IG (glazed) are defined here but
-    // dormant: top-section detection and glazing are not implemented yet.
     const bundles = bundleByHeight();
     const bundle = bundles[bundleIndex];
     const isDouble = bundle && bundle.sections.length === 2;
@@ -2248,9 +2405,7 @@ function buildSBDescription(prefix, height, qty, isBundleIndex = 0, bundleIndex 
         sbPrefix = isDouble ? "SB-II" : "SB-I";
     }
 
-    // Segment a then the shared b–d block, then conditional e (section options)
-    // and f (end caps). Empty segments dropped, joined with single spaces,
-    // hard-capped at 30 chars.
+
     return assembleDesc([
         sbPrefix,                         // a
         buildDescSegmentsBCD(height),     // b c d
@@ -2259,24 +2414,10 @@ function buildSBDescription(prefix, height, qty, isBundleIndex = 0, bundleIndex 
     ]);
 }
 
-// Maps the selected DOOR_MODEL to the part-number code segment used in
-// SB*/SR* part numbers. The convention is to drop the leading mount letter
-// (T150 -> 150, T200C -> 200C, etc.), but a few models need explicit codes
-// because the naive strip would collide or lose information. Notably:
-//   U200C -> "U200C"  (NOT "200C": that strip collides with T200C; the
-//                       designated part# is SBU200C0x, i.e. the full model name)
-// Add future exceptions to MODEL_CODE_OVERRIDES rather than special-casing
-// individual blocks.
 const MODEL_CODE_OVERRIDES = {
     "U200C": "U200C",
 };
 
-// getState throws when a node isn't registered yet. During applyDefaults / early
-// render, weight + description logic can run before every dependency node exists.
-// safeState delegates to the framework's own getState (so DOM-backed nodes like
-// DOOR_WIDTH_FEET / END_CAPS / COLOR resolve correctly — reimplementing the read
-// via nodeset[id].value misses those) but swallows the early-render throw and
-// returns undefined so callers can guard cleanly.
 function safeState(id) {
     try {
         return getState(id);
@@ -2285,13 +2426,214 @@ function safeState(id) {
     }
 }
 
+// Round a value UP to the nearest 3" increment (per the ZZ...ALUM-xxx rule).
+function roundUpTo3(n) {
+    return Math.ceil((Number(n) || 0) / 3) * 3;
+}
+
+// "No BOM output" for the 4" PVC bottom seal — blank the BTM_SEAL part#/desc.
+// Per Bill, when the 4" PVC seal is the bundled default it must NOT appear
+// separately on the BOM. Which combos count as "no output" differ by model:
+//   T150 / T150U: 4" PVC has no separate output for ANY retainer
+//                 (steel => "BS not required"; pvc => "no output required").
+//   T175 / T175U: 4" PVC has no output only with the aluminum retainer ("pvc");
+//                 with the steel/PVC retainer it DOES output 152-318.
+// (3" Santoprene always outputs ZZBTM-3IN; see BTM_SEAL_SPNUM.)
+function isNoSealOutput(seal, model, retainer) {
+    if (seal !== "pvc_4_35c") return false;
+    if (model === "T150" || model === "T150U") return true;
+    if (model === "T175" || model === "T175U") return retainer === "pvc";
+    return false;
+}
+
+// Bottom Retainer part# for the BOTTOM_RETAINER box.
+// DWin = total width in inches = WIDTH (custom-dim aware). Reads the model +
+// BottomRetainer radio directly (no state node feeds them).
+//
+//   retainer "steel" (Bottom seal with PVC retainer)    -> fixed part# per model
+//   retainer "pvc"   (Bottom seal with aluminum retainer) -> "ZZ<MODEL>ALUM-" + DWin↑3"
+//
+// Per Bill, the steel part# and the aluminum-prefix model differ by model:
+//   T150 / T150U: steel 328-266, aluminum ZZT150ALUM-###
+//   T175 / T175U: steel 328-265, aluminum ZZT175ALUM-###
+// Other models not yet specified — return "" (do NOT guess a part#).
+const BR_STEEL_PARTNUM = {
+    T150: "328-266", T150U: "328-266",
+    T175: "328-265", T175U: "328-265",
+};
+// Aluminum-retainer ZZ-prefix model code (the ### suffix is DWin↑3", padded).
+const BR_ALUM_PREFIX_MODEL = {
+    T150: "T150", T150U: "T150",
+    T175: "T175", T175U: "T175",
+};
+
+// T200 / T200-20 / T200U aluminum-retainer ("pvc") part# is a DWin-range lookup
+// (first range whose max >= DWin). UP TO 294" is a single part (secondary "").
+// Wider doors physically need TWO retainers: a primary 328-207-294 plus a
+// secondary, each qty 1 — hence the {primary, secondary} pair below.
+const BR_T200_MODELS = ["T200", "T200-20", "T200U"];
+const BR_T200_RANGES = [
+    { max: 98,  primary: "328-207-098", secondary: "" },
+    { max: 122, primary: "328-207-122", secondary: "" },
+    { max: 146, primary: "328-207-146", secondary: "" },
+    { max: 170, primary: "328-207-170", secondary: "" },
+    { max: 194, primary: "328-207-194", secondary: "" },
+    { max: 242, primary: "328-207-242", secondary: "" },
+    { max: 294, primary: "328-207-294", secondary: "" },
+    // Two-part bands: 328-207-294 + a second retainer.
+    { max: 392, primary: "328-207-294", secondary: "328-207-098" },
+    { max: 416, primary: "328-207-294", secondary: "328-207-122" },
+    // Top band capped at 440" (36'8"): the door-width limit is also capped there
+    // (see MODEL_WIDTH_LIMITS), so Infinity just guards any width that slips
+    // through — anything >416" uses the 440 band's parts.
+    { max: Infinity, primary: "328-207-294", secondary: "328-207-146" },
+];
+
+// T300 aluminum-retainer ("pvc") part#. Same DWin breakpoints + two-part bands
+// as T200, just the 328-212-XXX series. Bill's spec also lists T300-20 / T300U,
+// but neither is a selectable DOOR_MODEL in EW (see the radios in load_html.js),
+// so they're intentionally omitted — add here if those models are ever added.
+// Top band Infinity-guarded; width limit also caps ≤440. Every part is qty 1.
+const BR_T300_MODELS = ["T300"];
+const BR_T300_RANGES = [
+    { max: 98,  primary: "328-212-098", secondary: "" },
+    { max: 122, primary: "328-212-122", secondary: "" },
+    { max: 146, primary: "328-212-146", secondary: "" },
+    { max: 170, primary: "328-212-170", secondary: "" },
+    { max: 194, primary: "328-212-194", secondary: "" },
+    { max: 242, primary: "328-212-242", secondary: "" },
+    { max: 294, primary: "328-212-294", secondary: "" },
+    // Two-part bands: 328-212-294 + a second retainer.
+    { max: 392, primary: "328-212-294", secondary: "328-212-098" },
+    { max: 416, primary: "328-212-294", secondary: "328-212-122" },
+    { max: Infinity, primary: "328-212-294", secondary: "328-212-146" },
+];
+
+// T200C / U200C aluminum-retainer ("pvc") part#. Uses the 328-790-XXX series
+// with its own breakpoints. Note the non-uniform steps and the 261 "outlier"
+// at ≤313 before going back to 246 for the wide two-part bands. The ≤390 plus
+// part (truncated "328-790-0" in the source doc) is confirmed as 328-790-080.
+// U200C reuses the T200C parts (same as the end caps — see baseModelByModel).
+const BR_T200C_MODELS = ["T200C", "U200C"];
+const BR_T200C_RANGES = [
+    { max: 96,  primary: "328-790-080", secondary: "" },
+    { max: 108, primary: "328-790-090", secondary: "" },
+    { max: 120, primary: "328-790-100", secondary: "" },
+    { max: 144, primary: "328-790-120", secondary: "" },
+    { max: 168, primary: "328-790-140", secondary: "" },
+    { max: 180, primary: "328-790-150", secondary: "" },
+    { max: 192, primary: "328-790-160", secondary: "" },
+    { max: 216, primary: "328-790-180", secondary: "" },
+    { max: 242, primary: "328-790-202", secondary: "" },
+    { max: 294, primary: "328-790-246", secondary: "" },
+    { max: 313, primary: "328-790-261", secondary: "" },
+    // Two-part bands: 328-790-246 + a second retainer.
+    { max: 390, primary: "328-790-246", secondary: "328-790-080" },
+    { max: 402, primary: "328-790-246", secondary: "328-790-090" },
+    { max: 414, primary: "328-790-246", secondary: "328-790-100" },
+    { max: Infinity, primary: "328-790-246", secondary: "328-790-120" },
+];
+
+// Returns { primary, secondary } part#s for the Bottom Retainer. `secondary` is
+// "" for every single-part case; only the wide T200-family bands populate it.
+function buildBottomRetainerParts() {
+    // Read the model from the LIVE checked radio first. snapBottomRetainer()
+    // runs from the DOOR_MODEL change handler, where the radio is already updated
+    // but the setState-backed DOOR_MODEL node still holds the PREVIOUS model
+    // (the framework's state walk hasn't run yet). Using getState there computed
+    // the old model's part — e.g. T300's 328-212-146 lingered after switching to
+    // T150. The radio is the synchronous source of truth; state is the fallback.
+    const model = $("input[name='DOOR_MODEL']:checked").val()
+        || safeState("DOOR_MODEL")
+        || getNode("DOOR_MODEL")?.getAttribute("value")
+        || "";
+    const retainer = $("input[name='BottomRetainer']:checked").val() || "";
+    const dwin = Number(safeState("WIDTH")) || 0;
+    const none = { primary: "", secondary: "" };
+
+    if (retainer === "steel") {
+        return { primary: BR_STEEL_PARTNUM[model] || "", secondary: "" };
+    }
+    if (retainer === "pvc") {
+        // T200 family: DWin-range lookup (may yield two parts).
+        if (BR_T200_MODELS.includes(model)) {
+            const range = BR_T200_RANGES.find(r => dwin <= r.max);
+            return range ? { primary: range.primary, secondary: range.secondary } : none;
+        }
+        // T300: same breakpoints, 328-212-XXX series.
+        if (BR_T300_MODELS.includes(model)) {
+            const range = BR_T300_RANGES.find(r => dwin <= r.max);
+            return range ? { primary: range.primary, secondary: range.secondary } : none;
+        }
+        // T200C / U200C: 328-790-XXX series, its own breakpoints.
+        if (BR_T200C_MODELS.includes(model)) {
+            const range = BR_T200C_RANGES.find(r => dwin <= r.max);
+            return range ? { primary: range.primary, secondary: range.secondary } : none;
+        }
+        // T150/T175 family: ZZ<MODEL>ALUM-### (DWin↑3", zero-padded to 3 digits;
+        // matches the part list: 048, 051, ... 372).
+        const prefix = BR_ALUM_PREFIX_MODEL[model];
+        return prefix
+            ? { primary: `ZZ${prefix}ALUM-${String(roundUpTo3(dwin)).padStart(3, "0")}`, secondary: "" }
+            : none;
+    }
+
+    // TODO: the non-spec retainer options (ChannelCap, Galvanized,
+    // Aluminum-only, None) pending part#s.
+    return none;
+}
+
+// Back-compat: the primary part# only.
+function buildBottomRetainerSpNum() {
+    return buildBottomRetainerParts().primary;
+}
+
+// Bottom Retainer qty for the TM_BOTTOM_RETAINER_QTY box. Same inputs as
+// buildBottomRetainerParts (model + retainer + WIDTH/DWin). Default is qty 1
+// whenever a primary retainer part exists ("" otherwise); the T150/T150U and
+// T175/T175U families have a DWft-dependent qty on the PVC retainer ("steel")
+// path. The aluminum ("pvc") retainer part is implicitly qty 1; its DWft+0.5
+// "FT" qty in the spec is the BOTTOM SEAL qty (BTM_SEAL_QTY), not this box.
+//
+// Qty rounds to 2 decimals. NOTE: use WIDTH/12 for DWft, not DOOR_WIDTH_FEET,
+// which drops the inches part (so 16'4" would read as 16, not 16.33).
+//
+// T150 / T150U, PVC retainer (part# 328-266):
+//   DWft <= 16.33 -> DWft / 23.33   |   else (T150 max DWft = 20.17) -> 1
+// T175 / T175U, PVC retainer (part# 328-265):
+//   DWft <= 12.17 -> DWft / 19.33   |   DWft <= 20.33 -> 1   |   else -> DWft / 19.33
+function buildBottomRetainerQty() {
+    const parts = buildBottomRetainerParts();
+    if (!parts.primary) return "";
+
+    // Read the live checked radio first (state node lags on model change) —
+    // same as buildBottomRetainerParts.
+    const model = $("input[name='DOOR_MODEL']:checked").val()
+        || safeState("DOOR_MODEL")
+        || getNode("DOOR_MODEL")?.getAttribute("value")
+        || "";
+    const retainer = $("input[name='BottomRetainer']:checked").val() || "";
+
+    const round2 = (n) => Math.round(n * 100) / 100;
+    const dwft = (Number(safeState("WIDTH")) || 0) / 12;
+
+    if (retainer === "steel" && (model === "T150" || model === "T150U")) {
+        return dwft <= 16.33 ? round2(dwft / 23.33) : 1;
+    }
+    if (retainer === "steel" && (model === "T175" || model === "T175U")) {
+        if (dwft <= 12.17) return round2(dwft / 19.33);
+        if (dwft <= 20.33) return 1;
+        return round2(dwft / 19.33);
+    }
+
+    // Everything else — incl. T200/T200-20/T200U & T300/T200C/U200C on the
+    // aluminum ("pvc") retainer — is qty 1 per part (both the primary and the
+    // wide-door plus/secondary retainer each ship qty 1).
+    return 1;
+}
+
 function getModelPartCode() {
-    // Read the model the SAME way the descriptions do — via the registered
-    // DOOR_MODEL node's `value` — instead of $(":checked").val(). On load, two
-    // radios can transiently both carry the checked state (markup default T150 +
-    // applyDefaults-set default), and :checked returns whichever is later in the
-    // DOM (U200C) while the desc reads the node (T150). Reading the node keeps
-    // part# and desc in agreement.
+
     const model = getNode("DOOR_MODEL")?.getAttribute("value")
         || $("input[name='DOOR_MODEL']:checked").val()
         || "";

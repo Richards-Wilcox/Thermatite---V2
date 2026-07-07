@@ -100,27 +100,27 @@ const MODEL_WIDTH_LIMITS = {
   "3": {
     "T150":    { min: 4, max: 24, maxInches: 2 },
     "T175":    { min: 4, max: 38, maxInches: 2 },
-    "T200":    { min: 4, max: 38, maxInches: 2 },
-    "T300":    { min: 4, max: 38, maxInches: 2 },
-    "T200-20": { min: 4, max: 38, maxInches: 2 },
+    "T200":    { min: 4, max: 36, maxInches: 8 },
+    "T300":    { min: 4, max: 36, maxInches: 8 },
+    "T200-20": { min: 4, max: 36, maxInches: 8 },
     "T200C":   { min: 4, max: 32, maxInches: 2 },
     "U200C":   { min: 4, max: 32, maxInches: 2 },
     "T150U":   { min: 4, max: 20, maxInches: 2 },
     "T175U":   { min: 4, max: 38, maxInches: 2 },
-    "T200U":   { min: 4, max: 38, maxInches: 2 },
+    "T200U":   { min: 4, max: 36, maxInches: 8 },
   },
   // Door Face Only — same limits for HW2 and HW3 (CSV has no HW Size column)
   "face_only_2": {
     "T150":    { min: 4, max: 24, maxInches: 2 },
-    "T175":    { min: 4, max: 38, maxInches: 2 },
-    "T200":    { min: 4, max: 38, maxInches: 2 },
-    "T300":    { min: 4, max: 38, maxInches: 2 },
-    "T200-20": { min: 4, max: 38, maxInches: 2 },
+    "T175":    { min: 4, max: 36, maxInches: 2 },
+    "T200":    { min: 4, max: 36, maxInches: 2 },
+    "T300":    { min: 4, max: 36, maxInches: 2 },
+    "T200-20": { min: 4, max: 36, maxInches: 2 },
     "T200C":   { min: 4, max: 32, maxInches: 2 },
     "U200C":   { min: 4, max: 32, maxInches: 2 },
     "T150U":   { min: 4, max: 20, maxInches: 2 },
     "T175U":   { min: 4, max: 38, maxInches: 2 },
-    "T200U":   { min: 4, max: 38, maxInches: 2 },
+    "T200U":   { min: 4, max: 36, maxInches: 8 },
   },
   // Hardware Only — HW Size 2
   "hw_only_2": {
@@ -128,7 +128,7 @@ const MODEL_WIDTH_LIMITS = {
     "T175":    { min: 4, max: 20, maxInches: 2 },
     "T200":    { min: 4, max: 20, maxInches: 2 },
     "T300":    { min: 4, max: 20, maxInches: 2 },
-    "T200-20": { min: 4, max: 38, maxInches: 2 },
+    "T200-20": { min: 4, max: 36, maxInches: 8 },
     "T200C":   { min: 4, max: 20, maxInches: 2 },
     "U200C":   { min: 4, max: 20, maxInches: 2 },
     "T150U":   { min: 4, max: 20, maxInches: 2 },
@@ -139,14 +139,14 @@ const MODEL_WIDTH_LIMITS = {
   "hw_only_3": {
     "T150":    { min: 4, max: 24, maxInches: 2 },
     "T175":    { min: 4, max: 38, maxInches: 2 },
-    "T200":    { min: 4, max: 38, maxInches: 2 },
-    "T300":    { min: 4, max: 38, maxInches: 2 },
-    "T200-20": { min: 4, max: 38, maxInches: 2 },
+    "T200":    { min: 4, max: 36, maxInches: 8 },
+    "T300":    { min: 4, max: 36, maxInches: 8 },
+    "T200-20": { min: 4, max: 36, maxInches: 8 },
     "T200C":   { min: 4, max: 32, maxInches: 2 },
     "U200C":   { min: 4, max: 32, maxInches: 2 },
     "T150U":   { min: 4, max: 20, maxInches: 2 },
     "T175U":   { min: 4, max: 38, maxInches: 2 },
-    "T200U":   { min: 4, max: 38, maxInches: 2 },
+    "T200U":   { min: 4, max: 36, maxInches: 8 },
   },
 };
 
@@ -1123,40 +1123,233 @@ function loadDrivenInputEvents() {
   setTimeout(applyCsbbDrHgtConstraint, 250);
 
   // [BOTTOM-SEAL-LOGIC] Bottom Seal row stays visible so the user sees it exists.
-  // When the retainer has no seal slot, only "None" is selectable.
-  const RETAINER_HAS_SEAL = ["steel", "pvc"];
+  // The retainer (BR) drives which seal (BS) options are selectable.
+  //
+  // Radio value -> label reminder (see load_html.js BottomRetainer group):
+  //   "steel" = "Bottom seal with PVC retainer"
+  //   "pvc"   = "Bottom seal with aluminum retainer"
+  //
+  // Per Bill, by model:
+  //   T150 / T150U:
+  //     BR = PVC retainer ("steel")    -> ONLY Dual Durometer (sole option + default)
+  //     BR = aluminum retainer ("pvc") -> 4" PVC (-35C, default) + 3" Santoprene (-60C)
+  //   T175 / T175U:
+  //     BR = PVC retainer ("steel")    -> 4" PVC (-35C, default) + 3" Santoprene (-60C)
+  //     BR = aluminum retainer ("pvc") -> 4" PVC (-35C, default) + 3" Santoprene (-60C)
+  //   any other BR / model             -> no seal slot: only "None"
+  const DUAL_DUROMETER_MODELS = ["T150", "T150U"];
+  // Models where the PVC retainer ("steel") carries a normal PVC/Santoprene seal
+  // slot rather than the dual-durometer special case.
+  const STEEL_SEAL_MODELS = ["T175", "T175U"];
   const DEFAULT_BOTTOM_SEAL = "pvc_4_35c";
   function applyBottomSealConstraint() {
     const $row = $("#BOTTOM_SEAL_ROW");
     if (!$row.length) return;
-    const nextState = RETAINER_HAS_SEAL.includes($("input[name='BottomRetainer']:checked").val()) ? "seal" : "none";
-    if ($row.attr("data-seal-state") === nextState) return;
-    $row.attr("data-seal-state", nextState);
+    const retainer = $("input[name='BottomRetainer']:checked").val();
+    const model = $("input[name='DOOR_MODEL']:checked").val();
 
-    const $sealBtns = $("input[name='BottomSeal'][value='pvc_4_35c'], input[name='BottomSeal'][value='santoprene_3_60c']");
-    const $noneBtn = $("input[name='BottomSeal'][value='none']");
-
-    if (nextState === "seal") {
-      $sealBtns.each(function () { $(this).closest(".rw-button").show(); $(this).prop("disabled", false); });
-      $noneBtn.closest(".rw-button").hide();
-      $noneBtn.prop("disabled", true);
-      $("input[name='BottomSeal']").prop("checked", false);
-      $("input[name='BottomSeal']").closest(".rw-button").removeClass("btn-checked");
-      $("input[name='BottomSeal'][value='" + DEFAULT_BOTTOM_SEAL + "']").prop("checked", true).closest(".rw-button").addClass("btn-checked");
+    // Three mutually exclusive seal modes:
+    //   "dual" : PVC retainer on a dual-durometer model -> Dual Durometer only
+    //   "seal" : seal slot -> PVC (default) + Santoprene
+    //   "none" : everything else -> only None
+    // The aluminum retainer ("pvc") always carries the PVC/Santoprene seal slot.
+    // The PVC retainer ("steel") is model-dependent: dual-durometer for
+    // T150/T150U, a normal PVC/Santoprene slot for T175/T175U.
+    let sealMode;
+    if (retainer === "steel" && DUAL_DUROMETER_MODELS.includes(model)) {
+      sealMode = "dual";
+    } else if (retainer === "pvc" || (retainer === "steel" && STEEL_SEAL_MODELS.includes(model))) {
+      sealMode = "seal";
     } else {
-      $sealBtns.each(function () { $(this).closest(".rw-button").hide(); $(this).prop("disabled", true); });
-      $noneBtn.closest(".rw-button").show();
-      $noneBtn.prop("disabled", false);
-      $("input[name='BottomSeal']").prop("checked", false);
-      $("input[name='BottomSeal']").closest(".rw-button").removeClass("btn-checked");
-      $noneBtn.prop("checked", true).closest(".rw-button").addClass("btn-checked");
+      sealMode = "none";
+    }
+    if ($row.attr("data-seal-state") === sealMode) return;
+    $row.attr("data-seal-state", sealMode);
+
+    const $pvcSantoBtns = $("input[name='BottomSeal'][value='pvc_4_35c'], input[name='BottomSeal'][value='santoprene_3_60c']");
+    const $dualBtn = $("input[name='BottomSeal'][value='dual_durometer']");
+    const $noneBtn = $("input[name='BottomSeal'][value='none']");
+    const $allBtns = $("input[name='BottomSeal']");
+
+    // Helper: show/enable a set, hide/disable the rest, then select a seal.
+    // Normally selects `defaultVal`. But while restoring a saved config (Back),
+    // keep the already-checked seal if it's one of the now-visible options, so
+    // the user's saved BottomSeal pick isn't clobbered by the default.
+    function setSeal($visible, defaultVal) {
+      const restoring = window.__restoringInputs;
+      const current = $("input[name='BottomSeal']:checked").val();
+      const currentVisible = restoring && current &&
+        $visible.filter("[value='" + current + "']").length > 0;
+      const pick = currentVisible ? current : defaultVal;
+
+      $allBtns.prop("checked", false).closest(".rw-button").removeClass("btn-checked");
+      $allBtns.each(function () {
+        const show = $visible.is(this);
+        $(this).closest(".rw-button").toggle(show);
+        $(this).prop("disabled", !show);
+      });
+      $("input[name='BottomSeal'][value='" + pick + "']")
+        .prop("checked", true).closest(".rw-button").addClass("btn-checked");
+    }
+
+    if (sealMode === "dual") {
+      setSeal($dualBtn, "dual_durometer");
+    } else if (sealMode === "seal") {
+      setSeal($pvcSantoBtns, DEFAULT_BOTTOM_SEAL);
+    } else {
+      setSeal($noneBtn, "none");
     }
   }
+  // [BR-RESTRICT] Per-model allowed Bottom Retainer options. Each model exposes
+  // only the BR values Bill's spec defines; everything else is hidden/disabled,
+  // and if the current selection isn't allowed it snaps to the model's first
+  // allowed value. A model with no entry keeps ALL options (no restriction).
+  //
+  // Radio value -> label reminder (see load_html.js BottomRetainer group):
+  //   "steel" = "Bottom seal with PVC retainer"
+  //   "pvc"   = "Bottom seal with aluminum retainer"
+  //
+  // Per Bill:
+  //   T150 / T150U                                   -> steel + pvc only
+  //   T200, T200C, T200-20, T300, T200U, U200C       -> pvc only (aluminum w/ seal)
+  //   T175 / T175U                                   -> (unrestricted; default handled below)
+  // NOTE: order matters — applyBottomRetainerConstraint() snaps an invalid
+  // selection to allowed[0], so the first value doubles as the model's default
+  // when BR_DEFAULT_BY_MODEL has no explicit entry. T150/T150U list "steel"
+  // first so they default to the PVC-retainer path (part# 328-266, Dual
+  // Durometer seal) — per the T150 output spec, which tags "Bottom seal with
+  // PVC retainer" as the (default value).
+  // value -> label reminder:
+  //   aluminum=Aluminum retainer only, steel=Bottom seal w/ PVC retainer,
+  //   pvc=Bottom seal w/ aluminum retainer, ChannelCap=Channel Cap,
+  //   GalvanizedBottomAngle=Galvanized bottom angle, none=None.
+  // A model with NO entry keeps ALL 6 options (no restriction).
+  //   T150/T150U, T175/T175U -> all 6 (no entry; default handled below)
+  //   T200/T200U -> Galvanized, aluminum-retainer-w/-seal, Aluminum-only, None
+  //   T300       -> aluminum-retainer-w/-seal, Aluminum-only, None (no Galvanized)
+  const BR_ALLOWED_BY_MODEL = {
+    T200:      ["aluminum", "pvc", "GalvanizedBottomAngle", "none"],
+    T200U:     ["aluminum", "pvc", "GalvanizedBottomAngle", "none"],
+    "T200-20": ["aluminum", "pvc", "GalvanizedBottomAngle", "none"],
+    T300:      ["aluminum", "pvc", "none"],
+    T200C:     ["pvc", "none"],
+    U200C:     ["pvc", "none"],
+  };
+  function applyBottomRetainerConstraint() {
+    const model = $("input[name='DOOR_MODEL']:checked").val();
+    const $brBtns = $("input[name='BottomRetainer']");
+    if (!$brBtns.length) return;
+
+    const allowed = BR_ALLOWED_BY_MODEL[model];
+    if (!allowed) {
+      // No entry for this model — keep ALL options selectable.
+      $brBtns.each(function () {
+        $(this).closest(".rw-button").show();
+        $(this).prop("disabled", false);
+      });
+      return;
+    }
+
+    // Show/enable only the allowed options; hide/disable the rest.
+    $brBtns.each(function () {
+      const keep = allowed.includes(this.value);
+      $(this).closest(".rw-button").toggle(keep);
+      $(this).prop("disabled", !keep);
+    });
+
+    // If the current pick isn't allowed, snap to the first allowed value so a
+    // hidden/stale option can't stay selected. (The per-model DEFAULT in
+    // applyBottomRetainerDefault runs right after and may refine this further.)
+    const current = $("input[name='BottomRetainer']:checked").val();
+    if (!allowed.includes(current)) {
+      $brBtns.prop("checked", false).closest(".rw-button").removeClass("btn-checked");
+      $("input[name='BottomRetainer'][value='" + allowed[0] + "']")
+        .prop("checked", true).closest(".rw-button").addClass("btn-checked");
+    }
+  }
+
+  /* [BR-RESTRICT — OLD] Original aluminum-only-models implementation, kept for
+     reference. Superseded by the per-model allowed-set map above, which also
+     covers T150/T150U (steel + pvc). Restore this block if the generalized
+     version ever needs to be rolled back.
+
+  const ALUMINUM_ONLY_MODELS = ["T200", "T200C", "T200-20", "T300", "T200U", "U200C"];
+  const ALUMINUM_RETAINER = "pvc";
+  function applyBottomRetainerConstraint() {
+    const model = $("input[name='DOOR_MODEL']:checked").val();
+    const $brBtns = $("input[name='BottomRetainer']");
+    if (!$brBtns.length) return;
+
+    if (ALUMINUM_ONLY_MODELS.includes(model)) {
+      // Show only the aluminum-with-seal option; hide/disable the rest.
+      $brBtns.each(function () {
+        const keep = this.value === ALUMINUM_RETAINER;
+        $(this).closest(".rw-button").toggle(keep);
+        $(this).prop("disabled", !keep);
+      });
+      const $want = $("input[name='BottomRetainer'][value='" + ALUMINUM_RETAINER + "']");
+      if (!$want.is(":checked")) {
+        $brBtns.prop("checked", false).closest(".rw-button").removeClass("btn-checked");
+        $want.prop("checked", true).closest(".rw-button").addClass("btn-checked");
+      }
+    } else {
+      // Restore all BR options (re-show anything a prior model hid).
+      $brBtns.each(function () {
+        $(this).closest(".rw-button").show();
+        $(this).prop("disabled", false);
+      });
+    }
+  }
+  */
+
+  // [BR-DEFAULT] Per-model default Bottom Retainer. The global HTML default is
+  // "aluminum"; some models override it. Applied only when the model actually
+  // changes (tracked via _lastBrModel), so a user's manual retainer pick within
+  // a model isn't clobbered on every re-render.
+  //   "steel" = "Bottom seal with PVC Retainer" (NB: legacy value name, not a
+  //   material). T150/T150U and T175/T175U all default to it.
+  const BR_DEFAULT_BY_MODEL = {
+    T150: "steel", T150U: "steel",
+    T175: "steel", T175U: "steel",
+    // T200 family + T300 default to "Bottom seal with aluminum retainer".
+    T200: "pvc", T200U: "pvc", "T200-20": "pvc",
+    T300: "pvc",
+    // T200C/U200C default to "Bottom seal with aluminum retainer".
+    T200C: "pvc", U200C: "pvc",
+  };
+  let _lastBrModel = null;
+  function applyBottomRetainerDefault() {
+    const model = $("input[name='DOOR_MODEL']:checked").val();
+    if (model === _lastBrModel) return;
+    _lastBrModel = model;
+    // While restoring a saved config (Back), don't force the per-model default —
+    // it would overwrite the user's saved BottomRetainer pick. Track the model
+    // (above) so a later genuine user change still applies the default.
+    if (window.__restoringInputs) return;
+    const want = BR_DEFAULT_BY_MODEL[model];
+    if (!want) return;
+    const $want = $("input[name='BottomRetainer'][value='" + want + "']");
+    if (!$want.length || $want.is(":checked")) return;
+    $("input[name='BottomRetainer']").prop("checked", false)
+      .closest(".rw-button").removeClass("btn-checked");
+    $want.prop("checked", true).closest(".rw-button").addClass("btn-checked");
+  }
+
+  // On model change: restrict the BR options for the model, then apply the BR
+  // default, then constrain the seal so it reflects the resulting retainer.
+  // (Restrict runs first so an aluminum-only model can't keep a stale steel pick;
+  // its forced "pvc" selection makes the per-model default a no-op for that model.)
+  function syncBottomRetainerAndSeal() {
+    applyBottomRetainerConstraint();
+    applyBottomRetainerDefault();
+    applyBottomSealConstraint();
+  }
+  $(document).on("change", "input[name='DOOR_MODEL']", syncBottomRetainerAndSeal);
   $(document).on("change", "input[name='BottomRetainer']", applyBottomSealConstraint);
-  applyBottomSealConstraint();
+  syncBottomRetainerAndSeal();
   // Re-run after host framework finishes hydrating selects.
-  setTimeout(applyBottomSealConstraint, 0);
-  setTimeout(applyBottomSealConstraint, 250);
+  setTimeout(syncBottomRetainerAndSeal, 0);
+  setTimeout(syncBottomRetainerAndSeal, 250);
 
   // [NUM-COUPLINGS] Coupler (Hardware tab) drives Number of Couplings in
   // Advanced. Coupler=No → only the 0 button is visible and selected.

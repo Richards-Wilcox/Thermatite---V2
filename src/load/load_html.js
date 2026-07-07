@@ -1,101 +1,5 @@
 function loadForm() {
-    /* =========================================================================
-       Thermatite — load_html.js
-       =========================================================================
-       This file builds the entire configurator form as one big HTML string and
-       appends it into .concept-ui-form.scrollable. Search by the [TAGS] below.
-
-       LAYOUT
-         [LAYOUT-ROOT]        #configurator wrapper, splits page L/R
-         [LAYOUT-LEFT]        Left pane — door preview + window position picker
-         [LAYOUT-RIGHT]       Right pane — all configuration inputs
-
-       LEFT PANE
-         [NAV-TABS]           #NAVIGATION_SPC — top section tabs (filled by JS)
-         [WINDOW-POSITION]    Left / Center / Right / Both buttons
-         [CANVAS]             #CANVAS_PLUGIN — door preview canvas
-
-       RIGHT PANE — header
-         [HEADER-PROPS]       #DOOR_PROPERTIES — lift-type label + price display
-
-       RIGHT PANE — section: DIMENSIONS  (id="DIMENSIONS")
-         (rendered top-to-bottom in this order)
-         [DOOR-OPTIONS]       Complete Door / Door Face Only / Hardware Only
-         [DOOR-MODEL]         T150 / T175 / T200 / T300 (first 4)
-         [DOOR-MODEL-MORE]    Toggle + hidden 5th-9th (T200-20, T200C, U-series, U200C)
-         [DIMENSIONS-PRESET]  8x7 / 9x7 / 8x8 / 9x8 buttons
-         [DIMENSIONS-CUSTOM]  Custom width/height feet+inches + sections
-         [PATTERN]            Standard / Multi / Raynor Profile (per-model)
-         [COLOUR]             Door colour buttons (per-model)
-         [HARDWARE-SIZES]     2 or 3 (hidden when Door Face Only)
-         [OVERLAP-REQUIRED]   Yes / No
-         [OPERATION]          Manual / Drawbar / Jack Shaft / DC Pulse / Chain Hoist
-         [MANUAL-TYPE]        None / Pull Cord / Pull Chain (w/ + w/o Spring) — when Operation=Manual
-         [CHAIN-HOIST-TYPE]   2000 / By Others / JR / JRG — when Operation=Chain Hoist
-         [END-CAPS]           Single / Double (per model + width)
-         [DM-TOP-WEATHER-SEAL] Top Weather Seal — dropdown
-         [DM-BOTTOM-RETAINER]  Bottom Retainer — dropdown
-
-       RIGHT PANE — section: SECTION_OPTIONS  (id="SECTION_OPTIONS")
-         [SO-BOTTOM-SEAL]      Bottom Seal — TBD button options
-         [SO-WIND-LOAD]        Wind Load — TBD button options
-         [SO-TRUSS-STYLE]      Truss Style — dropdown (many options)
-         [SO-ROLLER-STYLE]     Roller Style — TBD button options
-         [SO-12-GAUGE-HINGES]  12 Gauge Hinges — TBD button options
-         [SO-STEP-PLATE]       Step Plate — TBD button options
-         [SO-EXHAUST-PORT]     Exhaust Port (View / Port Size / Latched dropdowns)
-         [SO-BAR-LATCH]        Bar Latch (Bar Latch / Interior-Exterior dropdowns)
-         [SO-ONE-POINT-LATCH]  One Point Latch (Yes-No / Qty dropdowns)
-         [SO-FENDER-GUARD]     Fender Guard (dropdown of variants)
-         [SO-NUM-COUPLINGS]    Number of Couplings (number input)
-         [SO-SPRING-FAILURE-DEVICE] Spring Failure Device (Yes / No)
-         [SO-CABLE-TYPE]       Cable Type (Galvanized Cable / Stainless Steel Cable)
-         [SO-THIMBLE-FOR-CABLE] Thimble For Cable Tor (Yes / No)
-         [SO-GALVANIZED-SPRING] Galvanized Spring (Yes / No)
-         [SO-WEIGHT-MODIFIER]  Current / Modify / New Adjusted Springing Weight
-
-       RIGHT PANE — section: GLAZING
-         [GLAZING-WINDOWS]    hidden input (always "none"); feeds canvas/BOM only
-         [GLAZING-TYPE]       Glazing — None / Lites / Polytite Fullview / Alumatite Fullview
-         [GLAZING-TEMPERED]   Untempered / Tempered
-
-       RIGHT PANE — section: HARDWARE  (id="HARDWARE")
-         [LIFT-TYPE]          Std 12R/15R/32R, LHF, LHR, High Lift dropdown
-         [HIGHLIFT]           Highlift inches dropdown (hidden by default)
-         [TRACK-MOUNT]        TRK_MOUNT_TYP — Track Mount buttons (filtered by thickness × HW size × CSBB × No Lap Steel Jamb)
-         [LOWER-SPLICE]       LOWER_SPLICE — Lower Splice dropdown
-         [JAMB]               JAMB select (hidden)
-         [JAMB-SEAL]          Jamb seal type + colour + screw packages
-         [HANGER-ANGLE]       Hanger angle option + qty
-         [EXTRA-TRUSS]        Yes / No
-         [HW-SHAFT-TYPE]      Shaft Type — Tube / Keyed Tube / 1" Solid / 1 1/4" Solid (dropdown)
-         [HW-DRUMS-CABLES]    Drums & Cables options table (radio per row)
-         [HW-SPRINGING-SOLUTIONS] Springing Solutions options table (radio per row)
-         [HW-BUMPER-OR-PUSHER-SPRINGS] Bumper or Pusher Springs (dropdown)
-         [HW-HANGER-ANGLE]    Hanger Angle (Type dropdown + Qty number)
-         [HW-COUPLER]         Coupler (Yes / No)
-         [HW-SELF-ALIGNING-FLANGE-BEARINGS] Self-Aligning Flange Bearings (Yes / No)
-         [HW-DUPLEX-SOLUTIONS] Include Duplex Solutions? (Yes / No)
-
-       RIGHT PANE — section: OPERATOR_OPTIONS
-         [OP-CAROUSEL]        Operator selection carousel
-         [OP-TRANSMITTER]     Additional transmitter + qty
-         [OP-CONTROL-PANEL]   Additional control panel + qty
-         [OP-KEYLESS]         Additional keyless entry + qty
-         [OP-BRACKET]         Operator bracket dropdown
-
-       RIGHT PANE — section: ANNOTATIONS
-         [ANNOTATIONS]        Tag / Contractor / Architect / Reference / Client
-
-       FOOTER
-         [FOOTER-NAV]         #NEXT_PAGE_BUTTONS — Back / Configure / Next
-         [DEFAULTS]           #DEFAULTS_PLUGIN — Save / Restore default buttons
-
-       AFTER FORM (JS, below the template literal)
-         [JS-APPEND]          Append form to DOM, hide unused JDE containers
-         [JS-RADIO-STYLE]     Generic radio-click visual highlight handler
-         [JS-COLOR-CLICK]     .color-button click forwards to inner radio
-       ========================================================================= */
+    // Builds the configurator form HTML and appends it into .concept-ui-form.scrollable.
     const form = `<div id="configurator">
 
   <!-- [LAYOUT-ROOT] outermost wrapper, splits L/R -->
@@ -104,7 +8,7 @@ function loadForm() {
     <div class="rw-configurator__layout--left">
 	<!-- [NAV-TABS] section tabs (populated by JS) -->
 	<div id="NAVIGATION_SPC"></div>
-	<!-- [WINDOW-POSITION] Left / Center / Right / Both -->
+	<!-- [WINDOW-POSITION] Left / Center / Right -->
 	<div class="postion-container">
 		<div style="text-align: center; padding-bottom: 5px;" class="config-option-title-style">Position</div>
 		<div class="window-position-container">
@@ -120,15 +24,11 @@ function loadForm() {
 			<label for="WINDOW_POSITION_2">Right</label>
 		 	<input type="radio" style="display:none;" id="WINDOW_POSITION_2"  name="WINDOW_POSITION" desc="Right" value="right" code="center" >
 		   </div>
-		   <div class="rw-button" tabindex="0">
-			<label for="WINDOW_POSITION_3">Both</label>
-			<input type="radio" style="display:none;" id="WINDOW_POSITION_3"  name="WINDOW_POSITION" desc="Both" code="both" value="both" >
-		   </div>
 		</div>
 	</div>
      <!-- [CANVAS] door preview canvas (drawn by canvas plugin) -->
      <div id="CANVAS_PLUGIN" style="display:flex;justify-content:center;">
-    		<canvas id="CONFIG_CANVAS" width=1400 height=1000 style="height:65vh; padding-bottom: 30px; border:none;background: transparent;"></canvas>
+    		<canvas id="CONFIG_CANVAS" width=1400 height=1000 style="height:65vh; border:none;background: transparent;"></canvas>
     	</div>
      <!-- [HW-LEFT-PANE-LANDING] Landing container for Hardware-tab tables that
           move here in place of the canvas. Filled by JS when entering Hardware. -->
@@ -435,41 +335,20 @@ function loadForm() {
 	     feeds the canvas render, GL_GLAZING_TYPE and the BOM output, but the visible
 	     None/Slim 40" picker was replaced by the GLAZING_TYPE styles below. -->
 	<input type="radio" style="display:none;" id="WINDOWS_0" name="WINDOWS" value="none" desc="None" checked>
-	<!-- [GLAZING-TYPE] glazing style — sits directly under the "Glazing" heading -->
+	<!-- [GLAZING-TYPE] glazing style — sits directly under the "Glazing" heading.
+	     GLAZING_TYPE_0 is the only radio left; it is not user-facing, it is kept
+	     in sync with the per-box picker on the canvas (see load_canvas.js) so
+	     existing GLAZING_TYPE === 'none' checks elsewhere keep working. -->
 	<div id="GLAZING_OPTIONS" style="margin-top:8px;display:flex;flex-direction:column;row-gap:5px;width:100%;">
-	<div style="text-align: left;" class="config-option-title-style">Glazing</div>
-	<div style="display:flex;justify-content:flex-start; flex-wrap: wrap; row-gap: 3px;">
-<div class="rw-button" tabindex="0">
-	<label for="GLAZING_TYPE_0">None</label>
-	<input type="radio" style="display:none;" id="GLAZING_TYPE_0"  name="GLAZING_TYPE" desc="None" value="none" checked>
-	</div>
-<div class="rw-button" tabindex="0">
-	<label for="GLAZING_TYPE_1">Lites</label>
-	<input type="radio" style="display:none;" id="GLAZING_TYPE_1" name="GLAZING_TYPE" desc="Lites" value="lites" >
-	</div>
-<div class="rw-button" tabindex="0">
-	<label for="GLAZING_TYPE_2">Polytite Fullview</label>
-	<input type="radio" style="display:none;" id="GLAZING_TYPE_2"  name="GLAZING_TYPE" desc="Polytite Fullview" value="polytite_fullview" >
-	</div>
-<div class="rw-button" tabindex="0">
-	<label for="GLAZING_TYPE_3">Alumatite Fullview</label>
-	<input type="radio" style="display:none;" id="GLAZING_TYPE_3"  name="GLAZING_TYPE" desc="Alumatite Fullview" value="alumatite_fullview" >
-	</div>
-	</div>
-	<!-- [GLAZING-TEMPERED] clear / tempered glass -->
-	<div style="text-align: left;" class="config-option-title-style">Glass Material</div>
-	<div class="combined-button-container">
-		<div class="combined-button-container-inner">
-		 <div class="rw-sliding-button" tabindex="0">
-		   <label for="TEMPERED_0">Clear Glass</label>
-		   <input type="radio" style="display:none;" id="TEMPERED_0"  name="TEMPERED" desc="Clear Glass" value="untempered" checked>
-		 </div>
-		 <div class="rw-sliding-button" tabindex="0">
-		   <label for="TEMPERED_1">Tempered Glass</label>
-		   <input type="radio" style="display:none;" id="TEMPERED_1" name="TEMPERED" desc="Tempered Glass" value="tempered" >
-		 </div>
-		</div>
-	</div>
+	<input type="radio" style="display:none;" id="GLAZING_TYPE_0" name="GLAZING_TYPE" desc="None" value="none" checked>
+	<!-- [GLAZING-TEMPERED] TEMPERED_0 retained as a hidden input (always "untempered"):
+	     not user-facing (Glass Material picker removed), kept in case anything
+	     downstream still expects a checked TEMPERED radio to exist. -->
+	<input type="radio" style="display:none;" id="TEMPERED_0" name="TEMPERED" desc="Clear Glass" value="untempered" checked>
+	<!-- [GLAZING-SECTION-PANEL] Filled by renderGlazingSectionPanel() in
+	     load_canvas.js — shows the Type/Material/Frame Color/Lites/Spacing/Size
+	     controls for whichever section's pencil was last clicked on the canvas. -->
+	<div id="GLAZING_SECTION_PANEL"></div>
 	</div>
      </section>
 
@@ -1189,6 +1068,10 @@ function loadForm() {
           <label for="BOTTOM_SEAL_SANTOPRENE" >3" Santoprene Bottom Seal (-60C)</label>
           <input type="radio" style="display:none;" id="BOTTOM_SEAL_SANTOPRENE" name="BottomSeal" value="santoprene_3_60c">
         </div>
+        <div class="rw-button" tabindex="0">
+          <label for="BOTTOM_SEAL_DUAL">Dual Durometer Bottom Seal</label>
+          <input type="radio" style="display:none;" id="BOTTOM_SEAL_DUAL" name="BottomSeal" value="dual_durometer">
+        </div>
       </div>
     </div>
   </div>
@@ -1844,9 +1727,7 @@ function loadForm() {
 
     //loadWeightNodes()
 
-    // [JS-RADIO-STYLE] highlight radio groups (COLOR/TEMPERED have their own).
-    // Uses a `btn-checked` class, not inline styles, so applyDefaults' synthetic
-    // clicks don't leave stale backgrounds on multiple radios in a group.
+    // [JS-RADIO-STYLE] btn-checked highlight per radio group (COLOR/TEMPERED self-managed).
     function syncRadioGroupHighlight(groupName) {
         $(`input[type='radio'][name='${groupName}']`).each((i, radio) => {
             const $parent = $(radio).closest(".rw-button");
@@ -1858,22 +1739,35 @@ function loadForm() {
         if (target.name === "COLOR" || target.name === "TEMPERED") return;
         syncRadioGroupHighlight(target.getAttribute("name"));
     });
+    // Groups with a hidden "None" option that clicking the checked button falls back to.
+    const DESELECTABLE_GROUPS = {};
+
     // Clicks on .rw-button padding (outside the label) don't trigger the radio —
     // forward them to the inner radio.
     $(document).on("click", "div.rw-configurator__layout .rw-button", function(e) {
         if ($(e.target).is("input,label")) return; // already handled by native label/input
         const $input = $(this).find("input[type='radio']").first();
-        if (!$input.length || $input.is(":checked") || $input.prop("disabled")) return;
+        if (!$input.length || $input.prop("disabled")) return;
+        // Deselect: padding-click on the already-checked button falls back to
+        // None instead of the generic "no-op when already checked" rule.
+        const noneId = DESELECTABLE_GROUPS[$input.attr("name")];
+        if (noneId && $input.is(":checked") && $input.attr("id") !== noneId) {
+            $("#" + noneId).prop("checked", true).trigger("change");
+            return;
+        }
+        if ($input.is(":checked")) return;
         $input.prop("checked", true).trigger("change");
     });
-    // Initial sync for any radios already on the page when the form loads.
-    setTimeout(() => {
+    // Repaint btn-checked for every .rw-button group (used by session restore).
+    window.syncAllRadioGroupHighlights = function () {
         const groups = new Set();
         $("div.rw-configurator__layout input[type='radio']").each((i, r) => {
             if (r.name && r.name !== "COLOR" && r.name !== "TEMPERED") groups.add(r.name);
         });
         groups.forEach(syncRadioGroupHighlight);
-    }, 0);
+    };
+    // Initial sync for any radios already on the page when the form loads.
+    setTimeout(window.syncAllRadioGroupHighlights, 0);
 
     // [JS-SLIDING-BUTTON] selected class sync for combined-button-container radios
     window.syncSlidingButtonGroup = function(groupName) {
@@ -1951,18 +1845,10 @@ function loadForm() {
             __perf("initial rw(T_DOOR_MODEL) walk", () => rw(getNode("T_DOOR_MODEL")));
         }
     }, 0);
-    // Part#/desc nodes depend only on DOOR_MODEL, so they compute once at load
-    // (before applyDefaults' async AJAX settles the real model) and go stale.
-    // Refresh after defaults land. NUM_OF_SEC must be derived from the loaded
-    // HEIGHT before bundles recompute, else resolveSectionHeights misses the
-    // section-count-keyed chart and falls back to wrong arithmetic.
+    // After defaults land: push SIZE/dimension leaves, derive NUM_OF_SEC, then
+    // recompute bundles (part#/desc nodes go stale before the model settles).
     const _settleBundles = () => {
-        // Push SIZE + dimension leaves first: on load HEIGHT can be left at the 7'
-        // default (the SIZE walk didn't propagate), giving a wrong chart lookup.
-        if (nodeset?.["SIZE"]) nodeset["SIZE"].value = $("input[name='SIZE']:checked").val();
-        ["SIZE_HEIGHT", "SIZE_WIDTH", "DOOR_WIDTH_FEET", "DOOR_WIDTH_INCHES", "DOOR_HEIGHT_FEET", "DOOR_HEIGHT_INCHES", "WIDTH", "HEIGHT"].forEach(id => {
-            if (typeof getNode === "function" && nodeset?.[id]) rw(getNode(id));
-        });
+        pushSizeLeaves();
         if (typeof renderNumOfSections === "function") renderNumOfSections();
         if (typeof refreshAllBundleDescs === "function") refreshAllBundleDescs();
     };
@@ -1970,12 +1856,16 @@ function loadForm() {
     setTimeout(_settleBundles, 1500);
     //loadTrussSchedule();
     //loadPriceDrivers();
-  // [DIMENSIONS-SOURCE-OF-TRUTH] One resolver for the selected size so summary,
-  // canvas, end-caps, and section-count readers can't drift. Custom reads CUSTOM_*;
-  // preset reads the checked SIZE radio's own attrs. A missing inches attr is 0 — it
-  // must NOT fall through to the DOOR_*_INCHES nodes (they lag a click behind, which
-  // rendered 14'0" as 14'2" after a custom→preset swap). Returns raw numbers; callers
-  // apply their own "nothing selected" fallback.
+  // Push the preset SIZE node + all dimension leaves through the node walk.
+  function pushSizeLeaves() {
+      if (nodeset?.["SIZE"]) nodeset["SIZE"].value = $("input[name='SIZE']:checked").val();
+      ["SIZE_HEIGHT", "SIZE_WIDTH", "DOOR_WIDTH_FEET", "DOOR_WIDTH_INCHES", "DOOR_HEIGHT_FEET", "DOOR_HEIGHT_INCHES", "WIDTH", "HEIGHT"]
+          .forEach(id => { if (typeof getNode === "function" && nodeset?.[id]) rw(getNode(id)); });
+  }
+
+  // [DIMENSIONS-SOURCE-OF-TRUTH] Single size resolver (summary/canvas/end-caps/
+  // sections all read this). Custom → CUSTOM_*; preset → checked SIZE attrs.
+  // Missing inches = 0 (must NOT fall through to lagging DOOR_*_INCHES nodes).
   window.getCurrentDimensions = function getCurrentDimensions() {
 	 if ($("#custom_dimensions").is(":checked")) {
 		return {
@@ -2004,13 +1894,14 @@ function loadForm() {
 	 const d = getCurrentDimensions();
 	 let widthInches, heightInches;
 	 if (d.custom) {
-		// Preserve prior behaviour: empty custom fields fall back to 96"/84".
-		widthInches = (d.wFt * 12 + d.wIn) || 96;
-		heightInches = (d.hFt * 12 + d.hIn) || 84;
+		// Custom default: 8'2" x 8'2" (98" x 98") when fields are empty.
+		widthInches = (d.wFt * 12 + d.wIn) || 98;
+		heightInches = (d.hFt * 12 + d.hIn) || 98;
 	 } else {
-		// Preserve prior preset defaults of 8' width / 7' height when unset.
-		widthInches = (d.wFt || 8) * 12 + d.wIn;
-		heightInches = (d.hFt || 7) * 12 + d.hIn;
+		// Preset default: 10'2" x 10'0" (122" x 120") when unset — matches the
+		// first/checked SIZE preset (DIMENSIONS_0).
+		widthInches = (d.wFt || 10) * 12 + (d.wFt ? d.wIn : 2);
+		heightInches = (d.hFt || 10) * 12 + d.hIn;
 	 }
 
 	 const pattern = $("input[name='Pattern']:checked").val() || "Standard Rib";
@@ -2019,12 +1910,16 @@ function loadForm() {
 	 const color = selectedColor.attr("hex") || "#654321";
 
 	 const numSections = parseInt($("#NUM_OF_SEC").val()) || 4;
+	 // Real per-section heights (21"/24" mix, bottom-to-top) so the canvas draws
+	 // sections at their true proportions instead of an equal-height guess.
+	 const sectionHeights = (typeof getSectionBundle === "function") ? getSectionBundle() : [];
 
 	 await CANVAS_PLUGIN.drawThermatiteDoor({
 		dimensions: {
 		    widthInches,
 		    heightInches,
 		    numSections,
+		    sectionHeights,
 		    scale: 1
 		},
 		background: {
@@ -2093,7 +1988,10 @@ function colorSwatchHTML(colorKey, isChecked) {
 function renderColorRow() {
     const model = $("input[name='DOOR_MODEL']:checked").val() || "T175";
     const list = MODEL_COLORS[model] || ["white"];
-    const previouslySelected = $("input[name='COLOR']:checked").val();
+    // Prefer the pending restore value (DOM has no checked COLOR mid-restore).
+    const previouslySelected = (window.__restorePendingColor && list.includes(window.__restorePendingColor))
+        ? window.__restorePendingColor
+        : $("input[name='COLOR']:checked").val();
 
     const primary = list.slice(0, 4);
     const secondary = list.slice(4);
@@ -2201,7 +2099,11 @@ const MODEL_PATTERNS = {
 function renderPatternRow() {
     const model = $("input[name='DOOR_MODEL']:checked").val() || "T175";
     const list = MODEL_PATTERNS[model] || ["Standard Rib"];
-    const previouslySelected = $("input[name='Pattern']:checked").val();
+    // Prefer the pending restore value during a session restore (DOM has no
+    // checked Pattern yet because this function rebuilds the row).
+    const previouslySelected = (window.__restorePendingPattern && list.includes(window.__restorePendingPattern))
+        ? window.__restorePendingPattern
+        : $("input[name='Pattern']:checked").val();
     const selected = list.includes(previouslySelected) ? previouslySelected : list[0];
 
     const $row = $("#PATTERN_ROW");
@@ -2229,9 +2131,13 @@ $(document).on("change", "input[name='DOOR_MODEL']", function() {
     renderEndCaps();
     redrawCanvas();
     if (typeof getNode === "function" && nodeset?.["T_DOOR_MODEL"]) rw(getNode("T_DOOR_MODEL"));
-    // Part#s/descs depend on DOOR_MODEL but aren't always reached by the model
-    // change-walk (e.g. after applyDefaults). Refresh them explicitly.
+    // Snap retainer boxes now (clears the prev model's part# immediately).
+    if (typeof snapBottomRetainer === "function") snapBottomRetainer();
     refreshAllBundleDescs();
+    // Refresh again after the BR/BS constraint may flip the selection (no event).
+    setTimeout(function() {
+        if (typeof refreshAllBundleDescs === "function") refreshAllBundleDescs();
+    }, 70);
 });
 
 // ===== [ENDCAPS-PER-MODEL] availability of single/double end caps by model + total width inches.
@@ -2359,21 +2265,24 @@ function renderNumOfSections() {
     const sel = document.getElementById("NUM_OF_SEC");
     if (!sel) return;
 
-    const hFt = getCurrentHeightFeet();
+    // Full height in inches (feet*12 + inches) so custom sizes hit the right
+    // chart row (whole-feet-only mismatched resolveSectionHeights' real height).
+    const dims = window.getCurrentDimensions();
+    const hFt = dims.hFt || 8;
+    const hIn = dims.hIn || 0;
+    const heightInches = hFt * 12 + hIn;
     // The stack chart's primary row decides the section count (one per height);
     // fall back to the HEIGHT_SECTIONS table only if the chart has no entry.
     let allowed;
     if (typeof getChartNumSections === "function") {
-        const n = getChartNumSections(hFt * 12);
+        const n = getChartNumSections(heightInches);
         allowed = n ? [n] : (HEIGHT_SECTIONS[hFt] || [4]);
     } else {
         allowed = HEIGHT_SECTIONS[hFt] || [4];
     }
     const selected = allowed[0];
 
-    // Rebuild options only if the allowed set changed, and touch raw DOM without
-    // dispatching: a jQuery empty/append/val emits change events that trigger a
-    // second full node walk. Sync the node value in code instead.
+    // Rebuild options only if changed; touch raw DOM (jQuery emits change → extra walk).
     const current = Array.from(sel.options).map(o => Number(o.value));
     const sameOptions = current.length === allowed.length && current.every((v, i) => v === allowed[i]);
     if (!sameOptions) {
@@ -2389,20 +2298,14 @@ $(document).on("change", "#CUSTOM_HEIGHT_FEET, input[name='SIZE']", function() {
     if (_numOfSecTimer) clearTimeout(_numOfSecTimer);
     _numOfSecTimer = setTimeout(() => {
         _numOfSecTimer = null;
-        // Push the dimension leaves for the current selection before rebuilding
-        // sections/bundles. The framework's SIZE walk is async, so recomputing
-        // first left the BOM one selection behind.
-        if (nodeset?.["SIZE"]) nodeset["SIZE"].value = $("input[name='SIZE']:checked").val();
-        ["SIZE_HEIGHT", "SIZE_WIDTH", "DOOR_WIDTH_FEET", "DOOR_WIDTH_INCHES", "DOOR_HEIGHT_FEET", "DOOR_HEIGHT_INCHES", "WIDTH", "HEIGHT"].forEach(id => {
-            if (typeof getNode === "function" && nodeset?.[id]) rw(getNode(id));
-        });
-        // NUM_OF_SEC must be current before bundles recompute (it's keyed on
-        // HEIGHT|NUM_OF_SEC), else the recompute reads the previous section count.
+        // Push dimension leaves before rebuilding (the SIZE walk is async).
+        pushSizeLeaves();
+        // NUM_OF_SEC must settle before bundles recompute (keyed HEIGHT|NUM_OF_SEC).
         renderNumOfSections();
         if (typeof invalidateSectionHeightsCache === "function") invalidateSectionHeightsCache();
         if (typeof invalidateDescSegmentsCache === "function") invalidateDescSegmentsCache();
+        if (typeof snapBottomRetainer === "function") snapBottomRetainer();
         if (typeof refreshAllBundleDescs === "function") refreshAllBundleDescs();
-        // RENDER node isn't registered, so redraw explicitly — exactly once.
         redrawCanvas();
     }, 80);
 });
@@ -2413,6 +2316,98 @@ $(document).on("change", "#NUM_OF_SEC", function() {
         CANVAS_PLUGIN.redrawFromCurrentForm();
     }
 });
+
+// Mirror BottomSeal radios → BTM_SEAL (desc) + BTM_SEAL_SPNUM (part#), written
+// directly to element + node (deferred, since the framework walk blanks them).
+function syncBtmSeal() {
+    const seal = $("input[name='BottomSeal']:checked").val() || "none";
+    const names = {
+        none: "",
+        pvc_4_35c: '4" PVC Bottom Seal (-35C)',
+        santoprene_3_60c: '3" Santoprene Bottom Seal (-60C)',
+        dual_durometer: 'T150 Btm Retainer & Seal 24\'6"',
+    };
+    const spnums = {
+        none: "",
+        pvc_4_35c: "152-318",
+        santoprene_3_60c: "152-319",
+        dual_durometer: "328-266",
+    };
+    const model = $("input[name='DOOR_MODEL']:checked").val() || "";
+    const retainer = $("input[name='BottomRetainer']:checked").val() || "";
+
+    let desc = names[seal] ?? "";
+    let spnum = spnums[seal] ?? "";
+    // Mirror the BTM_SEAL node logic in section_bundles.js: 4" PVC → no output
+    // (T150/T150U any; T175/T175U w/ alum); 3" Santoprene → ZZBTM-3IN.
+    const noSealOutput = seal === "pvc_4_35c" && (
+        model === "T150" || model === "T150U" ||
+        ((model === "T175" || model === "T175U") && retainer === "pvc")
+    );
+    const santoZZ = seal === "santoprene_3_60c" &&
+        ["T150", "T150U", "T175", "T175U", "T200", "T200-20", "T200U", "T300", "T200C", "U200C"].includes(model);
+    if (noSealOutput) {
+        desc = "";
+        spnum = "";
+    } else if (santoZZ) {
+        spnum = "ZZBTM-3IN";
+    }
+    const elDesc = document.getElementById("BTM_SEAL");
+    const elSpnum = document.getElementById("BTM_SEAL_SPNUM");
+    if (elDesc) elDesc.value = desc;
+    if (elSpnum) elSpnum.value = spnum;
+    if (nodeset?.["BTM_SEAL"]) nodeset["BTM_SEAL"].value = desc;
+    if (nodeset?.["BTM_SEAL_SPNUM"]) nodeset["BTM_SEAL_SPNUM"].value = spnum;
+}
+// Seal change: write now + after the framework walk settles.
+$(document).on("change", "input[name='BottomSeal']", function() {
+    syncBtmSeal();
+    setTimeout(syncBtmSeal, 60);
+});
+// Retainer change reveals/defaults the seal but fires no BottomSeal change.
+$(document).on("change", "input[name='BottomRetainer']", function() {
+    setTimeout(syncBtmSeal, 60);
+});
+// Retainer/seal radios aren't in the dep graph — refresh bundles after settle.
+$(document).on("change", "input[name='BottomRetainer'], input[name='BottomSeal']", function() {
+    setTimeout(function() {
+        if (typeof refreshAllBundleDescs === "function") refreshAllBundleDescs();
+    }, 70);
+});
+
+// Nav re-renders fields — re-assert seal + bundles after it settles.
+$(document).on("click", "#NAVIGATION_SPC, #tab_0, #tab_1, #tab_2, #tab_3, #tab_4, .button-nextpage, #BACK_BTN", function() {
+    setTimeout(syncBtmSeal, 60);
+    setTimeout(syncBtmSeal, 250);
+    setTimeout(function() {
+        if (typeof refreshAllBundleDescs === "function") refreshAllBundleDescs();
+    }, 250);
+});
+// Initial sync on load.
+setTimeout(syncBtmSeal, 300);
+setTimeout(syncBtmSeal, 1000);
+
+// Configure (nextPage) builds the BOM synchronously on click — run our snap +
+// session-save in the CAPTURE phase so they go first.
+(function () {
+    const btn = document.getElementById("CONFIGURE_BTN");
+    if (!btn) return;
+    btn.addEventListener("click", function () {
+        if (typeof snapBottomRetainer === "function") snapBottomRetainer();
+        ["TM_BOTTOM_RETAINER", "TM_BOTTOM_RETAINER_T200_T300", "TM_BOTTOM_RETAINER_QTY"].forEach(function (id) {
+            const el = document.getElementById(id);
+            if (el && el.tagName === "SELECT" && !(nodeset?.[id]?.value)) {
+                el.selectedIndex = -1;
+            }
+        });
+        // Save snapshot + one-shot flag so the next load restores ONLY on
+        // Configure → Back (not fresh visits — the old revert bug).
+        if (typeof saveSession === "function") {
+            saveSession();
+            try { sessionStorage.setItem("thermatite_came_from_configure", "1"); } catch (e) {}
+        }
+    }, true); // capture phase → before the inline onclick=nextPage()
+})();
 
 $(document).on("change", "#custom_dimensions", function() {
     renderNumOfSections();
@@ -2426,100 +2421,71 @@ setTimeout(() => { renderColorRow(); renderPatternRow(); renderNumOfSections(); 
 setTimeout(renderNumOfSections, 200);
 setTimeout(renderNumOfSections, 1000);
 
-// No custom SIZE click handler: the radio's native `change` fires the framework's
-// SIZE walk, which recomputes everything. A manual rw()-per-node pass here would
-// re-run the whole node walk — the source of the multi-second lag.
+// Preset SIZE has no custom handler — its native change fires the framework walk.
 
 let _customDimsCascadeTimer = null;
 $(document).on("change", "#CUSTOM_WIDTH_FEET, #CUSTOM_WIDTH_INCHES, #CUSTOM_WIDTH_FRACTION, #CUSTOM_HEIGHT_FEET, #CUSTOM_HEIGHT_INCHES, #custom_dimensions", function() {
     if (_customDimsCascadeTimer) clearTimeout(_customDimsCascadeTimer);
     _customDimsCascadeTimer = setTimeout(() => {
         _customDimsCascadeTimer = null;
-        console.log("%c[CUSTOM-DIMS] change", "color:#06c;font-weight:bold");
-        const tAll = performance.now();
-        // Push leaf values; framework's dep chain handles the section-bundle fan-out from there.
+        // Push dimension leaves; the dep chain fans out to the section bundles.
         ["DOOR_WIDTH_FEET", "DOOR_WIDTH_INCHES", "DOOR_WIDTH_FRACTION", "DOOR_HEIGHT_FEET", "DOOR_HEIGHT_INCHES"].forEach(id => {
-            if (typeof getNode === "function" && nodeset?.[id]) {
-                __perf(`  CUSTOM rw(${id})`, () => rw(getNode(id)));
-            }
+            if (typeof getNode === "function" && nodeset?.[id]) rw(getNode(id));
         });
-        if (typeof getNode === "function" && nodeset?.["WIDTH"]) __perf("  CUSTOM rw(WIDTH)", () => rw(getNode("WIDTH")));
-        if (typeof getNode === "function" && nodeset?.["HEIGHT"]) __perf("  CUSTOM rw(HEIGHT)", () => rw(getNode("HEIGHT")));
+        if (typeof getNode === "function" && nodeset?.["WIDTH"]) rw(getNode("WIDTH"));
+        if (typeof getNode === "function" && nodeset?.["HEIGHT"]) rw(getNode("HEIGHT"));
         renderNumOfSections();
-        console.log("[CUSTOM-DIMS DEBUG] custom?", $("#custom_dimensions").is(":checked"),
-            "| DOM h_ft:", $("#CUSTOM_HEIGHT_FEET").val(), "h_in:", $("#CUSTOM_HEIGHT_INCHES").val(),
-            "w_ft:", $("#CUSTOM_WIDTH_FEET").val(), "w_in:", $("#CUSTOM_WIDTH_INCHES").val(),
-            "|| nodes WIDTH:", nodeset?.["WIDTH"]?.value, "HEIGHT:", nodeset?.["HEIGHT"]?.value,
-            "NUM_OF_SEC:", nodeset?.["NUM_OF_SEC"]?.value,
-            "DOOR_WIDTH_FEET:", nodeset?.["DOOR_WIDTH_FEET"]?.value);
-        if (typeof refreshAllBundleDescs === "function") __perf("  CUSTOM recomputeBundles", () => refreshAllBundleDescs());
-        console.log("[CUSTOM-DIMS DEBUG] after refresh — SB1_DESC:", nodeset?.["SB1_DESC"]?.value,
-            "BUNDLE_1_HEIGHT:", nodeset?.["BUNDLE_1_HEIGHT"]?.value);
-        __perf("  CUSTOM redrawCanvas", () => redrawCanvas());
-        console.log(`%c[CUSTOM-DIMS] total handler: ${(performance.now() - tAll).toFixed(1)}ms`, "color:#06c;font-weight:bold");
+        // Snap retainer boxes first so they don't lag the full recompute.
+        if (typeof snapBottomRetainer === "function") snapBottomRetainer();
+        if (typeof refreshAllBundleDescs === "function") refreshAllBundleDescs();
+        redrawCanvas();
     }, 80);
 });
-// Refresh all section-bundle outputs (descs + part#s). The bundle nodes are out
-// of the framework dep graph (edges stripped to avoid an O(n²) walk), so they
-// don't auto-update — recomputeSectionBundles() runs them all once, cheaply.
+// Snap the Bottom Retainer boxes from live width/model/retainer (call from event
+// handlers only — setState in node logic recurses → crash).
+function snapBottomRetainer() {
+    if (typeof setState !== "function" || typeof buildBottomRetainerParts !== "function") return;
+    const br = buildBottomRetainerParts();
+    // Write node value DIRECTLY (the BOM reads nodeset[id].value, and setState
+    // ignores empty-string writes), then setState to sync the visible field.
+    const apply = (id, value) => {
+        if (!nodeset?.[id]) return;
+        nodeset[id].value = value;
+        setState(id, value);
+    };
+    // Default to "None" (not blank) so the BOM carries an explicit None line.
+    apply("TM_BOTTOM_RETAINER", br.primary || "None");
+    apply("TM_BOTTOM_RETAINER_T200_T300", br.secondary || "None");
+    if (typeof buildBottomRetainerQty === "function") {
+        apply("TM_BOTTOM_RETAINER_QTY", buildBottomRetainerQty());
+    }
+}
+
+// Refresh all section-bundle outputs (descs + part#s). Bundle nodes are out of
+// the dep graph, so recomputeSectionBundles() runs them all once.
 function refreshAllBundleDescs() {
-    // Clear both memo caches so the recompute reads current HEIGHT/NUM_OF_SEC and
-    // DOM, not a stale memo.
     if (typeof invalidateSectionHeightsCache === "function") invalidateSectionHeightsCache();
     if (typeof invalidateDescSegmentsCache === "function") invalidateDescSegmentsCache();
     if (typeof recomputeSectionBundles === "function") {
         recomputeSectionBundles();
-        return;
+        // Re-assert the retainer <select>s via setState (recompute set node values
+        // but a <select> keeps its prior option, which leaks to the BOM).
+        if (typeof setState === "function") {
+            ["TM_BOTTOM_RETAINER", "TM_BOTTOM_RETAINER_T200_T300", "TM_BOTTOM_RETAINER_QTY"].forEach(function(id) {
+                if (nodeset?.[id]) setState(id, nodeset[id].value || "");
+            });
+            // Force no-selection on any still-empty box (only the QTY box now).
+            ["TM_BOTTOM_RETAINER", "TM_BOTTOM_RETAINER_T200_T300", "TM_BOTTOM_RETAINER_QTY"].forEach(function(id) {
+                const el = document.getElementById(id);
+                if (el && el.tagName === "SELECT" && !(nodeset?.[id]?.value)) {
+                    el.selectedIndex = -1;
+                }
+            });
+        }
     }
-    // Fallback (shouldn't run): the old per-node rw() path.
-    const descIds = [
-        // SB descriptions
-        "SB1_DESC", "SB2_DESC", "SB3_DESC", "SB4_DESC", "SB5_DESC",
-        "SB6_DESC", "SB7_DESC", "SB8_DESC", "SB9_DESC",
-        // SC descriptions
-        "BUNDLE1_SC1_DESC", "BUNDLE1_SC2_DESC",
-        "BUNDLE2_SC1_DESC", "BUNDLE2_SC2_DESC",
-        "BUNDLE3_SC1_DESC", "BUNDLE3_SC2_DESC",
-        "BUNDLE4_SC1_DESC", "BUNDLE4_SC2_DESC",
-        "BUNDLE5_SC1_DESC", "BUNDLE6_SC1_DESC",
-        "BUNDLE7_SC1_DESC", "BUNDLE8_SC1_DESC",
-        "BUNDLE9_SC1_DESC",
-        // RP (raw panel) descriptions
-        "BUNDLE1_RP1_DESC", "BUNDLE1_RP2_DESC",
-        "BUNDLE2_RP1_DESC", "BUNDLE2_RP2_DESC",
-        "BUNDLE3_RP1_DESC", "BUNDLE3_RP2_DESC",
-        "BUNDLE4_RP1_DESC", "BUNDLE4_RP2_DESC",
-        "BUNDLE5_RP1_DESC", "BUNDLE6_RP1_DESC",
-        "BUNDLE7_RP1_DESC", "BUNDLE8_RP1_DESC",
-        "BUNDLE9_RP1_DESC",
-        // Part numbers (SB/SC/RP) — only dep on DOOR_MODEL, so they go stale when
-        // the model settles after applyDefaults; refresh here too.
-        "SB1_SPNUM", "SB2_SPNUM", "SB3_SPNUM", "SB4_SPNUM", "SB5_SPNUM",
-        "SB6_SPNUM", "SB7_SPNUM", "SB8_SPNUM", "SB9_SPNUM",
-        "BUNDLE1_SC1_SPNUM", "BUNDLE1_SC2_SPNUM",
-        "BUNDLE2_SC1_SPNUM", "BUNDLE2_SC2_SPNUM",
-        "BUNDLE3_SC1_SPNUM", "BUNDLE3_SC2_SPNUM",
-        "BUNDLE4_SC1_SPNUM", "BUNDLE4_SC2_SPNUM",
-        "BUNDLE5_SC1_SPNUM", "BUNDLE6_SC1_SPNUM",
-        "BUNDLE7_SC1_SPNUM", "BUNDLE8_SC1_SPNUM",
-        "BUNDLE9_SC1_SPNUM",
-        "BUNDLE1_RP1_SPNUM", "BUNDLE1_RP2_SPNUM",
-        "BUNDLE2_RP1_SPNUM", "BUNDLE2_RP2_SPNUM",
-        "BUNDLE3_RP1_SPNUM", "BUNDLE3_RP2_SPNUM",
-        "BUNDLE4_RP1_SPNUM", "BUNDLE4_RP2_SPNUM",
-        "BUNDLE5_RP1_SPNUM", "BUNDLE6_RP1_SPNUM",
-        "BUNDLE7_RP1_SPNUM", "BUNDLE8_RP1_SPNUM",
-        "BUNDLE9_RP1_SPNUM",
-    ];
-    // Drop the per-walk shared-fields cache so this refresh reads current DOM.
-    if (typeof invalidateDescSegmentsCache === "function") invalidateDescSegmentsCache();
-    descIds.forEach(id => {
-        if (typeof getNode === "function" && nodeset?.[id]) rw(getNode(id));
-    });
 }
 
-// Invalidate the getSharedDescFields cache on any input feeding it, else descs
-// go stale.
+// Invalidate the getSharedDescFields cache on any input feeding it.
 $(document).on(
     "change",
     "input[name='SIZE'], input[name='COLOR'], input[name='Pattern'], input[name='DOOR_MODEL'], " +
@@ -2530,8 +2496,7 @@ $(document).on(
     }
 );
 
-// Pattern/COLOR feed descriptions (segments c/d). Debounce so rapid toggles
-// coalesce to one recompute that reads the final checked value.
+// Pattern/COLOR feed descriptions — debounce rapid toggles.
 let _patternColorTimer = null;
 function _refreshDescsDebounced() {
     if (typeof invalidateDescSegmentsCache === "function") invalidateDescSegmentsCache();
@@ -2544,9 +2509,7 @@ function _refreshDescsDebounced() {
 }
 $(document).on("change", "input[name='Pattern']", _refreshDescsDebounced);
 $(document).on("change", "input[name='COLOR']", _refreshDescsDebounced);
-// SIZE updates descriptions through the framework dep chain, so it's omitted here.
-// Section-options (e), end-caps (f), THIRD_REINFORCE (c "-3"), and glazing type
-// (Y-line a: GF/DF) aren't on that chain, so refresh explicitly on their change.
+// These inputs aren't on the SIZE dep chain — refresh descs explicitly.
 $(document).on(
     "change",
     "input[name='StepPlate'], input[name='ExhaustPortView'], input[name='ExhaustPortSize'], input[name='EndCaps'], [name='THIRD_REINFORCE'], input[name='GLAZING_TYPE']",
@@ -2577,8 +2540,7 @@ syncHardwareVisibility();
 setTimeout(syncHardwareVisibility, 200);
 setTimeout(syncHardwareVisibility, 1000);
 
-// div#tab_2's inline onclick="showSection(2)" bypasses the disabled radio, so
-// strip/restore it around face-only mode.
+// tab_2's inline onclick bypasses the disabled radio — strip/restore in face-only.
 function syncHardwareTabInlineClick() {
     const tab = document.getElementById("tab_2");
     if (!tab) return;
@@ -2603,9 +2565,30 @@ syncHardwareTabInlineClick();
 setTimeout(syncHardwareTabInlineClick, 200);
 setTimeout(syncHardwareTabInlineClick, 1000);
 
-// [HARDWARE-TABLE-ROW-SYNC] Shared row-select behavior for option tables on the
-// Hardware tab (Drums & Cables, Springing Solutions): clicking a row selects its
-// radio and the selected row highlights blue.
+// [FACE-ONLY-SKIP-HARDWARE] Wrap formForward/Backward to skip the hidden
+// Hardware tab (section 2) in face-only mode.
+(function patchNavSkipHardware() {
+    const HW = "2";
+    const cur = () => $("input[name='section_select']:checked").val();
+    function skip(dir) {
+        if ($("#configurator").hasClass("face-only") && cur() === HW) {
+            if (typeof window[dir] === "function") window[dir]();   // step once more past hardware
+        }
+    }
+    ["formForward", "formBackward"].forEach((fn) => {
+        const orig = window[fn];
+        if (typeof orig !== "function" || orig.__hwPatched) return;
+        const dir = fn === "formForward" ? "formForward" : "formBackward";
+        window[fn] = function () {
+            const r = orig.apply(this, arguments);
+            skip(dir);
+            return r;
+        };
+        window[fn].__hwPatched = true;
+    });
+})();
+
+// [HARDWARE-TABLE-ROW-SYNC] Click a row → select its radio + highlight blue.
 function syncHardwareTableRows() {
     $(".hw-option-table tbody tr").each(function() {
         const checked = $(this).find("input[type='radio']").is(":checked");
@@ -2735,17 +2718,6 @@ $("#NAVIGATION_SPC").on("click", function() {
 });
 
 
- // const originalFormForward = window.formForward;
- // window.formForward = function() {
-//	 originalFormForward && originalFormForward();
-//	 updateBackButton();
-//  };
-
-//  const originalFormBackward = window.formBackward;
-//  window.formBackward = function() {
-//	 originalFormBackward && originalFormBackward();
-//	 updateBackButton();
-//  };
     function showErrorMessageIfError() {
         const messageElement = $("#ERROR_MESSAGE");
         if (isFormValid()) {
@@ -2779,9 +2751,7 @@ $("#NAVIGATION_SPC").on("click", function() {
         const model = $("input[name='DOOR_MODEL']:checked").val() || ns["DOOR_MODEL"]?.value || "";
         let wFt, wIn, hFt, hIn;
         const d = getCurrentDimensions();
-        // Preset path with no radio checked is the only case that may read the
-        // (possibly lagging) DOOR_*_INCHES nodes — every other case trusts the
-        // single resolver, so the summary can't drift from canvas/BOM.
+        // Only the preset-with-no-selection case reads the lagging DOOR_*_INCHES nodes.
         if (!d.custom && !d.hasSelection) {
             wFt = ns["DOOR_WIDTH_FEET"]?.value || "";
             wIn = ns["DOOR_WIDTH_INCHES"]?.value || "0";
@@ -2816,6 +2786,25 @@ $("#NAVIGATION_SPC").on("click", function() {
     setTimeout(updateDoorSummary, 2000);
 
 
+    // [DESELECT] No visible "None" button for GLAZING_TYPE/GLASS_MATERIAL —
+    // clicking the currently-selected button deselects it back to None. Capture
+    // phase so it runs before the native label click-to-check and jQuery's
+    // bubble-phase handlers; preventDefault stops the browser from re-checking it.
+    document.addEventListener("click", function(e) {
+        const label = e.target.closest && e.target.closest("#GLAZING_OPTIONS label[for]");
+        if (!label) return;
+        const forId = label.getAttribute("for");
+        const groupName = document.getElementById(forId)?.name;
+        const noneId = DESELECTABLE_GROUPS[groupName];
+        if (!noneId || forId === noneId) return;
+        const input = document.getElementById(forId);
+        if (input && input.checked) {
+            e.preventDefault();
+            e.stopPropagation();
+            $("#" + noneId).prop("checked", true).trigger("change");
+        }
+    }, true); // capture
+
     // Changing Color selection and Position
 
     $(function () {
@@ -2823,16 +2812,24 @@ $("#NAVIGATION_SPC").on("click", function() {
             $(".button-set.right").hide();
         }
 
-        // Show the window-position sub-nav for any GLAZING_TYPE except "None";
-        // toggle a class so .postion-container.hidden does the hiding.
+        // Show the window-position sub-nav only on the Glazing tab AND when a real
+        // GLAZING_TYPE (not "None") is selected. #GLAZING_OPTIONS is unique to the
+        // Glazing page, so its layout presence is the "on Glazing tab" signal.
         function syncPositionVisibility() {
-            const glazing = $('input[name="GLAZING_TYPE"]:checked').val();
-            $(".postion-container").toggleClass("hidden", !glazing || glazing === "none");
+            // None-case hiding is handled by CSS (#configurator:has(#GLAZING_TYPE_0:checked)).
+            // This only gates on being on the Glazing tab.
+            const opts = document.getElementById("GLAZING_OPTIONS");
+            const onGlazingTab = !!(opts && opts.offsetParent !== null);
+            $(".postion-container").toggleClass("hidden", !onGlazingTab);
         }
+        window.syncPositionVisibility = syncPositionVisibility;
         $(document).on("change", "input[name='GLAZING_TYPE']", syncPositionVisibility);
         syncPositionVisibility();
         setTimeout(syncPositionVisibility, 300);
         setTimeout(syncPositionVisibility, 1000);
+        // Tab changes aren't a GLAZING_TYPE change — poll so navigating on/off the
+        // Glazing tab shows/hides the bar without hooking framework nav internals.
+        setInterval(syncPositionVisibility, 300);
 
         // Observer for color changes
         const observer = new MutationObserver((mutations, obs) => {
@@ -2867,16 +2864,17 @@ $("#NAVIGATION_SPC").on("click", function() {
 				  $("#custom_dimensions_container").hide();
 				  $("input[name='SIZE']").closest(".dimension-layout").prev(".config-option-title-style").show();
 				  $("input[name='SIZE']").closest(".dimension-layout").show();
-				  // Toggling custom OFF must snap back to the preset SIZE. Push the
-				  // SIZE node + dimension leaves synchronously so the debounced
-				  // #custom_dimensions cascade reads the preset values, not the stale
-				  // custom ones (a second change event would race two cascades).
-				  if (typeof nodeset !== "undefined" && nodeset["SIZE"]) {
-					  nodeset["SIZE"].value = $("input[name='SIZE']:checked").val();
+				  // Custom OFF → snap back to preset SIZE synchronously (push leaves,
+				  // cancel the debounced cascade, recompute now to avoid a lag/double-run).
+				  pushSizeLeaves();
+				  if (typeof _customDimsCascadeTimer !== "undefined" && _customDimsCascadeTimer) {
+					  clearTimeout(_customDimsCascadeTimer);
+					  _customDimsCascadeTimer = null;
 				  }
-				  ["SIZE_HEIGHT", "SIZE_WIDTH", "DOOR_WIDTH_FEET", "DOOR_WIDTH_INCHES", "DOOR_HEIGHT_FEET", "DOOR_HEIGHT_INCHES", "WIDTH", "HEIGHT"].forEach(id => {
-					  if (typeof getNode === "function" && nodeset && nodeset[id]) rw(getNode(id));
-				  });
+				  if (typeof snapBottomRetainer === "function") snapBottomRetainer();
+				  if (typeof renderNumOfSections === "function") renderNumOfSections();
+				  if (typeof refreshAllBundleDescs === "function") refreshAllBundleDescs();
+				  if (typeof redrawCanvas === "function") redrawCanvas();
 			   }
 			 });
 
@@ -3192,22 +3190,25 @@ $("#NAVIGATION_SPC").on("click", function() {
 
     console.log(`%c[LOAD] loadForm synchronous body done @ ${performance.now().toFixed(0)}ms`, "color:#a60;font-weight:bold");
     if ($("#INPUT_JSON").val() !== "") {
-        console.log("[LOAD] saved input found → loadInputValues()");
+        // Saved order: __restoringInputs suppresses per-model BR/BS defaults that
+        // would clobber the saved picks (cleared after the radio-clicks settle).
+        window.__restoringInputs = true;
         __perf("loadInputValues", () => loadInputValues("configurator"));
         __perf("updateDoorSummary", () => updateDoorSummary());
-    // [SESSION-RESTORE DISABLED] restoreSession() re-applied a snapshot on every
-    // load, clicking saved radios back over the user's selection — the "reverts
-    // after a few seconds" bug. Re-enable only with "Back-only" gating.
-    // } else if (restoreSession()) {
-    //     console.log("[LOAD] session found → restoreSession()");
-    //     __perf("updateDoorSummary", () => updateDoorSummary());
+        setTimeout(function () { window.__restoringInputs = false; }, 400);
+    // Restore ONLY on Configure → Back (one-shot flag), else fresh load reverts.
+    } else if (sessionStorage.getItem("thermatite_came_from_configure") === "1" && restoreSession()) {
+        sessionStorage.removeItem("thermatite_came_from_configure");
+        __perf("updateDoorSummary", () => updateDoorSummary());
     } else {
-        console.log("[LOAD] no saved input → applyDefaults() (async AJAX + radio-click storm)");
+        try { sessionStorage.removeItem("thermatite_came_from_configure"); } catch (e) {}
         __perf("applyDefaults (sync part)", () => applyDefaults());
     }
 
     // Re-sync conditional visibility after defaults apply. applyDefaults populates
     // radios async, so re-run a few times to catch late writes.
+    // Re-sync conditional visibility + repaint all 3 highlight systems (restore
+    // sets radios but doesn't repaint). Re-run a few times for async writes.
     const resync = () => {
         if (typeof syncManualTypeVisibility === "function") syncManualTypeVisibility();
         if (typeof syncChainHoistTypeVisibility === "function") syncChainHoistTypeVisibility();
@@ -3216,21 +3217,15 @@ $("#NAVIGATION_SPC").on("click", function() {
         if (typeof syncOnePointLatchQtyVisibility === "function") syncOnePointLatchQtyVisibility();
         if (typeof renderEndCaps === "function") renderEndCaps();
         if (typeof window.syncAllSlidingGroups === "function") window.syncAllSlidingGroups();
+        if (typeof window.syncAllRadioGroupHighlights === "function") window.syncAllRadioGroupHighlights();
+        if (typeof updateColorSelectionStyling === "function") updateColorSelectionStyling();
     };
     resync();
     setTimeout(resync, 100);
     setTimeout(resync, 500);
     setTimeout(resync, 1500);
 
-    // [SESSION-SAVE DISABLED] paired with the restoreSession() branch above —
-    // re-enable together. Would save on Configure click + beforeunload (the inline
-    // nextPage() can navigate before a delegated handler runs).
-    // $(document).on("click", "#CONFIGURE_BTN", function () {
-    //     if (typeof saveSession === "function") saveSession();
-    // });
-    // $(window).on("beforeunload", function () {
-    //     if (typeof saveSession === "function") saveSession();
-    // });
+    // Session-save runs in the #CONFIGURE_BTN capture handler above.
 
     try {
 		hp_init();
@@ -3283,8 +3278,7 @@ function saveDefaults() {
         simpleConfirm("New Defaults Saved");
     });
 }
-// Session save/restore — keep selections across Configure → BOM → Back via
-// sessionStorage. Collects/applies values like saveDefaults()/applyDefaults().
+// Session save/restore — preserve selections across Configure → BOM → Back.
 const SESSION_KEY = "thermatite_config_session";
 
 function saveSession() {
@@ -3293,6 +3287,18 @@ function saveSession() {
         Object.values(nodeset).forEach((node) => {
             if (node.id !== "SPC_BOM" && node.id !== "INPUT_JSON" && node.id !== "SPRING_SOLUTION" && !node.id.startsWith("GL_") && node.id !== "RENDER")
                 state[node.id] = node.value;
+        });
+        // COLOUR/Pattern node .value isn't the selected key — read the radio.
+        const colorVal = $("input[name='COLOR']:checked").val();
+        const patternVal = $("input[name='Pattern']:checked").val();
+        if (colorVal) state["COLOR"] = colorVal;
+        if (patternVal) state["Pattern"] = patternVal;
+        // Custom size (toggle + CUSTOM_* selects are DOM-only, not in nodeset).
+        state["__custom_dimensions"] = $("#custom_dimensions").is(":checked");
+        ["CUSTOM_WIDTH_FEET", "CUSTOM_WIDTH_INCHES", "CUSTOM_WIDTH_FRACTION",
+         "CUSTOM_HEIGHT_FEET", "CUSTOM_HEIGHT_INCHES"].forEach((id) => {
+            const v = $("#" + id).val();
+            if (v !== undefined && v !== null) state["__" + id] = v;
         });
         sessionStorage.setItem(SESSION_KEY, JSON.stringify(state));
     } catch (e) {
@@ -3313,7 +3319,7 @@ function restoreSession() {
     }
     if (!saved || typeof saved !== "object") return false;
 
-    // Apply values like applyDefaults()'s success path so the dependent walks match.
+    // Apply saved node values (mirrors applyDefaults' success path).
     Object.keys(saved).forEach((id) => {
         if (!nodeset[id]) return;
         const value = saved[id];
@@ -3328,9 +3334,74 @@ function restoreSession() {
         }
     });
 
+    // COLOUR/Pattern rows are rebuilt per-model; the model click rebuilds them
+    // before the saved radio exists. Stash the picks so renderColor/PatternRow
+    // prefer them. __restoringInputs also suppresses per-model BR/BS defaults.
+    window.__restorePendingColor = saved["COLOR"];
+    window.__restorePendingPattern = saved["Pattern"];
+
+    // Custom size: set CUSTOM_* selects, then toggle + fire change (cascade).
+    ["CUSTOM_WIDTH_FEET", "CUSTOM_WIDTH_INCHES", "CUSTOM_WIDTH_FRACTION",
+     "CUSTOM_HEIGHT_FEET", "CUSTOM_HEIGHT_INCHES"].forEach((id) => {
+        const v = saved["__" + id];
+        if (v !== undefined && v !== null) $("#" + id).val(v);
+    });
+    if (saved["__custom_dimensions"] === true) {
+        $("#custom_dimensions").prop("checked", true).trigger("change");
+    }
+
+    window.__restoringInputs = true;
     const $checkedRadios = $("input[type=radio][checked]");
-    console.log(`%c[LOAD] restoreSession: clicking ${$checkedRadios.length} checked radios`, "color:#0a6;font-weight:bold");
     $checkedRadios.click();
+
+    // Rebuild colour/pattern rows now (covers a model that didn't change).
+    if (typeof renderColorRow === "function") renderColorRow();
+    if (typeof renderPatternRow === "function") renderPatternRow();
+
+    // General re-assert: restore clicks fire dependency constraints that force
+    // defaults onto dependent groups. After they settle, re-check each saved
+    // option that still exists/enabled/visible (skips ones a constraint removed).
+    const reassertSavedRadios = () => {
+        const groups = {};
+        $("div.rw-configurator__layout input[type='radio']").each((i, r) => {
+            if (r.name) groups[r.name] = true;
+        });
+        Object.keys(groups).forEach((name) => {
+            const want = saved[name];
+            if (want === undefined || want === null || want === "") return;
+            const $opt = $(`input[name='${name}'][value='${want}']`);
+            if (!$opt.length || $opt.is(":checked") || $opt.prop("disabled")) return;
+            if ($opt.closest(".rw-button, .rw-sliding-button, .color-button-container").is(":hidden")) return;
+            $opt.prop("checked", true).trigger("change");
+        });
+        // Custom size wins last (the SIZE click ran the cascade from the preset).
+        if (saved["__custom_dimensions"] === true) {
+            ["CUSTOM_WIDTH_FEET", "CUSTOM_WIDTH_INCHES", "CUSTOM_WIDTH_FRACTION",
+             "CUSTOM_HEIGHT_FEET", "CUSTOM_HEIGHT_INCHES"].forEach((id) => {
+                const v = saved["__" + id];
+                if (v !== undefined && v !== null) $("#" + id).val(v);
+            });
+            if (!$("#custom_dimensions").is(":checked")) {
+                $("#custom_dimensions").prop("checked", true);
+            }
+            // Show container directly (toggle handler may not be bound yet).
+            $("#custom_dimensions_container").show();
+            $("input[name='SIZE']").closest(".dimension-layout").prev(".config-option-title-style").hide();
+            $("input[name='SIZE']").closest(".dimension-layout").hide();
+            $("#custom_dimensions").trigger("change");
+        }
+        if (typeof window.syncAllSlidingGroups === "function") window.syncAllSlidingGroups();
+        if (typeof window.syncAllRadioGroupHighlights === "function") window.syncAllRadioGroupHighlights();
+        if (typeof updateColorSelectionStyling === "function") updateColorSelectionStyling();
+    };
+    setTimeout(reassertSavedRadios, 250);
+    setTimeout(reassertSavedRadios, 550);
+
+    setTimeout(function () {
+        window.__restoringInputs = false;
+        window.__restorePendingColor = null;
+        window.__restorePendingPattern = null;
+    }, 600);
     return true;
 }
 
@@ -3395,8 +3466,9 @@ function printError() {
         Object.values(nodeset).forEach((node) => (node.value + "").includes("ERROR") && console.log(node));
 }
 function additionalSaves(json) {
-    // Section-bundle nodes recompute on demand — make them current before the BOM
-    // is serialized.
+    // Invalidate section-height memos before recompute so stale end-cap values
+    // (e.g. a 24" cap on a 21"-only door) don't get serialized onto the BOM.
+    if (typeof invalidateSectionHeightsCache === "function") invalidateSectionHeightsCache();
     if (typeof recomputeSectionBundles === "function") recomputeSectionBundles();
     // pushSafe swallows failures (glazing/weight/price are WIP and may throw) and
     // falls back to "", so one bad value can't abort the save and hang nextPage().
